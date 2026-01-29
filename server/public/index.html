@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourism Server - Test Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .test-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .test-link {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .test-link-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .test-link-content {
+            flex: 1;
+        }
+
+        .test-link-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .test-link-desc {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .status {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .status-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏔️ Tourism Server</h1>
+        <p class="subtitle">Development Test Tools</p>
+
+        <div class="test-links">
+            <a href="/chat-tester.html" class="test-link">
+                <div class="test-link-icon">💬</div>
+                <div class="test-link-content">
+                    <div class="test-link-title">Chat Tester</div>
+                    <div class="test-link-desc">Test real-time chat, typing indicators, and read receipts</div>
+                </div>
+            </a>
+
+            <a href="/websocket-tester.html" class="test-link">
+                <div class="test-link-icon">🔌</div>
+                <div class="test-link-content">
+                    <div class="test-link-title">WebSocket Tester</div>
+                    <div class="test-link-desc">Test WebSocket connections and presence system</div>
+                </div>
+            </a>
+
+            <a href="/notification-tester.html" class="test-link">
+                <div class="test-link-icon">🔔</div>
+                <div class="test-link-content">
+                    <div class="test-link-title">Notification Tester</div>
+                    <div class="test-link-desc">Test real-time notifications, unread counts, and mark as read</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="status">
+            <div class="status-title">
+                <span class="status-indicator"></span>
+                Server Status
+            </div>
+            <div class="status-text">
+                All test tools are served from the same origin - no CORS issues! 🎉
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

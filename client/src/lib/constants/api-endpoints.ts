@@ -1,0 +1,51 @@
+export const API_ENDPOINTS = {
+  AUTH: {
+    REGISTER: '/auth/register',
+    LOGIN: '/auth/login',
+    LOGOUT: '/auth/logout',
+    REFRESH: '/auth/refresh',
+    ME: '/auth/me',
+    VERIFY_EMAIL: '/auth/verify-email',
+    RESEND_VERIFICATION: '/auth/resend-verification',
+    REQUEST_PASSWORD_RESET: '/auth/request-password-reset',
+    RESET_PASSWORD: '/auth/reset-password',
+  },
+  USERS: {
+    ME: '/users/me',
+    UPDATE_ME: '/users/me',
+    DELETE_ME: '/users/me',
+    BY_ID: (id: string) => `/users/${id}`,
+  },
+  TOURS: {
+    LIST: '/tours',
+    MY_TOURS: '/tours/my',
+    CREATE: '/tours',
+    GET: (id: string) => `/tours/${id}`,
+    UPDATE: (id: string) => `/tours/${id}`,
+    DELETE: (id: string) => `/tours/${id}`,
+    UPLOAD_IMAGE: (id: string) => `/tours/${id}/images`,
+  },
+  COMPANIES: {
+    LIST: '/companies',
+    GET: (id: string) => `/companies/${id}`,
+    MY_COMPANY: '/companies/my',
+    TOURS: (id: string) => `/companies/${id}/tours`,
+  },
+  LOCATIONS: {
+    LIST: '/locations',
+    GET: (id: string) => `/locations/${id}`,
+    SEARCH: '/locations/search',
+  },
+  BOOKINGS: {
+    LIST: '/bookings',
+    CREATE: '/bookings',
+    GET: (id: string) => `/bookings/${id}`,
+    UPDATE: (id: string) => `/bookings/${id}`,
+    CANCEL: (id: string) => `/bookings/${id}/cancel`,
+  },
+  INQUIRIES: {
+    LIST: '/inquiries',
+    CREATE: '/inquiries',
+    GET: (id: string) => `/inquiries/${id}`,
+  },
+} as const;

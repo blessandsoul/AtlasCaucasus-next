@@ -1,0 +1,421 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { ROUTES } from '@/lib/constants/routes';
+import { Compass, Briefcase, Building2, Headset, ChevronDown, User, LogOut, Map as MapIcon, Hotel, Users, Car, LayoutDashboard, MessageSquare, Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { NavMenu } from './NavMenu';
+import { ChatDrawer } from '@/features/chat/components/ChatDrawer';
+import { NotificationDrawer } from '@/features/notifications/components/NotificationDrawer';
+import { useWebSocket } from '@/context/WebSocketContext';
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
+import { useLoading } from '@/context/LoadingContext';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { colors } from '@/lib/colors';
+import { useAppDispatch } from '@/store/hooks';
+
+export const Header = () => {
+    const { t, i18n } = useTranslation();
+    const { scrollY } = useScroll();
+    const [hidden, setHidden] = useState(false);
+    const [isLangOpen, setIsLangOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const dispatch = useAppDispatch();
+    const langRef = useRef<HTMLDivElement>(null);
+    const userMenuRef = useRef<HTMLDivElement>(null);
+    const { isAuthenticated, user, logout } = useAuth();
+    const { subscribe } = useWebSocket();
+    const queryClient = useQueryClient();
+
+    // Mocks for missing features
+    // const { data: chatsData } = useChats({}, { enabled: isAuthenticated });
+    // const totalUnread = chatsData?.items.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
+    const totalUnread = 0;
+
+    // const { data: unreadCountData } = useUnreadCount();
+    // const notificationCount = unreadCountData?.count || 0;
+    const notificationCount = 0;
+
+    // Subscribe to real-time notifications
+    useEffect(() => {
+        // const unsubscribe = subscribe(MessageType.NOTIFICATION, () => {
+        //     // Invalidate and refetch notification count when new notification arrives
+        //     queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() });
+        //     queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
+        // });
+        // return unsubscribe;
+    }, [subscribe, queryClient]);
+
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        const previous = scrollY.getPrevious() || 0;
+        if (latest > previous && latest > 150) {
+            setHidden(true);
+            setIsLangOpen(false);
+            setIsUserMenuOpen(false);
+        } else {
+            setHidden(false);
+        }
+    });
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (langRef.current && !langRef.current.contains(event.target as Node)) {
+                setIsLangOpen(false);
+            }
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+                setIsUserMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const getFlagCode = (lang: string) => {
+        switch (lang) {
+            case 'ka': return 'ge';
+            case 'en': return 'gb';
+            case 'ru': return 'ru';
+            default: return 'ge';
+        }
+    };
+
+    const { startLoading, stopLoading } = useLoading();
+
+    const handleLanguageChange = (lang: string) => {
+        setIsLangOpen(false);
+        startLoading();
+        setTimeout(() => {
+            i18n.changeLanguage(lang);
+            setTimeout(() => {
+                stopLoading();
+            }, 300);
+        }, 500);
+    };
+
+    const handleLogout = () => {
+        setIsUserMenuOpen(false);
+        logout();
+    };
+
+    return (
+        <motion.header
+            variants={{
+                visible: { y: 0, opacity: 1 },
+                hidden: { y: -100, opacity: 0 },
+            }}
+            animate={hidden ? "hidden" : "visible"}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            className="fixed top-0 z-50 w-full pt-6 px-4 flex justify-center bg-transparent pointer-events-none"
+        >
+            <div className="container mx-auto flex h-16 items-center justify-between rounded-2xl border bg-background backdrop-blur-md shadow-lg px-6 pointer-events-auto">
+
+                {/* Brand Section */}
+                <Link href={ROUTES.HOME} className="flex items-center gap-3 group">
+                    <img src="/atlascaucasus.png" alt={t('header.brand.name')} className="h-8 w-8 object-contain group-hover:scale-105 transition-transform" />
+                    <div className="flex flex-col h-8 justify-between">
+                        <h1 className="text-sm font-bold leading-none text-foreground tracking-tight" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
+                            {t('header.brand.name')}
+                        </h1>
+                        <span className="text-[10px] text-muted-foreground font-medium text-nowrap">
+                            {t('header.brand.slogan')}
+                        </span>
+                    </div>
+                </Link>
+
+                {/* Navigation */}
+                <nav className="hidden md:flex items-center gap-1">
+                    <NavMenu
+                        trigger={
+                            <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+                                <Compass className="h-4 w-4" />
+                                <span>{t('header.nav.explore')}</span>
+                                <ChevronDown className="h-3 w-3 ml-0.5 opacity-50" />
+                            </Button>
+                        }
+                        items={[
+                            {
+                                title: t('header.nav_menu.items.tour'),
+                                description: t('header.nav_menu.explore.tour_desc'),
+                                href: ROUTES.TOURS.LIST,
+                                icon: <MapIcon className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.companies'),
+                                description: t('header.nav_menu.explore.companies_subtitle'),
+                                href: ROUTES.COMPANIES.LIST,
+                                icon: <Building2 className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.hotels'),
+                                description: t('header.nav_menu.explore.hotels_desc'),
+                                href: ROUTES.TOURS.LIST, // Redirect hotels to tours for now
+                                icon: <Hotel className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.guides'),
+                                description: t('header.nav_menu.explore.guides_desc'),
+                                href: "/",
+                                icon: <Users className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.drivers'),
+                                description: t('header.nav_menu.explore.drivers_desc'),
+                                href: ROUTES.DRIVERS.LIST,
+                                icon: <Car className="h-5 w-5" />
+                            }
+                        ]}
+                    />
+
+                    <NavMenu
+                        trigger={
+                            <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+                                <Briefcase className="h-4 w-4" />
+                                <span>{t('header.nav.traveler')}</span>
+                                <ChevronDown className="h-3 w-3 ml-0.5 opacity-50" />
+                            </Button>
+                        }
+                        items={[
+                            {
+                                title: t('header.nav_menu.items.tour'),
+                                description: t('header.nav_menu.traveler.tour_desc'),
+                                href: ROUTES.TOURS.LIST,
+                                icon: <MapIcon className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.hotels'),
+                                description: t('header.nav_menu.traveler.hotels_desc'),
+                                href: ROUTES.TOURS.LIST, // Redirect hotels to tours for now
+                                icon: <Hotel className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.companies'),
+                                description: t('header.nav_menu.explore.companies_subtitle'),
+                                href: ROUTES.COMPANIES.LIST,
+                                icon: <Building2 className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.guides'),
+                                description: t('header.nav_menu.traveler.guides_desc'),
+                                href: ROUTES.GUIDES?.LIST || '/',
+                                icon: <Users className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.drivers'),
+                                description: t('header.nav_menu.traveler.drivers_desc'),
+                                href: ROUTES.DRIVERS.LIST,
+                                icon: <Car className="h-5 w-5" />
+                            }
+                        ]}
+                    />
+
+                    <NavMenu
+                        trigger={
+                            <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+                                <Building2 className="h-4 w-4" />
+                                <span>{t('header.nav.business')}</span>
+                                <ChevronDown className="h-3 w-3 ml-0.5 opacity-50" />
+                            </Button>
+                        }
+                        items={[
+                            {
+                                title: t('header.nav_menu.items.tour'),
+                                description: t('header.nav_menu.business.tour_desc'),
+                                href: ROUTES.TOURS.LIST,
+                                icon: <MapIcon className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.hotels'),
+                                description: t('header.nav_menu.business.hotels_desc'),
+                                href: ROUTES.TOURS.LIST, // Redirect hotels to tours for now
+                                icon: <Hotel className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.guides'),
+                                description: t('header.nav_menu.business.guides_desc'),
+                                href: ROUTES.GUIDES?.LIST || '/',
+                                icon: <Users className="h-5 w-5" />
+                            },
+                            {
+                                title: t('header.nav_menu.items.drivers'),
+                                description: t('header.nav_menu.business.drivers_desc'),
+                                href: ROUTES.DRIVERS.LIST,
+                                icon: <Car className="h-5 w-5" />
+                            }
+                        ]}
+                    />
+
+                    <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+                        <Headset className="h-4 w-4" />
+                        <span>{t('header.nav.support')}</span>
+                    </Button>
+                </nav>
+
+                {/* Auth Section */}
+                <div className="flex items-center gap-2">
+                    {/* Language Selector */}
+                    <div className="relative" ref={langRef}>
+                        <Button
+                            variant="ghost"
+                            className="h-9 w-9 p-0 rounded-md"
+                            onClick={() => setIsLangOpen(!isLangOpen)}
+                        >
+                            <span className={`fi fis fi-${getFlagCode(i18n.language)} text-xl`} />
+                        </Button>
+
+                        {isLangOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-12 bg-background rounded-md shadow-lg border overflow-hidden z-50 flex flex-col p-1 gap-1"
+                            >
+                                <button
+                                    onClick={() => handleLanguageChange('ka')}
+                                    className="w-full h-8 flex items-center justify-center hover:bg-muted rounded-sm transition-colors"
+                                    aria-label="Georgian"
+                                >
+                                    <span className="fi fis fi-ge text-lg" />
+                                </button>
+                                <button
+                                    onClick={() => handleLanguageChange('en')}
+                                    className="w-full h-8 flex items-center justify-center hover:bg-muted rounded-sm transition-colors"
+                                    aria-label="English"
+                                >
+                                    <span className="fi fis fi-gb text-lg" />
+                                </button>
+                                <button
+                                    onClick={() => handleLanguageChange('ru')}
+                                    className="w-full h-8 flex items-center justify-center hover:bg-muted rounded-sm transition-colors"
+                                    aria-label="Russian"
+                                >
+                                    <span className="fi fis fi-ru text-lg" />
+                                </button>
+                            </motion.div>
+                        )}
+                    </div>
+
+                    {/* Auth Buttons or User Menu */}
+                    {isAuthenticated ? (
+                        <>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="relative text-muted-foreground hover:text-foreground"
+                                onClick={() => { /* dispatch(openDrawer()) */ console.log('Open chat'); }}
+                            >
+                                <MessageSquare className="h-5 w-5" />
+                                {totalUnread > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white ring-2 ring-background">
+                                        {totalUnread > 99 ? '99+' : totalUnread}
+                                    </span>
+                                )}
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="relative text-muted-foreground hover:text-foreground"
+                                onClick={() => setIsNotificationsOpen(true)}
+                            >
+                                <Bell className="h-5 w-5" />
+                                {notificationCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white ring-2 ring-background">
+                                        {notificationCount > 99 ? '99+' : notificationCount}
+                                    </span>
+                                )}
+                            </Button>
+
+                            <div className="relative" ref={userMenuRef}>
+                                <Button
+                                    variant="ghost"
+                                    className="h-9 w-9 p-0 rounded-full"
+                                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                >
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#22d3ee] text-white">
+                                        <User className="h-5 w-5" />
+                                    </div>
+                                </Button>
+
+                                {isUserMenuOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute top-full right-0 mt-2 w-48 bg-background rounded-md shadow-lg border overflow-hidden z-50"
+                                    >
+                                        <div className="px-4 py-3 border-b">
+                                            <p className="text-sm font-medium text-foreground">
+                                                {user?.firstName} {user?.lastName}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground truncate">
+                                                {user?.email}
+                                            </p>
+                                        </div>
+                                        <div className="p-1">
+                                            <Link
+                                                href={ROUTES.DASHBOARD}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-sm transition-colors"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                <LayoutDashboard className="h-4 w-4" />
+                                                <span>{t('auth.dashboard')}</span>
+                                            </Link>
+                                            <Link
+                                                href={ROUTES.PROFILE}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-sm transition-colors"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                <User className="h-4 w-4" />
+                                                <span>{t('auth.profile')}</span>
+                                            </Link>
+
+                                            {user?.roles?.includes('COMPANY') && (
+                                                <>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-sm transition-colors"
+                                            >
+                                                <LogOut className="h-4 w-4" />
+                                                <span>{t('auth.logout')}</span>
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Link href={ROUTES.LOGIN}>
+                                <Button variant="ghost" className="font-semibold">
+                                    {t('auth.login')}
+                                </Button>
+                            </Link>
+                            <Link href={ROUTES.REGISTER}>
+                                <Button
+                                    className="font-semibold shadow-sm text-white hover:opacity-90"
+                                    style={{ backgroundColor: colors.secondary }}
+                                >
+                                    {t('auth.register')}
+                                </Button>
+                            </Link>
+                        </>
+                    )}
+                </div>
+            </div>
+            <ChatDrawer />
+            <NotificationDrawer isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
+        </motion.header >
+    );
+};
+

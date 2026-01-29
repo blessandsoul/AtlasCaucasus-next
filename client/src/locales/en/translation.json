@@ -1,0 +1,770 @@
+
+{
+  "common": {
+    "welcome": "Welcome to AtlasCaucasus API",
+    "description": "Discover the beauty of Georgia",
+    "required_field": "This field is required",
+    "invalid_email": "Invalid email address",
+    "password_min_length": "Password must be at least 8 characters",
+    "error": "Error",
+    "error_loading": "Failed to load data. Please try again.",
+    "actions": "Actions",
+    "verified": "Verified",
+    "pending": "Pending",
+    "back": "Back",
+    "edit": "Edit",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "try_again": "Try Again",
+    "created": "Created",
+    "updated": "Updated",
+    "active": "Active",
+    "inactive": "Inactive",
+    "creating": "Creating...",
+    "id": "ID",
+    "created_at": "Created At",
+    "updated_at": "Updated At",
+    "phone": "Phone",
+    "website": "Website",
+    "status": "Status",
+    "years": "years",
+    "verification": "Verification",
+    "bio": "Bio",
+    "seats": "seats",
+    "close": "Close",
+    "pagination": {
+      "page_of": "Page {{page}} of {{total}}"
+    }
+  },
+  "header": {
+    "nav": {
+      "explore": "Explore",
+      "traveler": "Traveler",
+      "business": "Business",
+      "support": "Support"
+    },
+    "footer": {
+      "desc": "Discover the hidden gems of Georgia with us. We connect you with the best tours, guides, and local experiences for unforgettable memories.",
+      "contact_us": "Contact Us",
+      "newsletter": "Newsletter",
+      "newsletter_desc": "Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.",
+      "enter_email": "Enter your email",
+      "subscribe": "Subscribe",
+      "rights_reserved": "All rights reserved.",
+      "privacy_policy": "Privacy Policy",
+      "terms_of_service": "Terms of Service",
+      "cookie_policy": "Cookie Policy"
+    },
+    "brand": {
+      "name": "AtlasCaucasus.GE",
+      "slogan": "Travel without extra worry"
+    },
+    "nav_menu": {
+      "items": {
+        "tour": "Tour",
+        "hotels": "Hotels",
+        "guides": "Guides",
+        "drivers": "Drivers",
+        "companies": "Companies"
+      },
+      "explore": {
+        "tour_desc": "Explore our curated tours",
+        "hotels_desc": "Find distinct accommodations",
+        "guides_desc": "Connect with local experts",
+        "drivers_desc": "Reliable transportation services",
+        "companies_subtitle": "Find trusted tourism companies"
+      },
+      "traveler": {
+        "tour_desc": "Find tours for travelers",
+        "hotels_desc": "Find cozy stays",
+        "guides_desc": "Expert local guides",
+        "drivers_desc": "Professional transport"
+      },
+      "business": {
+        "tour_desc": "Corporate tour packages",
+        "hotels_desc": "Luxury business hotels",
+        "guides_desc": "Professional guides",
+        "drivers_desc": "Executive transport"
+      }
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "register": "Register",
+    "welcome_back": "Welcome Back",
+    "create_account": "Create Account",
+    "create_tour": "Create Tour",
+    "create_agent": "Create Agent",
+    "create_agent_desc": "Create a new agent account for your company.",
+    "create_agent_form_desc": "Fill in the details to invite a new agent.",
+    "email": "Email Address",
+    "password": "Password",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "forgot_password": "Forgot Password?",
+    "no_account": "Don't have an account?",
+    "has_account": "Already have an account?",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "email_placeholder": "john@example.com",
+    "password_placeholder": "••••••••",
+    "continue_with_google": "Continue with Google",
+    "sign_in_subtitle": "Please enter your details.",
+    "sign_up_subtitle": "Start your journey with us.",
+    "register_company": "Register as Company",
+    "register_company_subtitle": "Grow your business with us.",
+    "company_name": "Company Name",
+    "description": "Description",
+    "registration_number": "Registration Number",
+    "website_url": "Website URL",
+    "phone_number": "Phone Number",
+    "are_you_company": "Are you a company?",
+    "register_as_company_link": "Register as a Company",
+    "are_you_user": "Are you a traveler?",
+    "register_as_user_link": "Register as a Traveler",
+    "or_continue_with": "Or continue with",
+    "password_strength": {
+      "title": "Password strength:",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "password_requirements": {
+      "length": "At least 8 characters",
+      "uppercase": "One uppercase letter (A-Z)",
+      "lowercase": "One lowercase letter (a-z)",
+      "number": "One number (0-9)",
+      "special": "One special character (!@#$%^&*)"
+    },
+    "registration_success": "Registration successful! Please check your email to verify your account.",
+    "agent_created_success": "Agent created successfully!",
+    "login_success": "Login successful! Welcome back.",
+    "logout_success": "Logged out successfully.",
+    "verifying_email": "Verifying Email",
+    "verifying_email_subtitle": "Please wait while we verify your email address...",
+    "email_verified_success": "Email Verified!",
+    "email_verified_subtitle": "Your email has been successfully verified. Redirecting to login...",
+    "continue_to_login": "Continue to Login",
+    "verification_failed": "Verification Failed",
+    "go_to_home": "Go to Home",
+    "register_again": "Register Again",
+    "invalid_verification_link": "Invalid Verification Link",
+    "invalid_verification_link_subtitle": "The verification link is missing or invalid. Please check your email or register again.",
+    "forgot_password_subtitle": "No worries, we'll send you reset instructions.",
+    "forgot_password_desc": "Enter your email address and we will send you a link to reset your password.",
+    "send_reset_link": "Send Reset Link",
+    "back_to_login": "Back to log in",
+    "check_email": "Check your email",
+    "recovery_instructions_sent": "We sent a password reset link to {{email}}",
+    "try_another_email": "Try another email",
+    "reset_password": "Reset Password",
+    "reset_password_subtitle": "Enter your new password below.",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "resetting_password": "Resetting password...",
+    "password_reset_success": "Password reset successfully! You can now log in.",
+    "invalid_reset_link": "Invalid or expired reset link",
+    "request_new_link": "Request new link",
+    "verify_email_pending_title": "Verify Your Email",
+    "verify_email_pending_subtitle": "We've sent a verification email to your inbox.",
+    "verification_sent_to": "Verification email sent to:",
+    "verify_step_1": "Check your inbox for an email from Tourism Georgia",
+    "verify_step_2": "Click the verification link in the email",
+    "verify_step_3": "You'll be automatically redirected to continue",
+    "resend_verification_email": "Resend Verification Email",
+    "verification_email_sent": "Verification Email Sent!",
+    "check_spam_folder": "If you don't see it, check your spam or junk folder.",
+    "verification_link_expires": "The verification link expires in 24 hours.",
+    "logout_all_success": "All sessions have been logged out successfully.",
+    "change_password": "Change Password"
+  },
+  "validation": {
+    "password_required": "Password is required",
+    "password_length_min": "Password must be at least 8 characters long",
+    "password_length_max": "Password must not exceed 128 characters",
+    "password_uppercase": "Password must contain at least one uppercase letter",
+    "password_lowercase": "Password must contain at least one lowercase letter",
+    "password_number": "Password must contain at least one number",
+    "password_special": "Password must contain at least one special character",
+    "email_required": "Email is required",
+    "email_invalid": "Invalid email format",
+    "email_max": "Email must not exceed 255 characters",
+    "name_min": "Name must be at least 2 characters",
+    "name_max": "Name must not exceed 100 characters",
+    "passwords_must_match": "Passwords must match",
+    "company_name_required": "Company name is required",
+    "description_required": "Description is required",
+    "registration_number_required": "Registration number is required",
+    "phone_number_required": "Phone number is required"
+  },
+  "home": {
+    "title": "Discover the Beauty of Georgia",
+    "subtitle": "Experience breathtaking landscapes, ancient culture, and warm hospitality",
+    "hero": {
+      "title_start": "Ready for",
+      "title_end": "adventure?",
+      "subtitle": "Discover amazing tours, hotels, and experiences from trusted local operators",
+      "booked_today": "847 tours booked today",
+      "trending": "Trending:",
+      "countries": {
+        "georgia": "Georgia",
+        "turkey": "Turkey",
+        "armenia": "Armenia",
+        "azerbaijan": "Azerbaijan",
+        "greece": "Greece"
+      },
+      "search": {
+        "where": "WHERE",
+        "destinations_placeholder": "Search destinations",
+        "when": "WHEN",
+        "dates_placeholder": "Add dates",
+        "who": "WHO",
+        "guests_placeholder": "Add guests",
+        "search_button": "Search"
+      }
+    },
+    "promotional_banner": {
+      "new_badge": "New",
+      "title": "Introducing Premium Tours",
+      "description": "Experience Georgia like never before with our exclusive guided packages.",
+      "cta_button": "Learn More"
+    },
+    "features": {
+      "title": "Featured Tours",
+      "subtitle": "Hand-picked experiences for you",
+      "view_all": "View All",
+      "view_all_tours": "View All Tours"
+    },
+    "destinations": {
+      "title": "Popular Destinations",
+      "tours_count": "{{count}} Tours"
+    },
+    "why_choose": {
+      "title": "Why Choose Atlas Caucasus?",
+      "subtitle": "We provide the best travel experiences with local expertise and premium support.",
+      "verified_guides": "Verified Guides",
+      "verified_guides_desc": "All our guides go through a strict verification process to ensure your safety and quality of experience.",
+      "best_prices": "Best Prices",
+      "best_prices_desc": "We guarantee the best market rates with no hidden fees. Direct booking prices from operators.",
+      "support": "Support 24/7",
+      "support_desc": "Our local support team is always available to help you with any questions or emergencies."
+    },
+    "cta": {
+      "title": "Ready to start your journey?",
+      "subtitle": "Join thousands of travelers exploring the beauty of Georgia. Create your account today and get exclusive deals.",
+      "get_started": "Get Started",
+      "browse_tours": "Browse Tours"
+    },
+    "categories": {
+      "title": "Find Your Vibe",
+      "subtitle": "Discover tours that match your travel style.",
+      "items": {
+        "hiking": "Hiking & Trekking",
+        "wine": "Wine & Gastronomy",
+        "culture": "Culture & History",
+        "sea": "Sea & Relax",
+        "adventure": "Off-road Adventure"
+      }
+    },
+    "testimonials": {
+      "title": "Trusted by Travelers",
+      "review_1": "The best experience of my life! Georgia is stunning.",
+      "review_2": "Incredible guides and seamless organization.",
+      "review_3": "Highly recommended for solo travelers.",
+      "review_4": "Food, wine, and views - everything was perfect."
+    }
+  },
+  "explore_page": {
+    "hero": {
+      "title": "Tour packages",
+      "subtitle": "Search and compare ready-made tour offers.",
+      "tags": {
+        "top_rated": "Top Rated",
+        "budget": "Budget",
+        "family": "Family"
+      },
+      "viewing": "viewing",
+      "companies_title": "Trusted Tour Operators",
+      "companies_subtitle": "Find and connect with certified travel companies in Georgia.",
+      "drivers_title": "Professional Drivers",
+      "drivers_subtitle": "Reliable transportation services for your journey across Georgia."
+    },
+    "filters": {
+      "title": "Tour Filters",
+      "sorting": "SORTING",
+      "select_order": "Select order",
+      "sort_price_low_high": "Price: Low to High",
+      "sort_price_high_low": "Price: High to Low",
+      "sort_rating": "Rating",
+      "search": "Search",
+      "search_placeholder": "Search tours...",
+      "category": "Category",
+      "category_placeholder": "e.g., Adventure, Cultural",
+      "location": "Location",
+      "country": "Country",
+      "city": "City / Resort",
+      "departure_city": "Departure City",
+      "flexible_dates": "Flexible dates (±3 days)",
+      "budget": "Budget (GEL)",
+      "from": "From",
+      "to": "To",
+      "duration": "Duration",
+      "hotel_class": "Hotel Class",
+      "meals": "Meals",
+      "amenities": "Amenities",
+      "languages": "Languages",
+      "language_placeholder": "English, Georgian...",
+      "experience": "Experience",
+      "min_years": "Min years",
+      "coming_soon": "Coming soon..."
+    },
+    "tabs": {
+      "tours": "Tours",
+      "hotels": "Hotels",
+      "companies": "Companies",
+      "guides": "Guides",
+      "drivers": "Drivers",
+      "coming_soon": "(Coming soon)"
+    },
+    "verified_operators": "verified operators",
+    "no_companies": "No companies found.",
+    "verified_drivers": "verified drivers",
+    "no_drivers": "No drivers found."
+  },
+  "profile_page": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information and account settings",
+    "active": "Active",
+    "inactive": "Inactive",
+    "email_address": "Email Address",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "user_id": "User ID",
+    "member_since": "Member Since",
+    "last_updated": "Last Updated",
+    "account_roles": "Account Roles",
+    "logout_all_sessions": "Logout All Sessions",
+    "logout_all_dialog": {
+      "title": "Logout All Sessions?",
+      "description": "This will log you out from all devices and browsers. You will need to login again on all your devices. This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Logout All",
+      "logging_out": "Logging out..."
+    }
+  },
+  "tours": {
+    "update_success": "Tour updated successfully!",
+    "delete_success": "Tour deleted successfully!",
+    "all_tours": "All Tours",
+    "showing_count": "Showing {{count}} of {{total}} tours",
+    "page_of": "Page {{page}} of {{total}}",
+    "edit": {
+      "title": "Edit Tour",
+      "description": "Update the details of your tour.",
+      "is_active": "Active",
+      "is_active_desc": "Tour is visible to customers"
+    },
+    "delete_dialog": {
+      "title": "Delete Tour",
+      "description": "Are you sure you want to delete \"{{title}}\"? This action will deactivate the tour and it will no longer be visible to customers."
+    },
+    "create": {
+      "title": "List a New Tour",
+      "subtitle": "Create a comprehensive listing for your tour to attract travelers.",
+      "basic_info": "Basic Information",
+      "basic_info_desc": "The core details of your tour. Make it catchy!",
+      "tour_title": "Tour Title",
+      "tour_title_placeholder": "e.g. Magic of Old Tbilisi Walking Tour",
+      "summary": "Summary",
+      "summary_placeholder": "Describe the highlights and experience...",
+      "summary_desc": "A brief overview that appears in search results (max 1000 chars).",
+      "region": "Region / City",
+      "region_placeholder": "e.g. Tbilisi",
+      "meeting_point": "Meeting Point",
+      "meeting_point_placeholder": "e.g. Freedom Square Metro",
+      "logistics": "Logistics & Details",
+      "duration": "Duration (minutes)",
+      "duration_desc": "Total duration of the tour.",
+      "max_group_size": "Max Group Size",
+      "start_date": "Start Date & Time",
+      "pick_date": "Pick a date",
+      "start_date_desc": "When does this tour start?",
+      "instant_booking": "Instant Booking",
+      "instant_booking_desc": "Allow customers to book without manual approval.",
+      "free_cancellation": "Free Cancellation",
+      "free_cancellation_desc": "Full refund if cancelled 24h before.",
+      "gallery": "Gallery",
+      "gallery_desc": "Showcase your tour with high-quality images.",
+      "upload_text": "Click to upload or drag and drop",
+      "upload_subtext": "SVG, PNG, JPG or GIF (max 10 images)",
+      "pricing": "Pricing",
+      "price": "Price",
+      "currency": "Currency",
+      "select_currency": "Select currency",
+      "original_price": "Original Price (Optional)",
+      "original_price_desc": "Set this higher than price to show a discount.",
+      "publish_button": "Publish Tour",
+      "publishing": "Publishing...",
+      "terms": "By publishing, you agree to our terms of service.",
+      "success_message": "Tour created successfully!",
+      "image_upload_success": "{{count}} image(s) uploaded successfully!",
+      "image_upload_error": "Tour created, but image upload failed.",
+      "error_message": "Failed to create tour. Please try again.",
+      "max_images_error": "You can upload a maximum of 10 images",
+      "validation": {
+          "title_min": "Title must be at least 3 characters",
+          "title_max": "Title must be at most 200 characters",
+          "price_min": "Price must be at least 0",
+          "summary_max": "Summary must be at most 1000 characters",
+          "currency_length": "Currency must be exactly 3 characters",
+          "city_max": "City must be at most 100 characters",
+          "start_location_max": "Start location must be at most 100 characters",
+          "original_price_min": "Original price must be at least 0",
+          "duration_min": "Duration must be at least 0",
+          "max_people_min": "Max people must be at least 1"
+      }
+    }
+  },
+  "company": {
+    "management": {
+      "title": "My Company",
+      "group_title": "Management",
+      "subtitle": "Manage your company profile and settings",
+      "company_info": "Company Information",
+      "company_info_desc": "Update your company details and contact information",
+      "no_company": "You don't have a company profile yet"
+    },
+    "name": "Company Name",
+    "name_placeholder": "Enter company name",
+    "description": "Description",
+    "description_placeholder": "Describe your company...",
+    "registration_number": "Registration Number",
+    "registration_placeholder": "e.g., 123456789",
+    "phone": "Phone Number",
+    "website": "Website",
+    "pending_verification": "Pending Verification",
+    "update_success": "Company updated successfully!",
+    "delete_success": "Company deleted successfully!",
+    "danger_zone": "Danger Zone",
+    "danger_zone_desc": "Irreversible actions for your company",
+    "delete_company": "Delete Company",
+    "delete_company_warning": "Once deleted, your company and all associated data will be removed.",
+    "delete": "Delete Company",
+    "delete_dialog": {
+      "title": "Are you sure you want to delete your company?",
+      "description": "This action cannot be undone. Your company profile, tours, and all associated data will be permanently removed."
+    },
+    "operations": {
+      "title": "Operations",
+      "subtitle": "Manage your business operations",
+      "tabs": {
+        "agents": "Agents",
+        "tours": "Tours"
+      },
+      "tours": {
+        "table": {
+          "title": "Title",
+          "location": "Location",
+          "price": "Price",
+          "status": "Status",
+          "created": "Created"
+        },
+        "empty_state": "No tours found. Create your first tour to get started."
+      }
+    },
+    "agents": {
+      "title": "Tour Agents",
+      "subtitle": "Manage your company's tour agents and their access.",
+      "add_new": "Add Agent",
+      "empty_state": "No agents found. Create your first agent to get started.",
+      "table": {
+        "agent": "Agent",
+        "contact": "Contact",
+        "status": "Status",
+        "joined": "Joined"
+      }
+    }
+  },
+  "partner": {
+    "become_partner": "Become Partner",
+    "program": "Partner Program",
+    "program_subtitle": "Join our network of professional guides and drivers.",
+    "guide_card": {
+      "title": "Become a Guide",
+      "already_guide": "You are a Guide",
+      "description": "Lead tours, share your knowledge, and show travelers the best of Georgia.",
+      "benefits": {
+        "custom_tours": "Create custom tours",
+        "own_rates": "Set your own rates",
+        "manage_schedule": "Manage your schedule"
+      }
+    },
+    "driver_card": {
+      "title": "Become a Driver",
+      "already_driver": "You are a Driver",
+      "description": "Offer transportation services with your vehicle for tours and transfers.",
+      "benefits": {
+        "list_vehicle": "List your vehicle",
+        "accept_jobs": "Accept transfer jobs",
+        "fill_seats": "Fill empty seats"
+      }
+    },
+    "application": {
+      "guide_title": "Guide Application",
+      "driver_title": "Driver Application",
+      "subtitle": "Please fill out the details below to complete your profile.",
+      "received_title": "Application Received!",
+      "received_desc": "Thank you for applying to become a {{role}}. Our team will review your application and get back to you shortly.",
+      "go_to_dashboard": "Go to Dashboard",
+      "back_to_selection": "Back to Selection",
+      "submit": "Submit Application",
+      "submitting": "Submitting...",
+      "form": {
+        "phone": "Phone Number",
+        "location": "Primary Location",
+        "location_placeholder": "e.g. Tbilisi",
+        "bio": "Bio & Experience",
+        "bio_placeholder": "Tell us about yourself and your experience...",
+        "languages": "Languages (comma separated)",
+        "languages_placeholder": "English, Georgian, Russian",
+        "years_experience": "Years of Experience",
+        "daily_rate": "Daily Rate (GEL)",
+        "vehicle_details": "Vehicle Details",
+        "vehicle_type": "Vehicle Type",
+        "select_type": "Select type",
+        "types": {
+          "sedan": "Sedan",
+          "suv": "SUV / Jeep",
+          "minivan": "Minivan",
+          "minibus": "Minibus"
+        },
+        "capacity": "Passenger Capacity",
+        "make": "Vehicle Make",
+        "model": "Vehicle Model",
+        "year": "Year",
+        "license": "License Plate"
+      }
+    }
+  },
+  "guide_details": {
+    "unknown_guide": "Unknown Guide",
+    "years_exp": "years exp.",
+    "reviews": "reviews",
+    "send_message": "Send Message",
+    "call": "Call",
+    "tabs": {
+      "about": "About",
+      "tours": "Tours",
+      "reviews": "Reviews"
+    },
+    "about_section": "About",
+    "no_bio": "No bio available.",
+    "specializations": "Specializations",
+    "operating_areas": "Operating Areas",
+    "availability": "Availability",
+    "specs": {
+      "mountain_tours": "Mountain Tours",
+      "wine_tours": "Wine Tours",
+      "cultural_heritage": "Cultural Heritage",
+      "photography": "Photography",
+      "private_tours": "Private Tours",
+      "city_tours": "City Tours"
+    },
+    "badges": {
+      "verified_identity": "Verified Identity",
+      "top_rated": "Top Rated 2024",
+      "tours_count": "{{count}}+ Tours",
+      "has_vehicle": "Has Vehicle"
+    },
+    "no_tours_title": "No Tours Yet",
+    "no_tours_desc": "This guide hasn't listed any tours yet. Contact them directly to arrange a custom tour.",
+    "no_reviews_title": "No Reviews Yet",
+    "no_reviews_desc": "Be the first to review this guide after your tour experience.",
+    "starting_from": "Starting from",
+    "per_day": "day",
+    "contact_for_price": "Contact for price",
+    "book_now": "Book Now",
+    "not_found_title": "Guide not found",
+    "not_found_desc": "The guide you are looking for does not exist or has been removed.",
+    "back_to_guides": "Back to Guides"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome_user": "Welcome back, {{name}}!",
+    "overview": "Overview",
+    "activity_summary": "Your activity summary",
+    "content_soon": "Content coming soon",
+    "menu": {
+      "dashboard": "Dashboard",
+      "account": "Account",
+      "settings": "Settings"
+    }
+  },
+  "profile": {
+    "title": "Profile Settings",
+    "subtitle": "Manage your personal information and account preferences.",
+    "tabs": {
+      "general": "General",
+      "security": "Security"
+    },
+    "verified": "Verified",
+    "active": "Active",
+    "save_changes": "Save Changes",
+    "general": {
+      "avatar_title": "Profile Picture",
+      "avatar_desc": "Your profile picture helps people recognize you.",
+      "personal_info": "Personal Information",
+      "personal_info_desc": "Update your personal details here."
+    },
+    "security": {
+      "password_title": "Password",
+      "password_desc": "Manage your password and security settings.",
+      "last_changed_never": "Last changed: Never",
+      "sessions_title": "Active Sessions",
+      "sessions_desc": "Manage devices where you're currently logged in.",
+      "current_session": "Current Session"
+    }
+  },
+  "driver": {
+    "dashboard": {
+      "title": "Driver Profile",
+      "profile": "Profile",
+      "locations": "Locations"
+    },
+    "profile": {
+      "title": "Edit Profile"
+    },
+    "locations": {
+      "title": "Manage Locations",
+      "coming_soon": "Location management coming soon..."
+    }
+  },
+  "guide": {
+    "dashboard": {
+      "title": "Guide Profile",
+      "profile": "Profile",
+      "locations": "Locations"
+    },
+    "profile": {
+      "title": "Edit Profile"
+    },
+    "locations": {
+      "title": "Manage Locations",
+      "coming_soon": "Location management coming soon..."
+    }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "Manage system settings and data.",
+    "tabs": {
+      "locations": "Locations",
+      "users": "Users"
+    },
+    "locations": {
+      "title": "Locations",
+      "subtitle": "Manage locations available in the system.",
+      "add_new": "Add Location",
+      "all_locations": "All Locations",
+      "showing_count": "Showing {{count}} of {{total}} locations",
+      "page_of": "Page {{page}} of {{total}}",
+      "empty_state": "No locations found. Create your first location to get started.",
+      "create_success": "Location created successfully!",
+      "update_success": "Location updated successfully!",
+      "delete_success": "Location deleted successfully!",
+      "create_title": "Create Location",
+      "create_description": "Add a new location to the system.",
+      "edit_title": "Edit Location",
+      "edit_description": "Update the location details.",
+      "name": "Name",
+      "name_placeholder": "e.g. Tbilisi",
+      "region": "Region",
+      "region_placeholder": "e.g. Tbilisi",
+      "country": "Country",
+      "country_placeholder": "e.g. Georgia",
+      "latitude": "Latitude",
+      "latitude_placeholder": "e.g. 41.7151",
+      "longitude": "Longitude",
+      "longitude_placeholder": "e.g. 44.8271",
+      "is_active": "Active",
+      "is_active_desc": "Location is available for selection",
+      "table": {
+        "name": "Name",
+        "region": "Region",
+        "country": "Country",
+        "coordinates": "Coordinates",
+        "status": "Status",
+        "created": "Created"
+      },
+      "delete_dialog": {
+        "title": "Delete Location",
+        "description": "Are you sure you want to delete \"{{name}}\"? This action will deactivate the location."
+      },
+      "details": {
+        "title": "Location Details",
+        "description": "Full information about the selected location.",
+        "latitude": "Latitude",
+        "longitude": "Longitude"
+      }
+    },
+    "users": {
+       "title": "Users",
+       "subtitle": "Manage users and roles.",
+       "empty_state": "No users found.",
+       "showing_count": "Showing {{count}} of {{total}} users",
+       "page_of": "Page {{page}} of {{total}}",
+       "table": {
+         "name": "Name",
+         "surname": "Last Name",
+         "email": "Email",
+         "role": "Role",
+         "status": "Status",
+         "joined": "Joined",
+         "actions": "Actions"
+       },
+       "updateRole": "Update Role",
+       "selectRole": "Select Role to Add",
+       "selectRolePlaceholder": "Select a role",
+       "currentRoles": "Current Roles",
+       "roleUpdated": "User role updated successfully",
+       "deleteTitle": "Delete User?",
+       "deleteConfirm": "Are you sure you want to delete user {{email}}? This action cannot be undone.",
+       "deleted": "User deleted successfully",
+       "editUser": "Edit User",
+       "updated": "User updated successfully",
+       "addRole": "Add Role",
+       "active": "Active Account",
+       "details": {
+        "title": "User Details",
+        "subtitle": "View full information about this user.",
+        "roles": "Roles",
+        "tabs": {
+          "overview": "Overview",
+          "company": "Company",
+          "guide": "Guide",
+          "driver": "Driver"
+        },
+        "company": {
+          "reg_number": "Reg. Number"
+        },
+        "guide": {
+          "title": "Guide Profile",
+          "languages": "Languages",
+          "experience": "Experience"
+        },
+        "driver": {
+          "title": "Driver Profile",
+          "vehicle": "Vehicle",
+          "capacity": "Capacity",
+          "type": "Type",
+          "license": "License"
+        }
+      }
+     }
+   }
+ }

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(tree:*)",
+      "Bash(npm run prisma:migrate:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run dev:*)",
+      "Bash(findstr:*)",
+      "Bash(npx prisma db execute:*)",
+      "Bash(ls -la \"c:\\\\Users\\\\seed\\\\Documents\\\\GitHub\\\\AtlasCaucasus\\\\server\\\\src\\\\modules\"\" | grep -E \"^d \")",
+      "Bash(npm run build:*)",
+      "Bash(npm run type-check:*)"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+-- PRODUCTION-SAFE PERMISSIONS
+-- Use this in production instead of 01-grant-permissions.sql
+
+-- Grant only necessary privileges on the specific database
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, ALTER, DROP, REFERENCES
+ON tourism_db.*
+TO 'tourism_user'@'%';
+
+-- Allow creating the shadow database (for Prisma migrations in staging)
+-- Remove this line if you don't run migrations in production
+GRANT CREATE ON `prisma_migrate_shadow_db_%`.* TO 'tourism_user'@'%';
+GRANT DROP ON `prisma_migrate_shadow_db_%`.* TO 'tourism_user'@'%';
+GRANT ALL PRIVILEGES ON `prisma_migrate_shadow_db_%`.* TO 'tourism_user'@'%';
+
+FLUSH PRIVILEGES;
+
+-- Note: In production, you typically:
+-- 1. Run migrations in a CI/CD pipeline with a privileged user
+-- 2. Application uses a restricted user with only SELECT, INSERT, UPDATE, DELETE
+-- 3. Never run "prisma migrate dev" in production (use "prisma migrate deploy" in CI/CD)

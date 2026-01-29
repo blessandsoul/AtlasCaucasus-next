@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Tester</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #1a1a2e; color: #eee; }
+    h1 { color: #00d9ff; }
+    input, button { padding: 10px; margin: 5px 0; font-size: 14px; }
+    input { width: 100%; box-sizing: border-box; background: #16213e; border: 1px solid #0f3460; color: #fff; }
+    button { cursor: pointer; background: #0f3460; color: #fff; border: none; margin-right: 10px; }
+    button:hover { background: #00d9ff; color: #000; }
+    button:disabled { background: #333; cursor: not-allowed; }
+    #log { background: #16213e; padding: 15px; height: 400px; overflow-y: auto; border: 1px solid #0f3460; font-family: monospace; font-size: 13px; }
+    .connected { color: #00ff88; }
+    .disconnected { color: #ff4444; }
+    .sent { color: #ffaa00; }
+    .received { color: #00d9ff; }
+    .error { color: #ff4444; }
+    .info { color: #aaa; }
+  </style>
+</head>
+<body>
+  <h1>🔌 Tourism Server WebSocket Tester</h1>
+  
+  <div style="margin-bottom: 20px;">
+    <label>Access Token (from /api/v1/auth/login):</label>
+    <input type="text" id="token" placeholder="Paste your JWT access token here...">
+  </div>
+  
+  <div style="margin-bottom: 20px;">
+    <button id="connectBtn" onclick="connect()">Connect</button>
+    <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+    <button onclick="sendHeartbeat()">Send Heartbeat</button>
+    <button onclick="clearLog()">Clear Log</button>
+  </div>
+  
+  <div style="margin-bottom: 10px;">
+    <label>Custom Message (JSON):</label>
+    <input type="text" id="customMsg" value='{"type":"heartbeat","payload":{}}'>
+    <button onclick="sendCustom()">Send Custom</button>
+  </div>
+  
+  <h3>Connection Log:</h3>
+  <div id="log"></div>
+
+  <script>
+    let ws = null;
+    const logEl = document.getElementById('log');
+    const tokenEl = document.getElementById('token');
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+
+    function log(message, className = 'info') {
+      const time = new Date().toLocaleTimeString();
+      logEl.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function connect() {
+      const token = tokenEl.value.trim();
+      if (!token) {
+        log('❌ Please enter an access token first!', 'error');
+        return;
+      }
+
+      const url = `ws://localhost:3000/ws?token=${token}`;
+      log(`🔄 Connecting to ${url}...`, 'info');
+
+      try {
+        ws = new WebSocket(url);
+
+        ws.onopen = () => {
+          log('✅ Connected!', 'connected');
+          connectBtn.disabled = true;
+          disconnectBtn.disabled = false;
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            log(`📥 Received: ${JSON.stringify(data, null, 2)}`, 'received');
+          } catch {
+            log(`📥 Received: ${event.data}`, 'received');
+          }
+        };
+
+        ws.onclose = (event) => {
+          log(`🔴 Disconnected (code: ${event.code}, reason: ${event.reason || 'none'})`, 'disconnected');
+          connectBtn.disabled = false;
+          disconnectBtn.disabled = true;
+          ws = null;
+        };
+
+        ws.onerror = (error) => {
+          log(`❌ WebSocket error occurred`, 'error');
+        };
+
+      } catch (error) {
+        log(`❌ Failed to connect: ${error.message}`, 'error');
+      }
+    }
+
+    function disconnect() {
+      if (ws) {
+        ws.close();
+        log('🔄 Disconnecting...', 'info');
+      }
+    }
+
+    function sendHeartbeat() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('❌ Not connected!', 'error');
+        return;
+      }
+      const msg = { type: 'heartbeat', payload: {} };
+      ws.send(JSON.stringify(msg));
+      log(`📤 Sent: ${JSON.stringify(msg)}`, 'sent');
+    }
+
+    function sendCustom() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('❌ Not connected!', 'error');
+        return;
+      }
+      const msgText = document.getElementById('customMsg').value;
+      try {
+        const msg = JSON.parse(msgText);
+        ws.send(JSON.stringify(msg));
+        log(`📤 Sent: ${JSON.stringify(msg)}`, 'sent');
+      } catch (e) {
+        log(`❌ Invalid JSON: ${e.message}`, 'error');
+      }
+    }
+
+    function clearLog() {
+      logEl.innerHTML = '';
+    }
+
+    log('👋 Ready! Paste your access token and click Connect.', 'info');
+  </script>
+</body>
+</html>

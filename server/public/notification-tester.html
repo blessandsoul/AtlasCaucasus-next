@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification System Tester - Tourism Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: 600px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px;
+        }
+
+        .auth-section {
+            margin-bottom: 20px;
+        }
+
+        .auth-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            margin: 0;
+        }
+
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .status.connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Stats Card */
+        .stats-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .stats-card .number {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .stats-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Notifications Area */
+        .notifications-area {
+            padding: 20px 30px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .notifications-header h2 {
+            color: #1f2937;
+            font-size: 20px;
+        }
+
+        .notification-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .notification-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .notification-item.unread {
+            border-left: 4px solid #667eea;
+            background: #f8f9ff;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .notification-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .notification-type.CHAT_MESSAGE {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .notification-type.CHAT_MENTION {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .notification-type.SYSTEM {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .notification-type.INQUIRY_RECEIVED {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* Real-time Badge */
+        .realtime-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f0f4ff;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .realtime-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .realtime-dot.offline {
+            background: #ef4444;
+            animation: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Log */
+        .log {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .log-entry.error {
+            color: #ef4444;
+        }
+
+        .log-entry.success {
+            color: #10b981;
+        }
+
+        .log-entry.info {
+            color: #60a5fa;
+        }
+
+        .log-entry.notification {
+            color: #fbbf24;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #6b7280;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+            color: #667eea;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Notification System Tester</h1>
+            <p>Test real-time notifications, unread counts, and mark as read</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="auth-section">
+                    <h3>🔐 Authentication</h3>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="email" value="user@example.com" placeholder="user@example.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="password" value="SecurePass123!" placeholder="Password">
+                    </div>
+                    <button class="btn btn-primary" onclick="login()">Login</button>
+                    <button class="btn btn-success" onclick="connectWebSocket()" id="wsConnectBtn" disabled>Connect
+                        WebSocket</button>
+                    <div id="authStatus" class="status disconnected">Not Authenticated</div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="number" id="unreadCount">0</div>
+                    <div class="label">Unread Notifications</div>
+                </div>
+
+                <button class="btn btn-primary" onclick="loadNotifications()">Refresh Notifications</button>
+                <button class="btn btn-success" onclick="markAllAsRead()">Mark All as Read</button>
+            </div>
+
+            <!-- Notifications Area -->
+            <div class="notifications-area">
+                <div class="notifications-header">
+                    <h2>Notifications</h2>
+                    <div class="realtime-badge">
+                        <div class="realtime-dot offline" id="realtimeDot"></div>
+                        <span id="realtimeStatus">WebSocket Offline</span>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterNotifications('all')"
+                        data-filter="all">All</button>
+                    <button class="filter-btn" onclick="filterNotifications('unread')"
+                        data-filter="unread">Unread</button>
+                    <button class="filter-btn" onclick="filterNotifications('CHAT_MESSAGE')"
+                        data-filter="CHAT_MESSAGE">Messages</button>
+                    <button class="filter-btn" onclick="filterNotifications('CHAT_MENTION')"
+                        data-filter="CHAT_MENTION">Mentions</button>
+                    <button class="filter-btn" onclick="filterNotifications('SYSTEM')"
+                        data-filter="SYSTEM">System</button>
+                </div>
+
+                <div id="notificationsList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔔</div>
+                        <h3>No notifications</h3>
+                        <p>Login and connect WebSocket to receive real-time notifications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log -->
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        let accessToken = '';
+        let userId = '';
+        let ws = null;
+        let notifications = [];
+        let currentFilter = 'all';
+
+        const API_BASE = 'http://localhost:3000/api/v1';
+        const WS_URL = 'ws://localhost:3000/ws';
+
+        // Logging
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${time}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Authentication
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    accessToken = data.data.accessToken;
+                    userId = data.data.user.id;
+                    document.getElementById('authStatus').textContent = `✅ Logged in as ${data.data.user.email}`;
+                    document.getElementById('authStatus').className = 'status connected';
+                    document.getElementById('wsConnectBtn').disabled = false;
+                    log(`Logged in as ${data.data.user.email}`, 'success');
+                    loadNotifications();
+                    loadUnreadCount();
+                } else {
+                    log(`Login failed: ${data.error.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Login error: ${error.message}`, 'error');
+            }
+        }
+
+        // WebSocket
+        function connectWebSocket() {
+            if (!accessToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            ws = new WebSocket(`${WS_URL}?token=${accessToken}`);
+
+            ws.onopen = () => {
+                log('WebSocket connected', 'success');
+                document.getElementById('realtimeDot').classList.remove('offline');
+                document.getElementById('realtimeStatus').textContent = 'Real-time Active';
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleWebSocketMessage(message);
+            };
+
+            ws.onclose = () => {
+                log('WebSocket disconnected', 'error');
+                document.getElementById('realtimeDot').classList.add('offline');
+                document.getElementById('realtimeStatus').textContent = 'WebSocket Offline';
+            };
+
+            ws.onerror = (error) => {
+                log('WebSocket error', 'error');
+            };
+        }
+
+        function handleWebSocketMessage(message) {
+            const { type, payload } = message;
+
+            if (type === 'connected') {
+                log(`Connected with ID: ${payload.connectionId}`, 'success');
+            } else if (type === 'notification') {
+                // New notification received in real-time!
+                log(`🔔 NEW NOTIFICATION: ${payload.notification.title}`, 'notification');
+
+                // Add to beginning of list
+                notifications.unshift(payload.notification);
+                renderNotifications();
+                loadUnreadCount();
+
+                // Show browser notification if supported
+                if (Notification.permission === 'granted') {
+                    new Notification(payload.notification.title, {
+                        body: payload.notification.message,
+                        icon: '🔔'
+                    });
+                }
+            }
+        }
+
+        // Load Notifications
+        async function loadNotifications() {
+            if (!accessToken) return;
+
+            try {
+                let url = `${API_BASE}/notifications?page=1&limit=50`;
+
+                if (currentFilter === 'unread') {
+                    url += '&isRead=false';
+                } else if (['CHAT_MESSAGE', 'CHAT_MENTION', 'SYSTEM'].includes(currentFilter)) {
+                    url += `&type=${currentFilter}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    notifications = data.data.items;
+                    renderNotifications();
+                    log(`Loaded ${notifications.length} notifications`, 'success');
+                }
+            } catch (error) {
+                log(`Failed to load notifications: ${error.message}`, 'error');
+            }
+        }
+
+        // Load Unread Count
+        async function loadUnreadCount() {
+            if (!accessToken) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/notifications/unread-count`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('unreadCount').textContent = data.data.count;
+                }
+            } catch (error) {
+                log(`Failed to load unread count: ${error.message}`, 'error');
+            }
+        }
+
+        // Render Notifications
+        function renderNotifications() {
+            const listEl = document.getElementById('notificationsList');
+
+            if (notifications.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔔</div>
+                        <h3>No notifications</h3>
+                        <p>You're all caught up!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = notifications.map(n => `
+                <div class="notification-item ${!n.isRead ? 'unread' : ''}">
+                    <div class="notification-header">
+                        <span class="notification-type ${n.type}">${n.type.replace('_', ' ')}</span>
+                        <span class="notification-time">${formatTime(n.createdAt)}</span>
+                    </div>
+                    <div class="notification-title">${n.title}</div>
+                    <div class="notification-message">${n.message}</div>
+                    <div class="notification-actions">
+                        ${!n.isRead ? `<button class="btn btn-secondary btn-small" onclick="markAsRead('${n.id}')">Mark as Read</button>` : ''}
+                        <button class="btn btn-secondary btn-small" onclick="deleteNotification('${n.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Mark as Read
+        async function markAsRead(notificationId) {
+            try {
+                const response = await fetch(`${API_BASE}/notifications/${notificationId}/read`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log(`Notification marked as read`, 'success');
+                    loadNotifications();
+                    loadUnreadCount();
+                }
+            } catch (error) {
+                log(`Failed to mark as read: ${error.message}`, 'error');
+            }
+        }
+
+        // Mark All as Read
+        async function markAllAsRead() {
+            try {
+                const response = await fetch(`${API_BASE}/notifications/read-all`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log(`All notifications marked as read (${data.data.updatedCount} updated)`, 'success');
+                    loadNotifications();
+                    loadUnreadCount();
+                }
+            } catch (error) {
+                log(`Failed to mark all as read: ${error.message}`, 'error');
+            }
+        }
+
+        // Delete Notification
+        async function deleteNotification(notificationId) {
+            try {
+                const response = await fetch(`${API_BASE}/notifications/${notificationId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log(`Notification deleted`, 'success');
+                    loadNotifications();
+                    loadUnreadCount();
+                }
+            } catch (error) {
+                log(`Failed to delete: ${error.message}`, 'error');
+            }
+        }
+
+        // Filter Notifications
+        function filterNotifications(filter) {
+            currentFilter = filter;
+
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+
+            loadNotifications();
+        }
+
+        // Format Time
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Request browser notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        log('Notification tester ready. Please login to start.', 'info');
+    </script>
+</body>
+
+</html>
