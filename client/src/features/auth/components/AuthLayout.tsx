@@ -16,7 +16,7 @@ export const AuthLayout = ({ children, title, subtitle, showSocialAuth = true }:
     const { t } = useTranslation();
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center bg-gray-50 pt-32 pb-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
                 <div className="text-center">
                     <Link href={ROUTES.HOME} className="inline-block mb-6">

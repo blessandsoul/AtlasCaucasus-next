@@ -3,6 +3,7 @@ import "./globals.css";
 import "@/lib/i18n"; // Init i18n on server/build too if needed? No, purely client.
 import "flag-icons/css/flag-icons.min.css"; // Import flag icons
 import { Providers } from "./providers";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -50,7 +51,9 @@ export default function RootLayout({
         className={`${outfit.variable} ${inter.variable} ${jetbrainsMono.variable} ${notoSans.variable} ${notoSansGeorgian.variable} font-sans antialiased`}
       >
         <Providers>
-          {children}
+          <MainLayout>
+            {children}
+          </MainLayout>
         </Providers>
       </body>
     </html>

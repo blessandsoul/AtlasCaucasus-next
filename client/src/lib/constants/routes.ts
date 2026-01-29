@@ -7,6 +7,13 @@ export const ROUTES = {
   RESET_PASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
+  EXPLORE: {
+    ROOT: '/explore',
+    TOURS: '/explore/tours',
+    COMPANIES: '/explore/companies',
+    GUIDES: '/explore/guides',
+    DRIVERS: '/explore/drivers',
+  },
   TOURS: {
     LIST: '/tours',
     DETAILS: (id: string) => `/tours/${id}`,

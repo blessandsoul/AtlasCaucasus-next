@@ -24,10 +24,16 @@ export const Header = () => {
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [hasMounted, setHasMounted] = useState(false);
     const dispatch = useAppDispatch();
     const langRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const { isAuthenticated, user, logout } = useAuth();
+
+    // Prevent hydration mismatch by only rendering auth-dependent content after mount
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
     const { subscribe } = useWebSocket();
     const queryClient = useQueryClient();
 
@@ -143,31 +149,31 @@ export const Header = () => {
                             {
                                 title: t('header.nav_menu.items.tour'),
                                 description: t('header.nav_menu.explore.tour_desc'),
-                                href: ROUTES.TOURS.LIST,
+                                href: ROUTES.EXPLORE.TOURS,
                                 icon: <MapIcon className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.companies'),
                                 description: t('header.nav_menu.explore.companies_subtitle'),
-                                href: ROUTES.COMPANIES.LIST,
+                                href: ROUTES.EXPLORE.COMPANIES,
                                 icon: <Building2 className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.hotels'),
                                 description: t('header.nav_menu.explore.hotels_desc'),
-                                href: ROUTES.TOURS.LIST, // Redirect hotels to tours for now
+                                href: ROUTES.EXPLORE.TOURS, // Redirect hotels to tours for now
                                 icon: <Hotel className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.guides'),
                                 description: t('header.nav_menu.explore.guides_desc'),
-                                href: "/",
+                                href: ROUTES.EXPLORE.GUIDES,
                                 icon: <Users className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.drivers'),
                                 description: t('header.nav_menu.explore.drivers_desc'),
-                                href: ROUTES.DRIVERS.LIST,
+                                href: ROUTES.EXPLORE.DRIVERS,
                                 icon: <Car className="h-5 w-5" />
                             }
                         ]}
@@ -185,31 +191,31 @@ export const Header = () => {
                             {
                                 title: t('header.nav_menu.items.tour'),
                                 description: t('header.nav_menu.traveler.tour_desc'),
-                                href: ROUTES.TOURS.LIST,
+                                href: ROUTES.EXPLORE.TOURS,
                                 icon: <MapIcon className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.hotels'),
                                 description: t('header.nav_menu.traveler.hotels_desc'),
-                                href: ROUTES.TOURS.LIST, // Redirect hotels to tours for now
+                                href: ROUTES.EXPLORE.TOURS, // Redirect hotels to tours for now
                                 icon: <Hotel className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.companies'),
                                 description: t('header.nav_menu.explore.companies_subtitle'),
-                                href: ROUTES.COMPANIES.LIST,
+                                href: ROUTES.EXPLORE.COMPANIES,
                                 icon: <Building2 className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.guides'),
                                 description: t('header.nav_menu.traveler.guides_desc'),
-                                href: ROUTES.GUIDES?.LIST || '/',
+                                href: ROUTES.EXPLORE.GUIDES,
                                 icon: <Users className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.drivers'),
                                 description: t('header.nav_menu.traveler.drivers_desc'),
-                                href: ROUTES.DRIVERS.LIST,
+                                href: ROUTES.EXPLORE.DRIVERS,
                                 icon: <Car className="h-5 w-5" />
                             }
                         ]}
@@ -227,25 +233,25 @@ export const Header = () => {
                             {
                                 title: t('header.nav_menu.items.tour'),
                                 description: t('header.nav_menu.business.tour_desc'),
-                                href: ROUTES.TOURS.LIST,
+                                href: ROUTES.EXPLORE.TOURS,
                                 icon: <MapIcon className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.hotels'),
                                 description: t('header.nav_menu.business.hotels_desc'),
-                                href: ROUTES.TOURS.LIST, // Redirect hotels to tours for now
+                                href: ROUTES.EXPLORE.TOURS, // Redirect hotels to tours for now
                                 icon: <Hotel className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.guides'),
                                 description: t('header.nav_menu.business.guides_desc'),
-                                href: ROUTES.GUIDES?.LIST || '/',
+                                href: ROUTES.EXPLORE.GUIDES,
                                 icon: <Users className="h-5 w-5" />
                             },
                             {
                                 title: t('header.nav_menu.items.drivers'),
                                 description: t('header.nav_menu.business.drivers_desc'),
-                                href: ROUTES.DRIVERS.LIST,
+                                href: ROUTES.EXPLORE.DRIVERS,
                                 icon: <Car className="h-5 w-5" />
                             }
                         ]}
@@ -303,7 +309,7 @@ export const Header = () => {
                     </div>
 
                     {/* Auth Buttons or User Menu */}
-                    {isAuthenticated ? (
+                    {hasMounted && isAuthenticated ? (
                         <>
                             <Button
                                 variant="ghost"
