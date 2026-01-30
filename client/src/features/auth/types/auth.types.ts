@@ -92,3 +92,12 @@ export interface IClaimDriverRoleRequest {
 
 // Union type for claim role request
 export type IClaimRoleRequest = IClaimGuideRoleRequest | IClaimDriverRoleRequest;
+
+// Admin create user input
+export interface CreateUserInput {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role?: UserRole;
+}

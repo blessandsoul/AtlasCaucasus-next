@@ -42,9 +42,16 @@ export const ProtectedRoute = ({ children, requireVerified = false, allowedRoles
         // return null;
     }
 
-    if (allowedRoles && user && !allowedRoles.includes(user.roles[0])) {
-        // router.push('/unauthorized');
-        // return null;
+    if (allowedRoles && user) {
+        const hasAllowedRole = user.roles.some((role) => allowedRoles.includes(role));
+        if (!hasAllowedRole) {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+                    <h2 className="text-2xl font-bold text-destructive mb-2">Access Denied</h2>
+                    <p className="text-muted-foreground">You do not have permission to access this page.</p>
+                </div>
+            );
+        }
     }
 
     return <>{children}</>;

@@ -1,4 +1,11 @@
 export const API_ENDPOINTS = {
+  PRESENCE: {
+    ME: '/presence/me',
+    USER: (userId: string) => `/presence/${userId}`,
+    MULTIPLE: '/presence/multiple',
+    ONLINE_ALL: '/presence/online/all',
+    STATS: '/presence/stats',
+  },
   AUTH: {
     REGISTER: '/auth/register',
     REGISTER_COMPANY: '/auth/register-company',
@@ -16,10 +23,16 @@ export const API_ENDPOINTS = {
     LOGOUT_ALL: '/auth/logout-all',
   },
   USERS: {
+    LIST: '/users',
     ME: '/users/me',
     UPDATE_ME: '/users/me',
     DELETE_ME: '/users/me',
     BY_ID: (id: string) => `/users/${id}`,
+    CREATE: '/users',
+    UPDATE: (id: string) => `/users/${id}`,
+    DELETE: (id: string) => `/users/${id}`,
+    UPDATE_ROLE: (id: string) => `/users/${id}/role`,
+    REMOVE_ROLE: (id: string, role: string) => `/users/${id}/roles/${role}`,
   },
   TOURS: {
     LIST: '/tours',

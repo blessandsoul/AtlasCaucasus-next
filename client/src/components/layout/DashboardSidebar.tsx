@@ -14,6 +14,7 @@ import {
     Building2,
     MapPin,
     MessageSquare,
+    Users,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
@@ -162,10 +163,16 @@ export const DashboardSidebar = () => {
                             </h2>
                             <div className="space-y-1">
                                 <SidebarItem
+                                    icon={Users}
+                                    label={t('admin.tabs.users', 'Users')}
+                                    href={ROUTES.ADMIN.USERS}
+                                    isActive={pathname === ROUTES.ADMIN.USERS || pathname === ROUTES.ADMIN.ROOT}
+                                />
+                                <SidebarItem
                                     icon={MapPin}
                                     label={t('admin.tabs.locations', 'Locations')}
                                     href={ROUTES.ADMIN.LOCATIONS}
-                                    isActive={pathname.startsWith(ROUTES.ADMIN.ROOT)}
+                                    isActive={pathname === ROUTES.ADMIN.LOCATIONS}
                                 />
                             </div>
                         </div>

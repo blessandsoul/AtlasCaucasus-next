@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Mail, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { authService } from '@/features/auth/services/auth.service';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { ROUTES } from '@/lib/constants/routes';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/utils/error';
