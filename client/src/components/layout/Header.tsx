@@ -16,6 +16,10 @@ import { useLoading } from '@/context/LoadingContext';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { colors } from '@/lib/colors';
 import { useAppDispatch } from '@/store/hooks';
+import { openDrawer } from '@/features/chat/store/chatSlice';
+import { useChats } from '@/features/chat/hooks/useChats';
+import { useUnreadCount, notificationKeys } from '@/features/notifications/hooks/useNotifications';
+import { MessageType } from '@/lib/websocket/websocket.types';
 
 export const Header = () => {
     const { t, i18n } = useTranslation();
@@ -25,10 +29,10 @@ export const Header = () => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [hasMounted, setHasMounted] = useState(false);
-    const dispatch = useAppDispatch();
     const langRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const { isAuthenticated, user, logout } = useAuth();
+    const dispatch = useAppDispatch();
 
     // Prevent hydration mismatch by only rendering auth-dependent content after mount
     useEffect(() => {
@@ -37,23 +41,22 @@ export const Header = () => {
     const { subscribe } = useWebSocket();
     const queryClient = useQueryClient();
 
-    // Mocks for missing features
-    // const { data: chatsData } = useChats({}, { enabled: isAuthenticated });
-    // const totalUnread = chatsData?.items.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
-    const totalUnread = 0;
+    // Get chat unread count
+    const { data: chatsData } = useChats({}, { enabled: isAuthenticated && hasMounted });
+    const totalUnread = chatsData?.items.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
 
-    // const { data: unreadCountData } = useUnreadCount();
-    // const notificationCount = unreadCountData?.count || 0;
-    const notificationCount = 0;
+    // Get notification unread count
+    const { data: unreadCountData } = useUnreadCount();
+    const notificationCount = unreadCountData?.count || 0;
 
     // Subscribe to real-time notifications
     useEffect(() => {
-        // const unsubscribe = subscribe(MessageType.NOTIFICATION, () => {
-        //     // Invalidate and refetch notification count when new notification arrives
-        //     queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() });
-        //     queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
-        // });
-        // return unsubscribe;
+        const unsubscribe = subscribe(MessageType.NOTIFICATION, () => {
+            // Invalidate and refetch notification count when new notification arrives
+            queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() });
+            queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
+        });
+        return unsubscribe;
     }, [subscribe, queryClient]);
 
     useMotionValueEvent(scrollY, "change", (latest) => {
@@ -315,7 +318,7 @@ export const Header = () => {
                                 variant="ghost"
                                 size="icon"
                                 className="relative text-muted-foreground hover:text-foreground"
-                                onClick={() => { /* dispatch(openDrawer()) */ console.log('Open chat'); }}
+                                onClick={() => dispatch(openDrawer())}
                             >
                                 <MessageSquare className="h-5 w-5" />
                                 {totalUnread > 0 && (
@@ -382,6 +385,14 @@ export const Header = () => {
                                             >
                                                 <User className="h-4 w-4" />
                                                 <span>{t('auth.profile')}</span>
+                                            </Link>
+                                            <Link
+                                                href="/chats"
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-sm transition-colors"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                <MessageSquare className="h-4 w-4" />
+                                                <span>{t('auth.messages', 'Messages')}</span>
                                             </Link>
 
                                             {user?.roles?.includes('COMPANY') && (

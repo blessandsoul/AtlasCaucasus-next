@@ -1,6 +1,6 @@
 import { apiClient } from '@/lib/api/axios.config';
 import { API_ENDPOINTS } from '@/lib/constants/api-endpoints';
-import type { Location, LocationFilters, LocationsResponse } from '../types/location.types';
+import type { Location, LocationFilters, LocationsResponse, CreateLocationInput, UpdateLocationInput } from '../types/location.types';
 
 class LocationService {
     async getLocations(params: LocationFilters = {}): Promise<LocationsResponse> {
@@ -18,6 +18,28 @@ class LocationService {
             params: { q: query }
         });
         return response.data.data;
+    }
+
+    async createLocation(data: CreateLocationInput): Promise<Location> {
+        const response = await apiClient.post<{
+            success: boolean;
+            message: string;
+            data: Location;
+        }>(API_ENDPOINTS.LOCATIONS.CREATE, data);
+        return response.data.data;
+    }
+
+    async updateLocation(id: string, data: UpdateLocationInput): Promise<Location> {
+        const response = await apiClient.patch<{
+            success: boolean;
+            message: string;
+            data: Location;
+        }>(API_ENDPOINTS.LOCATIONS.UPDATE(id), data);
+        return response.data.data;
+    }
+
+    async deleteLocation(id: string): Promise<void> {
+        await apiClient.delete(API_ENDPOINTS.LOCATIONS.DELETE(id));
     }
 }
 

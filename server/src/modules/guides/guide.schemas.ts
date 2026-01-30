@@ -3,7 +3,7 @@ import { z } from "zod";
 // Update guide schema
 export const updateGuideSchema = z.object({
     bio: z.string().max(2000).optional(),
-    languages: z.array(z.string().min(2).max(10)).optional(),
+    languages: z.array(z.string().min(2).max(50)).optional(),
     yearsOfExperience: z.number().int().min(0).max(70).optional(),
     photoUrl: z.string().url("Invalid photo URL").max(512).optional(),
     phoneNumber: z.string().max(20).optional(),

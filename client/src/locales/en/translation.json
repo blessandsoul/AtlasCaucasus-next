@@ -629,6 +629,7 @@
     "content_soon": "Content coming soon",
     "menu": {
       "dashboard": "Dashboard",
+      "inquiries": "Inquiries",
       "account": "Account",
       "settings": "Settings"
     }

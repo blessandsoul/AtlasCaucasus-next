@@ -66,15 +66,12 @@ class DriverService {
       formData.append('file', file);
     });
 
+    // Don't set Content-Type manually - axios will set it automatically with the boundary
     const response = await apiClient.post<{
       success: boolean;
       message: string;
       data: DriverMedia[];
-    }>(API_ENDPOINTS.DRIVERS.PHOTOS(id), formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    }>(API_ENDPOINTS.DRIVERS.PHOTOS(id), formData);
 
     return response.data.data;
   }

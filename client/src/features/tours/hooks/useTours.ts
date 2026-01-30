@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { tourService } from '../services/tour.service';
 import { getErrorMessage } from '@/lib/utils/error';
-import type { TourFilters, UpdateTourInput, MyToursParams, ToursResponse } from '../types/tour.types';
+import type { TourFilters, UpdateTourInput, MyToursParams, ToursResponse, CreateTourInput } from '../types/tour.types';
 
 interface UseToursParams extends TourFilters {
     page?: number;
@@ -82,6 +82,40 @@ export const useDeleteTour = () => {
             queryClient.removeQueries({ queryKey: ['tour', id] });
             queryClient.invalidateQueries({ queryKey: ['tours'] });
             toast.success(t('tours.delete_success', 'Tour deleted successfully!'));
+        },
+        onError: (error) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+};
+
+export const useCreateTour = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+
+    return useMutation({
+        mutationFn: (data: CreateTourInput) => tourService.createTour(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tours', 'my'] });
+            queryClient.invalidateQueries({ queryKey: ['tours'] });
+            toast.success(t('tours.create.success_message', 'Tour created successfully!'));
+        },
+        onError: (error) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+};
+
+export const useUploadTourImage = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+
+    return useMutation({
+        mutationFn: ({ id, files }: { id: string; files: File[] }) =>
+            tourService.uploadTourImage(id, files),
+        onSuccess: (_, { id }) => {
+            queryClient.invalidateQueries({ queryKey: ['tour', id] });
+            toast.success(t('tours.create.image_upload_success', 'Images uploaded successfully!'));
         },
         onError: (error) => {
             toast.error(getErrorMessage(error));

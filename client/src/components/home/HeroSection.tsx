@@ -45,8 +45,14 @@ export const HeroSection = () => {
         if (selectedLocation) {
             params.set('locationId', selectedLocation.id);
         }
+        if (selectedDate) {
+            params.set('date', selectedDate.toISOString().split('T')[0]);
+        }
+        if (guests) {
+            params.set('guests', guests);
+        }
         router.push(`/explore/tours?${params.toString()}`);
-    }, [router, selectedLocation]);
+    }, [router, selectedLocation, selectedDate, guests]);
 
     const formatDate = (date: Date | undefined) => {
         if (!date) return '';

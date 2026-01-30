@@ -40,8 +40,55 @@ export interface IRegisterRequest {
   lastName: string;
 }
 
+export interface ICompanyRegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  companyName: string;
+  registrationNumber?: string;
+  description?: string;
+  websiteUrl?: string;
+  phoneNumber?: string;
+}
+
 export interface IAuthState {
   user: IUser | null;
   tokens: IAuthTokens | null;
   isAuthenticated: boolean;
 }
+
+// Guide profile for claim role
+export interface IGuideProfile {
+  bio?: string;
+  languages: string[];
+  yearsOfExperience?: number;
+  phoneNumber?: string;
+}
+
+// Driver profile for claim role
+export interface IDriverProfile {
+  bio?: string;
+  vehicleType?: string;
+  vehicleCapacity?: number;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehicleYear?: number;
+  licenseNumber?: string;
+  phoneNumber?: string;
+}
+
+// Claim GUIDE role request
+export interface IClaimGuideRoleRequest {
+  role: 'GUIDE';
+  profile: IGuideProfile;
+}
+
+// Claim DRIVER role request
+export interface IClaimDriverRoleRequest {
+  role: 'DRIVER';
+  profile: IDriverProfile;
+}
+
+// Union type for claim role request
+export type IClaimRoleRequest = IClaimGuideRoleRequest | IClaimDriverRoleRequest;

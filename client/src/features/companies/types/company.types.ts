@@ -22,6 +22,8 @@ export interface Company {
   websiteUrl: string | null;
   phoneNumber: string | null;
   isVerified: boolean;
+  averageRating: number | null;
+  reviewCount: number;
   createdAt: string;
   updatedAt: string;
   user?: {
@@ -32,6 +34,36 @@ export interface Company {
     emailVerified: boolean;
   };
   images?: CompanyMedia[];
+}
+
+export interface IUpdateCompanyRequest {
+  companyName?: string;
+  description?: string;
+  registrationNumber?: string;
+  logoUrl?: string;
+  websiteUrl?: string;
+  phoneNumber?: string;
+}
+
+export interface IGetMyCompanyResponse {
+  company: Company;
+}
+
+export interface CreateAgentFormData {
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface CreateTourAgentResponse {
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    roles: string[];
+  };
+  temporaryPassword: string;
 }
 
 export interface CompanyFilters {
@@ -55,4 +87,17 @@ export interface CompaniesResponse {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
   };
+}
+
+export interface TourAgent {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  emailVerified: boolean;
+  createdAt: string;
+}
+
+export interface IGetTourAgentsResponse {
+  tourAgents: TourAgent[];
 }

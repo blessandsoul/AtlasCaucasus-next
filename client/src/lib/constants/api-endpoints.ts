@@ -1,14 +1,19 @@
 export const API_ENDPOINTS = {
   AUTH: {
     REGISTER: '/auth/register',
+    REGISTER_COMPANY: '/auth/register-company',
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
     ME: '/auth/me',
     VERIFY_EMAIL: '/auth/verify-email',
     RESEND_VERIFICATION: '/auth/resend-verification',
-    REQUEST_PASSWORD_RESET: '/auth/request-password-reset',
+    FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
+    TOUR_AGENTS: '/auth/tour-agents',
+    CREATE_TOUR_AGENT: '/auth/tour-agents',
+    CLAIM_ROLE: '/auth/claim-role',
+    LOGOUT_ALL: '/auth/logout-all',
   },
   USERS: {
     ME: '/users/me',
@@ -18,7 +23,7 @@ export const API_ENDPOINTS = {
   },
   TOURS: {
     LIST: '/tours',
-    MY_TOURS: '/tours/my',
+    MY_TOURS: '/me/tours',
     CREATE: '/tours',
     GET: (id: string) => `/tours/${id}`,
     UPDATE: (id: string) => `/tours/${id}`,
@@ -29,6 +34,8 @@ export const API_ENDPOINTS = {
     LIST: '/companies',
     GET: (id: string) => `/companies/${id}`,
     MY_COMPANY: '/companies/my',
+    UPDATE: (id: string) => `/companies/${id}`,
+    DELETE: (id: string) => `/companies/${id}`,
     TOURS: (id: string) => `/companies/${id}/tours`,
     PHOTOS: (id: string) => `/companies/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/companies/${id}/photos/${photoId}`,
@@ -55,6 +62,9 @@ export const API_ENDPOINTS = {
     LIST: '/locations',
     GET: (id: string) => `/locations/${id}`,
     SEARCH: '/locations/search',
+    CREATE: '/locations',
+    UPDATE: (id: string) => `/locations/${id}`,
+    DELETE: (id: string) => `/locations/${id}`,
   },
   BOOKINGS: {
     LIST: '/bookings',
@@ -65,7 +75,29 @@ export const API_ENDPOINTS = {
   },
   INQUIRIES: {
     LIST: '/inquiries',
+    RECEIVED: '/inquiries/received',
     CREATE: '/inquiries',
     GET: (id: string) => `/inquiries/${id}`,
+    RESPOND: (id: string) => `/inquiries/${id}/respond`,
+  },
+  SEARCH: {
+    MAIN: '/search',
+    LOCATIONS: '/search/locations',
+    LOCATION_STATS: (id: string) => `/search/locations/${id}/stats`,
+  },
+  CHATS: {
+    LIST: '/chats',
+    DIRECT: '/chats/direct',
+    GET: (id: string) => `/chats/${id}`,
+    MESSAGES: (chatId: string) => `/chats/${chatId}/messages`,
+    SEND_MESSAGE: (chatId: string) => `/chats/${chatId}/messages`,
+    MARK_READ: (chatId: string) => `/chats/${chatId}/read`,
+  },
+  NOTIFICATIONS: {
+    LIST: '/notifications',
+    UNREAD_COUNT: '/notifications/unread-count',
+    MARK_READ: (id: string) => `/notifications/${id}/read`,
+    MARK_ALL_READ: '/notifications/read-all',
+    DELETE: (id: string) => `/notifications/${id}`,
   },
 } as const;

@@ -138,6 +138,42 @@ function buildApp() {
       return reply.status(error.statusCode).send(errorResponse(error.code, error.message));
     }
 
+    // Handle Fastify built-in errors with user-friendly messages
+    if ('code' in error && typeof error.code === 'string') {
+      const fastifyErrorMap: Record<string, { statusCode: number; message: string }> = {
+        FST_REQ_FILE_TOO_LARGE: {
+          statusCode: 413,
+          message: `File too large. Maximum size is ${Math.round(env.MAX_FILE_SIZE / 1024 / 1024)}MB`
+        },
+        FST_PARTS_LIMIT: {
+          statusCode: 400,
+          message: 'Too many parts in multipart request'
+        },
+        FST_FILES_LIMIT: {
+          statusCode: 400,
+          message: 'Too many files uploaded. Maximum is 10 files'
+        },
+        FST_FIELDS_LIMIT: {
+          statusCode: 400,
+          message: 'Too many form fields'
+        },
+        FST_PROTO_VIOLATION: {
+          statusCode: 400,
+          message: 'Invalid request format'
+        },
+        FST_INVALID_MULTIPART_CONTENT_TYPE: {
+          statusCode: 400,
+          message: 'Invalid content type for file upload'
+        },
+      };
+
+      const mappedError = fastifyErrorMap[error.code];
+      if (mappedError) {
+        logger.warn({ err: error, requestId: request.id }, mappedError.message);
+        return reply.status(mappedError.statusCode).send(errorResponse(error.code, mappedError.message));
+      }
+    }
+
     // Unexpected errors - log full details, return generic message
     logger.error({ err: error, requestId: request.id }, "Unhandled error");
     return reply.status(500).send(errorResponse("INTERNAL_ERROR", "An unexpected error occurred"));

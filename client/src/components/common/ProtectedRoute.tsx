@@ -2,8 +2,7 @@
 
 import { useAppSelector } from '@/store/hooks';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { LoadingPage } from '@/components/common/LoadingSpinner';
+import { useEffect, useState } from 'react';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -14,18 +13,28 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children, requireVerified = false, allowedRoles }: ProtectedRouteProps) => {
     const router = useRouter();
     const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+    const [hasMounted, setHasMounted] = useState(false);
 
-    // Note: IsAuthenticated check might need to wait for hydration (redux persist).
-    // Assuming 'isAuthenticated' is correctly loaded from localStorage in store/index.ts initialization.
-
+    // Wait for client-side hydration to complete before checking auth
     useEffect(() => {
-        if (!isAuthenticated) {
+        setHasMounted(true);
+    }, []);
+
+    // Redirect to login if not authenticated (only after mount to avoid hydration issues)
+    useEffect(() => {
+        if (hasMounted && !isAuthenticated) {
             router.push('/login');
         }
-    }, [isAuthenticated, router]);
+    }, [hasMounted, isAuthenticated, router]);
+
+    // Always render children during SSR and initial hydration to prevent mismatch
+    // After mount, check authentication
+    if (!hasMounted) {
+        return <>{children}</>;
+    }
 
     if (!isAuthenticated) {
-        return null; // Or return null while redirecting
+        return null; // Redirecting to login
     }
 
     if (requireVerified && !user?.emailVerified) {
@@ -33,7 +42,7 @@ export const ProtectedRoute = ({ children, requireVerified = false, allowedRoles
         // return null;
     }
 
-    if (allowedRoles && user && !allowedRoles.includes(user.roles[0])) { // Checking first role for now if singular access logic
+    if (allowedRoles && user && !allowedRoles.includes(user.roles[0])) {
         // router.push('/unauthorized');
         // return null;
     }

@@ -32,3 +32,20 @@ export interface LocationsResponse {
         hasPreviousPage: boolean;
     };
 }
+
+export interface CreateLocationInput {
+    name: string;
+    region?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
+}
+
+export interface UpdateLocationInput {
+    name?: string;
+    region?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
+    isActive?: boolean;
+}
