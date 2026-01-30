@@ -37,7 +37,15 @@
     "close": "Close",
     "pagination": {
       "page_of": "Page {{page}} of {{total}}"
-    }
+    },
+    "photo_uploaded": "Photo uploaded successfully",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "role": "Role",
+    "optional": "Optional",
+    "create": "Create"
   },
   "header": {
     "nav": {
@@ -483,12 +491,18 @@
       "subtitle": "Manage your company's tour agents and their access.",
       "add_new": "Add Agent",
       "empty_state": "No agents found. Create your first agent to get started.",
+      "empty_state_description": "No agents found for your company.",
       "table": {
         "agent": "Agent",
         "contact": "Contact",
         "status": "Status",
         "joined": "Joined"
       }
+    },
+    "photos": {
+      "title": "Company Photos",
+      "description": "Upload photos to showcase your company",
+      "supported_formats": "Supports JPG, PNG, WebP (max 5MB each)"
     }
   },
   "partner": {
@@ -723,7 +737,9 @@
          "surname": "Last Name",
          "email": "Email",
          "role": "Role",
+         "roles": "Roles",
          "status": "Status",
+         "online": "Online",
          "joined": "Joined",
          "actions": "Actions"
        },
@@ -737,9 +753,16 @@
        "deleted": "User deleted successfully",
        "editUser": "Edit User",
        "updated": "User updated successfully",
-       "addRole": "Add Role",
-       "active": "Active Account",
-       "details": {
+      "addRole": "Add Role",
+      "active": "Active Account",
+      "isActive": "Active",
+      "createUser": "Create User",
+      "deleteUser": "Delete User",
+      "userDetails": "User Details",
+      "userNotFound": "User not found",
+      "online_count": "{{count}} online",
+      "roles": "Roles",
+      "details": {
         "title": "User Details",
         "subtitle": "View full information about this user.",
         "roles": "Roles",
@@ -766,5 +789,20 @@
         }
       }
      }
-   }
+   },
+ "inquiries": {
+    "title": "Inquiries",
+    "description": "Manage your inquiries and communications",
+    "tabs": {
+      "sent": "Sent",
+      "received": "Received"
+    },
+    "new_inquiry": "New Inquiry",
+    "sent": {
+      "empty": "You haven't sent any inquiries yet",
+      "first_inquiry": "Send Your First Inquiry"
+    },
+    "from": "From",
+    "received_on": "Received"
  }
+}

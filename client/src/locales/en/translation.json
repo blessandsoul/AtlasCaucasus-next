@@ -1,4 +1,3 @@
-
 {
   "common": {
     "welcome": "Welcome to AtlasCaucasus API",
@@ -37,7 +36,15 @@
     "close": "Close",
     "pagination": {
       "page_of": "Page {{page}} of {{total}}"
-    }
+    },
+    "photo_uploaded": "Photo uploaded successfully",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "role": "Role",
+    "optional": "Optional",
+    "create": "Create"
   },
   "header": {
     "nav": {
@@ -292,28 +299,18 @@
       "viewing": "viewing",
       "companies_title": "Trusted Tour Operators",
       "companies_subtitle": "Find and connect with certified travel companies in Georgia.",
-      "guides_title": "Expert Local Guides",
-      "guides_subtitle": "Connect with knowledgeable guides who bring Georgia's stories to life.",
       "drivers_title": "Professional Drivers",
       "drivers_subtitle": "Reliable transportation services for your journey across Georgia."
     },
     "filters": {
-      "title": "Filters",
+      "title": "Tour Filters",
       "sorting": "SORTING",
       "select_order": "Select order",
-      "sort_by": "Sort By",
-      "sort_default": "Default",
-      "sort_newest": "Newest",
-      "sort_rating": "Highest Rated",
-      "sort_price_low": "Price: Low to High",
-      "sort_price_high": "Price: High to Low",
       "sort_price_low_high": "Price: Low to High",
       "sort_price_high_low": "Price: High to Low",
-      "sort_experience": "Most Experienced",
-      "sort_capacity": "Largest Capacity",
-      "sort_name": "Name A-Z",
+      "sort_rating": "Rating",
       "search": "Search",
-      "search_placeholder": "Search...",
+      "search_placeholder": "Search tours...",
       "category": "Category",
       "category_placeholder": "e.g., Adventure, Cultural",
       "location": "Location",
@@ -324,31 +321,14 @@
       "budget": "Budget (GEL)",
       "from": "From",
       "to": "To",
-      "price_range": "Price Range",
-      "duration": "Duration (minutes)",
-      "difficulty": "Difficulty",
-      "any_difficulty": "Any Difficulty",
-      "difficulty_easy": "Easy",
-      "difficulty_moderate": "Moderate",
-      "difficulty_challenging": "Challenging",
-      "group_size": "Min Group Size",
-      "min_people": "Min people",
-      "min_rating": "Minimum Rating",
-      "any_rating": "Any Rating",
+      "duration": "Duration",
       "hotel_class": "Hotel Class",
       "meals": "Meals",
       "amenities": "Amenities",
       "languages": "Languages",
-      "language": "Language",
-      "any_language": "Any Language",
       "language_placeholder": "English, Georgian...",
-      "experience": "Min Experience (years)",
+      "experience": "Experience",
       "min_years": "Min years",
-      "vehicle_type": "Vehicle Type",
-      "any_vehicle": "Any Vehicle",
-      "min_capacity": "Min Capacity",
-      "min_seats": "Min seats",
-      "has_active_tours": "Has Active Tours",
       "coming_soon": "Coming soon..."
     },
     "tabs": {
@@ -510,12 +490,18 @@
       "subtitle": "Manage your company's tour agents and their access.",
       "add_new": "Add Agent",
       "empty_state": "No agents found. Create your first agent to get started.",
+      "empty_state_description": "No agents found for your company.",
       "table": {
         "agent": "Agent",
         "contact": "Contact",
         "status": "Status",
         "joined": "Joined"
       }
+    },
+    "photos": {
+      "title": "Company Photos",
+      "description": "Upload photos to showcase your company",
+      "supported_formats": "Supports JPG, PNG, WebP (max 5MB each)"
     }
   },
   "partner": {
@@ -629,7 +615,6 @@
     "content_soon": "Content coming soon",
     "menu": {
       "dashboard": "Dashboard",
-      "inquiries": "Inquiries",
       "account": "Account",
       "settings": "Settings"
     }
@@ -751,7 +736,9 @@
          "surname": "Last Name",
          "email": "Email",
          "role": "Role",
+         "roles": "Roles",
          "status": "Status",
+         "online": "Online",
          "joined": "Joined",
          "actions": "Actions"
        },
@@ -765,9 +752,16 @@
        "deleted": "User deleted successfully",
        "editUser": "Edit User",
        "updated": "User updated successfully",
-       "addRole": "Add Role",
-       "active": "Active Account",
-       "details": {
+      "addRole": "Add Role",
+      "active": "Active Account",
+      "isActive": "Active",
+      "createUser": "Create User",
+      "deleteUser": "Delete User",
+      "userDetails": "User Details",
+      "userNotFound": "User not found",
+      "online_count": "{{count}} online",
+      "roles": "Roles",
+      "details": {
         "title": "User Details",
         "subtitle": "View full information about this user.",
         "roles": "Roles",
@@ -793,6 +787,21 @@
           "license": "License"
         }
       }
-     }
-   }
- }
+    }
+  },
+  "inquiries": {
+    "title": "Inquiries",
+    "description": "Manage your inquiries and communications",
+    "tabs": {
+      "sent": "Sent",
+      "received": "Received"
+    },
+    "new_inquiry": "New Inquiry",
+    "sent": {
+      "empty": "You have not sent any inquiries yet",
+      "first_inquiry": "Send your first inquiry"
+    },
+    "from": "From",
+    "received_on": "Received On"
+  }
+}
