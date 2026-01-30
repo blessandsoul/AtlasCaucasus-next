@@ -78,7 +78,7 @@ export const GuideCard = ({ guide, className, onFavorite }: GuideCardProps) => {
   const languagesArray = getLanguages();
 
   const handleCardClick = () => {
-    router.push(`/guides/${guide.id}`);
+    router.push(`/explore/guides/${guide.id}`);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {

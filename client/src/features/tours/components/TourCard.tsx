@@ -49,7 +49,7 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
     };
 
     const handleCardClick = () => {
-        router.push(`/tours/${tour.id}`);
+        router.push(`/explore/tours/${tour.id}`);
     };
 
     const handleFavoriteClick = (e: React.MouseEvent) => {

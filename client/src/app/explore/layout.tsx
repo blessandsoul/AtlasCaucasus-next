@@ -9,6 +9,7 @@ import { ExploreFilters } from '@/features/explore/components/ExploreFilters';
 /**
  * ExploreLayout - Shared layout for /explore/* routes
  * Contains the hero section, tabs, and persistent sidebar filters
+ * Detail pages (with IDs) bypass the filter layout
  */
 export default function ExploreLayout({
     children,
@@ -26,7 +27,16 @@ export default function ExploreLayout({
     // Determine current type from URL path for the filters
     const pathParts = pathname.split('/');
     // e.g. /explore/tours -> parts=["", "explore", "tours"]
+    // e.g. /explore/drivers/123 -> parts=["", "explore", "drivers", "123"]
     const currentType: EntityType = (pathParts[2] as EntityType) || 'tours';
+
+    // Check if this is a detail page (has an ID segment - 4th part)
+    const isDetailPage = pathParts.length > 3 && pathParts[3];
+
+    // Detail pages render without the explore layout wrapper
+    if (isDetailPage) {
+        return <>{children}</>;
+    }
 
     return (
         <div className="flex flex-col bg-gray-50 dark:bg-gray-950">

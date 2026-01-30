@@ -38,7 +38,7 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
   const imageUrl = getImageUrl();
 
   const handleCardClick = () => {
-    router.push(`/companies/${company.id}`);
+    router.push(`/explore/companies/${company.id}`);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
