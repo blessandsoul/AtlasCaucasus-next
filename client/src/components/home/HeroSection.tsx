@@ -60,7 +60,7 @@ export const HeroSection = () => {
     };
 
     return (
-        <section className="relative flex min-h-[50vh] w-full flex-col items-center justify-center px-2 min-[370px]:px-4 pt-40 pb-24 overflow-hidden">
+        <section className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-2 min-[370px]:px-4 pt-40 pb-24 overflow-hidden">
             {/* Background Image with Parallax */}
             <div className="absolute inset-0 z-0">
                 <motion.div
@@ -76,6 +76,9 @@ export const HeroSection = () => {
                     <div className="absolute inset-0 bg-black/40" />
                 </motion.div>
             </div>
+
+            {/* Bottom Gradient Transition */}
+            <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background via-background/60 to-transparent z-0 pointer-events-none" />
 
             <div className="relative z-10 flex flex-col items-center w-full">
                 <h2 className="font-heading text-center text-xl min-[370px]:text-2xl min-[420px]:text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-semibold text-white mb-6 tracking-[1.15px] leading-tight pb-2 max-w-5xl mx-auto drop-shadow-md">

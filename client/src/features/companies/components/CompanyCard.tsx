@@ -140,9 +140,8 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
             </span>
           </div>
 
-          <Button className="h-8 rounded-full bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold px-4 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all text-xs">
-            View Profile
-            <ArrowRight className="h-3 w-3 ml-2" />
+          <Button size="icon" className="h-9 w-9 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all">
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
 

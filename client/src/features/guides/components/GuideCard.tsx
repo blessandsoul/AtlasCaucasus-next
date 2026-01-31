@@ -200,9 +200,8 @@ export const GuideCard = ({ guide, className, onFavorite }: GuideCardProps) => {
             </div>
           </div>
 
-          <Button className="h-9 rounded-full bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold px-4 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all text-sm">
-            View Profile
-            <ArrowRight className="h-3.5 w-3.5 ml-2" />
+          <Button size="icon" className="h-9 w-9 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all">
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
 

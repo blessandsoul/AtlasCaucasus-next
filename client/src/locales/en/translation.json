@@ -255,11 +255,11 @@
     "why_choose": {
       "title": "Why Choose Atlas Caucasus?",
       "subtitle": "We provide the best travel experiences with local expertise and premium support.",
-      "verified_guides": "Verified Guides",
+      "verified_guides": "Guides",
       "verified_guides_desc": "All our guides go through a strict verification process to ensure your safety and quality of experience.",
-      "best_prices": "Best Prices",
+      "best_prices": "Prices",
       "best_prices_desc": "We guarantee the best market rates with no hidden fees. Direct booking prices from operators.",
-      "support": "Support 24/7",
+      "support": "Support",
       "support_desc": "Our local support team is always available to help you with any questions or emergencies."
     },
     "cta": {
@@ -272,11 +272,11 @@
       "title": "Find Your Vibe",
       "subtitle": "Discover tours that match your travel style.",
       "items": {
-        "hiking": "Hiking & Trekking",
-        "wine": "Wine & Gastronomy",
-        "culture": "Culture & History",
-        "sea": "Sea & Relax",
-        "adventure": "Off-road Adventure"
+        "hiking": "Hiking",
+        "wine": "Wine",
+        "culture": "Culture",
+        "sea": "Sea",
+        "adventure": "Adventure"
       }
     },
     "testimonials": {
