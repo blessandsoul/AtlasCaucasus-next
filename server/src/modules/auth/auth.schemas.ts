@@ -100,6 +100,7 @@ export const createTourAgentSchema = z.object({
   email: emailSchema,
   firstName: nameSchema,
   lastName: nameSchema,
+  phoneNumber: z.string().max(20, "Phone number is too long").optional(),
 });
 
 // ==========================================

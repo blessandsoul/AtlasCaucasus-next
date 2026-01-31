@@ -53,6 +53,7 @@ export interface User {
   passwordHash: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string | null;
   isActive: boolean;
   tokenVersion: number;
   createdAt: Date;
@@ -88,6 +89,7 @@ export interface SafeUser {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string | null;
   // Roles are fetched from UserRoleAssignment
   roles: UserRole[];
   isActive: boolean;
@@ -119,6 +121,7 @@ export interface UpdateUserData {
   passwordHash?: string;
   firstName?: string;
   lastName?: string;
+  phoneNumber?: string | null;
   isActive?: boolean;
   tokenVersion?: number;
   // Email verification

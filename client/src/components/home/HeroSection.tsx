@@ -60,7 +60,7 @@ export const HeroSection = () => {
     };
 
     return (
-        <section className="relative flex min-h-[50vh] w-full flex-col items-center justify-center px-4 pt-40 pb-24 overflow-hidden">
+        <section className="relative flex min-h-[50vh] w-full flex-col items-center justify-center px-2 min-[370px]:px-4 pt-40 pb-24 overflow-hidden">
             {/* Background Image with Parallax */}
             <div className="absolute inset-0 z-0">
                 <motion.div
@@ -78,29 +78,31 @@ export const HeroSection = () => {
             </div>
 
             <div className="relative z-10 flex flex-col items-center w-full">
-                <h2 className="font-heading text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-white mb-6 tracking-[1.15px] leading-tight pb-2 max-w-5xl mx-auto drop-shadow-md">
+                <h2 className="font-heading text-center text-xl min-[370px]:text-2xl min-[420px]:text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-semibold text-white mb-6 tracking-[1.15px] leading-tight pb-2 max-w-5xl mx-auto drop-shadow-md">
                     {t('home.hero.title_start')} <span className="text-gradient">{t('home.hero.title_end')}</span>
                 </h2>
-                <p className="text-center text-lg sm:text-xl text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-sm">
+                <p className="text-center text-sm min-[370px]:text-lg sm:text-xl text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-sm">
                     {t('home.hero.subtitle')}
                 </p>
 
-                <div className="w-full max-w-[896px] rounded-full bg-background border shadow-lg flex items-center pr-2">
+                <div className="w-full max-w-[896px] rounded-2xl md:rounded-full bg-background border shadow-lg flex flex-col md:flex-row items-stretch md:items-center pr-0 md:pr-2 pb-2 md:pb-0">
                     {/* Where - Location Autocomplete */}
                     <LocationAutocomplete
                         value={selectedLocation}
                         onChange={setSelectedLocation}
                         onSelect={handleLocationSelect}
+                        triggerClassName="rounded-t-2xl md:rounded-l-full md:rounded-tr-none md:rounded-br-none"
                     />
 
                     {/* Divider */}
-                    <div className="w-px h-10 bg-border shrink-0" />
+                    <div className="hidden md:block w-px h-10 bg-border shrink-0" />
+                    <div className="block md:hidden h-px w-full bg-border shrink-0" />
 
                     {/* When - Date Picker */}
                     <Popover open={dateOpen} onOpenChange={setDateOpen}>
                         <PopoverTrigger asChild>
                             <div className={cn(
-                                'flex-1 flex items-center gap-3 px-6 cursor-pointer transition-colors h-full py-3',
+                                'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 cursor-pointer transition-colors h-full py-4 md:py-3',
                                 dateOpen ? 'bg-muted/50' : 'hover:bg-muted/50'
                             )}>
                                 <Calendar className="text-muted-foreground w-5 h-5 shrink-0" />
@@ -138,12 +140,13 @@ export const HeroSection = () => {
                     </Popover>
 
                     {/* Divider */}
-                    <div className="w-px h-10 bg-border shrink-0" />
+                    <div className="hidden md:block w-px h-10 bg-border shrink-0" />
+                    <div className="block md:hidden h-px w-full bg-border shrink-0" />
 
                     {/* Who - Guest Count (Inline Input) */}
                     <div
                         className={cn(
-                            'flex-1 flex items-center gap-3 px-6 transition-colors h-full py-3',
+                            'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 transition-colors h-full py-4 md:py-3 rounded-b-2xl md:rounded-none',
                             guestsFocused ? 'bg-muted/50' : 'hover:bg-muted/50'
                         )}
                         onClick={() => guestsInputRef.current?.focus()}
@@ -181,7 +184,7 @@ export const HeroSection = () => {
                     <button
                         onClick={handleSearch}
                         style={{ backgroundColor: colors.secondary }}
-                        className="hover:opacity-90 text-primary-foreground rounded-full px-8 py-3.5 flex items-center gap-2 font-medium shadow-md transition-all ml-2 cursor-pointer my-2 shrink-0"
+                        className="hover:opacity-90 text-primary-foreground rounded-xl md:rounded-full px-5 lg:px-8 py-3.5 flex items-center justify-center md:justify-start gap-2 font-medium shadow-md transition-all md:ml-2 cursor-pointer mt-2 md:my-2 mx-4 md:mx-0 shrink-0"
                     >
                         <Search className="w-5 h-5" />
                         {t('home.hero.search.search_button')}

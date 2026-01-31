@@ -55,6 +55,7 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    phoneNumber: user.phoneNumber,
     roles,
     isActive: user.isActive,
     emailVerified: user.emailVerified,
@@ -323,6 +324,7 @@ export async function createTourAgent(
     passwordHash,
     firstName: input.firstName,
     lastName: input.lastName,
+    phoneNumber: input.phoneNumber,
     parentCompanyId: companyUserId,
   });
 

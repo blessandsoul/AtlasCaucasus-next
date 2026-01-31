@@ -18,11 +18,11 @@ import {
   Calendar,
   Building2,
   Share2,
-  MessageCircle,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils/format';
 import { getMediaUrl } from '@/lib/utils/media';
 import { useCallback } from 'react';
+import { ChatButton } from '@/features/chat/components/ChatButton';
 
 export default function CompanyDetailsPage() {
   const params = useParams();
@@ -163,10 +163,11 @@ export default function CompanyDetailsPage() {
 
               {/* Action Buttons */}
               <div className="flex gap-2 mt-4 md:mt-0">
-                <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
-                  <MessageCircle className="w-4 h-4" />
-                  Contact
-                </Button>
+                <ChatButton
+                  otherUserId={company.userId}
+                  label="Contact"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+                />
                 <Button variant="secondary" size="icon" className="shadow-md">
                   <Share2 className="w-4 h-4" />
                 </Button>

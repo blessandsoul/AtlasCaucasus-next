@@ -10,6 +10,7 @@ function toUser(prismaUser: PrismaUser & { companyProfile?: any; guideProfile?: 
     passwordHash: prismaUser.passwordHash,
     firstName: prismaUser.firstName,
     lastName: prismaUser.lastName,
+    phoneNumber: prismaUser.phoneNumber,
     isActive: prismaUser.isActive,
     tokenVersion: prismaUser.tokenVersion,
     createdAt: prismaUser.createdAt,
@@ -104,6 +105,7 @@ export async function updateUser(id: string, data: UpdateUserData): Promise<User
     data: {
       firstName: data.firstName,
       lastName: data.lastName,
+      phoneNumber: data.phoneNumber,
       passwordHash: data.passwordHash,
       emailVerified: data.emailVerified,
       verificationToken: data.verificationToken,
@@ -373,6 +375,7 @@ export interface CreateTourAgentData {
   passwordHash: string;
   firstName: string;
   lastName: string;
+  phoneNumber?: string;
   parentCompanyId: string;
 }
 
@@ -383,6 +386,7 @@ export async function createTourAgent(data: CreateTourAgentData): Promise<User> 
       passwordHash: data.passwordHash,
       firstName: data.firstName,
       lastName: data.lastName,
+      phoneNumber: data.phoneNumber,
       parentCompanyId: data.parentCompanyId,
       roles: {
         create: {

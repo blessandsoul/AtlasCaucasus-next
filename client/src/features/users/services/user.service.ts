@@ -3,6 +3,12 @@ import { API_ENDPOINTS } from '@/lib/constants/api-endpoints';
 import type { PaginatedApiResponse, PaginationParams, ApiResponse } from '@/lib/api/api.types';
 import type { IUser } from '@/features/auth/types/auth.types';
 
+export interface UpdateProfileData {
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+}
+
 class UserService {
     async getAllUsers(params: PaginationParams) {
         const response = await apiClient.get<PaginatedApiResponse<IUser>>(
@@ -10,6 +16,14 @@ class UserService {
             { params }
         );
         return response.data.data;
+    }
+
+    async updateProfile(userId: string, data: UpdateProfileData): Promise<IUser> {
+        const response = await apiClient.patch<ApiResponse<{ user: IUser }>>(
+            API_ENDPOINTS.USERS.UPDATE(userId),
+            data
+        );
+        return response.data.data.user;
     }
 
     async getUser(id: string) {

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Star,
   MapPin,
@@ -8,11 +10,17 @@ import {
   Phone,
   Users,
   CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getMediaUrl } from '@/lib/utils/media';
 import type { Driver } from '../types/driver.types';
+import { useCreateDirectChat } from '@/features/chat/hooks/useChats';
+import { selectChat } from '@/features/chat/store/chatSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface DriverHeaderProps {
   driver: Driver;
@@ -20,6 +28,12 @@ interface DriverHeaderProps {
 }
 
 export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
+  const createChat = useCreateDirectChat();
+  const [isLoading, setIsLoading] = useState(false);
+
   const fullName = driver.user
     ? `${driver.user.firstName} ${driver.user.lastName}`
     : 'Unknown Driver';
@@ -29,10 +43,29 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
 
   const primaryLocation = driver.locations?.[0];
 
-  const handleSendMessage = () => {
-    // TODO: Implement messaging logic
-    console.log('Send message to driver:', driver.id);
-  };
+  const handleSendMessage = useCallback(async () => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to send a message');
+      router.push('/login');
+      return;
+    }
+
+    if (user?.id === driver.userId) {
+      toast.error("You can't message yourself");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const chat = await createChat.mutateAsync({ otherUserId: driver.userId });
+      dispatch(selectChat(chat.id));
+    } catch (error) {
+      console.error('Failed to create chat:', error);
+      toast.error('Failed to start chat. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, user?.id, driver.userId, createChat, dispatch, router]);
 
   const handleCall = () => {
     if (driver.phoneNumber) {
@@ -114,8 +147,13 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
             size="lg"
             className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
             onClick={handleSendMessage}
+            disabled={isLoading || createChat.isPending}
           >
-            <MessageCircle className="h-5 w-5 mr-2" />
+            {isLoading || createChat.isPending ? (
+              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+            ) : (
+              <MessageCircle className="h-5 w-5 mr-2" />
+            )}
             Send Message
           </Button>
           {driver.phoneNumber && (

@@ -7,6 +7,7 @@ import { Zap, ShieldCheck } from 'lucide-react';
 import type { Tour } from '@/features/tours/types/tour.types';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/format';
+import { ChatButton } from '@/features/chat/components/ChatButton';
 
 interface TourSidebarProps {
   tour: Tour;
@@ -69,7 +70,7 @@ export const TourSidebar = ({ tour, className, onBook }: TourSidebarProps) => {
         </div>
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-3">
         <Button
           size="lg"
           className="w-full text-lg font-semibold shadow-md active:scale-95 transition-transform"
@@ -77,6 +78,13 @@ export const TourSidebar = ({ tour, className, onBook }: TourSidebarProps) => {
         >
           Check Availability
         </Button>
+        <ChatButton
+          otherUserId={tour.ownerId}
+          variant="outline"
+          size="lg"
+          label="Message Host"
+          className="w-full"
+        />
       </CardFooter>
     </Card>
   );

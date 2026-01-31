@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import { Loader2, User, Mail, UserPlus } from 'lucide-react';
+import { Loader2, User, Mail, Phone, UserPlus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +28,7 @@ export const CreateAgentForm = () => {
       firstName: '',
       lastName: '',
       email: '',
+      phoneNumber: '',
     },
   });
 
@@ -87,28 +88,52 @@ export const CreateAgentForm = () => {
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('auth.email', 'Email')}</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="email"
-                    placeholder={t('auth.email_placeholder', 'Enter email address')}
-                    autoComplete="email"
-                    className="pl-9"
-                    {...field}
-                  />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('auth.email', 'Email')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder={t('auth.email_placeholder', 'Enter email address')}
+                      autoComplete="email"
+                      className="pl-9"
+                      {...field}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('auth.phone_number', 'Phone Number')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="tel"
+                      placeholder="+995 555 00 00 00"
+                      autoComplete="tel"
+                      className="pl-9"
+                      {...field}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="flex justify-end pt-4">
           <Button

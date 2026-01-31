@@ -78,6 +78,7 @@ model User {
   passwordHash String    @map("password_hash")
   firstName    String    @map("first_name")
   lastName     String    @map("last_name")
+  phoneNumber  String?   @map("phone_number") @db.VarChar(20)
   isActive     Boolean   @default(true) @map("is_active")
   tokenVersion Int       @default(0) @map("token_version")
   createdAt    DateTime  @default(now()) @map("created_at")

@@ -17,6 +17,7 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    phoneNumber: user.phoneNumber,
     roles: user.roles || [],
     isActive: user.isActive,
     emailVerified: user.emailVerified,
@@ -104,6 +105,7 @@ export async function updateUserSelf(
     email: input.email,
     firstName: input.firstName,
     lastName: input.lastName,
+    phoneNumber: input.phoneNumber,
   });
 
   return await toSafeUser(user);
@@ -130,6 +132,7 @@ export async function updateUserAdmin(
     email: input.email,
     firstName: input.firstName,
     lastName: input.lastName,
+    phoneNumber: input.phoneNumber,
     isActive: input.isActive,
   });
 

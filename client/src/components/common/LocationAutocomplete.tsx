@@ -19,7 +19,8 @@ export const LocationAutocomplete = ({
     onSelect,
     placeholder,
     className,
-}: LocationAutocompleteProps) => {
+    triggerClassName,
+}: LocationAutocompleteProps & { triggerClassName?: string }) => {
     const { t } = useMockTranslation();
     const [isFocused, setIsFocused] = useState(false);
     const [query, setQuery] = useState('');
@@ -70,7 +71,10 @@ export const LocationAutocomplete = ({
         <div ref={containerRef} className={cn('relative flex-1', className)}>
             <div
                 className={cn(
-                    'flex items-center gap-3 px-6 h-full py-3 transition-colors rounded-l-full',
+                    'flex items-center gap-3 px-6 h-full py-3 transition-colors',
+                    // Default rounded-l-full if no triggerClassName provided, otherwise controlled by parent or combined
+                    !triggerClassName && 'rounded-l-full',
+                    triggerClassName,
                     isFocused ? 'bg-muted/50' : 'hover:bg-muted/50'
                 )}
                 onClick={() => inputRef.current?.focus()}

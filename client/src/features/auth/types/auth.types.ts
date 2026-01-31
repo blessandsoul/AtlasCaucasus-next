@@ -4,6 +4,7 @@ export interface IUser {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string | null;
   roles: UserRole[]; // Array of roles
   isActive: boolean;
   emailVerified: boolean;

@@ -7,6 +7,7 @@ export const createAgentSchema = (t: TFunction) =>
     email: createEmailSchema(t),
     firstName: createNameSchema(t),
     lastName: createNameSchema(t),
+    phoneNumber: z.string().max(20, t('validation.phone_too_long', 'Phone number is too long')).optional(),
   });
 
 export type CreateAgentFormData = z.infer<ReturnType<typeof createAgentSchema>>;

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Star,
   MapPin,
@@ -9,12 +11,18 @@ import {
   Globe,
   Award,
   CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getMediaUrl } from '@/lib/utils/media';
 import type { Guide, Location, GuideLocation } from '../types/guide.types';
+import { useCreateDirectChat } from '@/features/chat/hooks/useChats';
+import { selectChat } from '@/features/chat/store/chatSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface GuideHeaderProps {
   guide: Guide;
@@ -22,6 +30,12 @@ interface GuideHeaderProps {
 }
 
 export const GuideHeader = ({ guide, className }: GuideHeaderProps) => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
+  const createChat = useCreateDirectChat();
+  const [isLoading, setIsLoading] = useState(false);
+
   const fullName = guide.user
     ? `${guide.user.firstName} ${guide.user.lastName}`
     : 'Unknown Guide';
@@ -45,9 +59,29 @@ export const GuideHeader = ({ guide, className }: GuideHeaderProps) => {
   const locations = getLocations();
   const primaryLocation = locations[0];
 
-  const handleSendMessage = () => {
-    console.log('Send message to guide:', guide.id);
-  };
+  const handleSendMessage = useCallback(async () => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to send a message');
+      router.push('/login');
+      return;
+    }
+
+    if (user?.id === guide.userId) {
+      toast.error("You can't message yourself");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const chat = await createChat.mutateAsync({ otherUserId: guide.userId });
+      dispatch(selectChat(chat.id));
+    } catch (error) {
+      console.error('Failed to create chat:', error);
+      toast.error('Failed to start chat. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, user?.id, guide.userId, createChat, dispatch, router]);
 
   const handleCall = () => {
     if (guide.phoneNumber) {
@@ -169,8 +203,13 @@ export const GuideHeader = ({ guide, className }: GuideHeaderProps) => {
             size="lg"
             className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
             onClick={handleSendMessage}
+            disabled={isLoading || createChat.isPending}
           >
-            <MessageCircle className="h-5 w-5 mr-2" />
+            {isLoading || createChat.isPending ? (
+              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+            ) : (
+              <MessageCircle className="h-5 w-5 mr-2" />
+            )}
             Send Message
           </Button>
           {guide.phoneNumber && (

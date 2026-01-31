@@ -15,6 +15,16 @@ module.exports = {
         "2xl": "1400px",
       },
     },
+    screens: {
+      'xs': '475px',
+      'sm': '640px',
+      'md': '768px',
+      'header-md': '850px',
+      'lg': '1024px',
+      'header-lg': '1130px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", "var(--font-georgian)", "sans-serif"],

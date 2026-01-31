@@ -14,6 +14,7 @@ export const updateUserSelfSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
   firstName: z.string().min(2, "First name must be at least 2 characters").optional(),
   lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
+  phoneNumber: z.string().max(20, "Phone number is too long").optional().nullable(),
 });
 
 // Admin-update: admins can update any field including role and isActive
@@ -21,6 +22,7 @@ export const updateUserAdminSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
   firstName: z.string().min(2, "First name must be at least 2 characters").optional(),
   lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
+  phoneNumber: z.string().max(20, "Phone number is too long").optional().nullable(),
   role: z.enum(["USER", "COMPANY", "ADMIN", "TOUR_AGENT", "GUIDE", "DRIVER"]).optional(),
   isActive: z.boolean().optional(),
 });
