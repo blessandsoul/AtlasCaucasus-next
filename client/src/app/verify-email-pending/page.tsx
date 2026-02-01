@@ -135,7 +135,7 @@ export default function VerifyEmailPendingPage() {
                     {/* Help Text */}
                     <div className="mt-6 pt-6 border-t">
                         <p className="text-xs text-center text-muted-foreground">
-                            {t('auth.verification_link_expires') || 'The verification link expires in 24 hours'}
+                            {t('auth.verification_link_expires') || 'The verification link expires in 7 days'}
                         </p>
                     </div>
                 </div>

@@ -22,11 +22,11 @@ export const CompanyAgentsTable = () => {
             header: t('company.agents.table.agent', 'Agent'),
             cell: (agent) => (
                 <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold flex-shrink-0">
                         {agent.firstName[0]}
                     </div>
-                    <div>
-                        <div className="font-semibold">{agent.firstName} {agent.lastName}</div>
+                    <div className="min-w-0">
+                        <div className="font-semibold truncate">{agent.firstName} {agent.lastName}</div>
                         <div className="text-xs text-muted-foreground hidden sm:block">ID: {agent.id.slice(0, 8)}...</div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@ export const CompanyAgentsTable = () => {
         {
             header: t('company.agents.table.joined', 'Joined'),
             cell: (agent) => (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-muted-foreground whitespace-nowrap">
                     <Calendar className="h-3.5 w-3.5" />
                     {formatDate(agent.createdAt)}
                 </div>

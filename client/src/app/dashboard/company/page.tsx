@@ -231,10 +231,9 @@ export default function CompanyManagementPage() {
 
       {/* Company Info Card */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <CardTitle>{t('company.management.company_info', 'Company Information')}</CardTitle>
-
           </div>
           {!isEditing && (
             <Button variant="outline" size="icon" onClick={() => setIsEditing(true)}>
@@ -343,7 +342,7 @@ export default function CompanyManagementPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
                 <Button type="button" variant="outline" onClick={handleCancel}>
                   {t('common.cancel', 'Cancel')}
                 </Button>
@@ -441,7 +440,7 @@ export default function CompanyManagementPage() {
 
       {/* Photos Card */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2">
             <ImageIcon className="h-5 w-5" />
             {t('company.photos.title', 'Company Photos')}

@@ -37,6 +37,11 @@ async function start(): Promise<void> {
     await app.listen({ port: env.PORT, host: "0.0.0.0" });
     logger.info(`Server started on port ${env.PORT}`);
 
+    // Signal PM2 that the app is ready (for cluster mode with wait_ready: true)
+    if (process.send) {
+      process.send("ready");
+    }
+
     // Log service status
     logger.info({
       database: databaseAvailable ? "Connected" : "Unavailable",

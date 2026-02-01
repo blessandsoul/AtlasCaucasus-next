@@ -8,12 +8,16 @@ import { DriverInfo } from '@/features/drivers/components/DriverInfo';
 import { DriverSidebar } from '@/features/drivers/components/DriverSidebar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
+import { isValidUuid } from '@/lib/utils/validation';
 
 export default function DriverDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { data: driver, isLoading, error } = useDriver(id);
+
+  // Validate UUID format before making API call
+  const isValidId = isValidUuid(id);
+  const { data: driver, isLoading, error } = useDriver(isValidId ? id : '');
 
   if (isLoading) {
     return (
@@ -23,7 +27,7 @@ export default function DriverDetailsPage() {
     );
   }
 
-  if (error || !driver) {
+  if (!isValidId || error || !driver) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center px-4">
         <h2 className="text-2xl font-bold text-foreground">Driver not found</h2>

@@ -52,4 +52,18 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
     { preHandler: [authGuard, requireVerifiedEmail, requireSelfOrAdmin] },
     userController.deleteUser
   );
+
+  // Admin-only: unlock user account (removes lockout and resets failed attempts)
+  fastify.post(
+    "/users/:id/unlock",
+    { preHandler: [authGuard, requireRole("ADMIN")] },
+    userController.unlockUserAccount
+  );
+
+  // Admin-only: restore soft-deleted user
+  fastify.post(
+    "/users/:id/restore",
+    { preHandler: [authGuard, requireRole("ADMIN")] },
+    userController.restoreUser
+  );
 }

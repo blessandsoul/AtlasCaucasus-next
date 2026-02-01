@@ -47,7 +47,7 @@ class InquiryService {
       data: Inquiry;
     }>(API_ENDPOINTS.INQUIRIES.CREATE, data);
 
-    return response.data;
+    return response.data.data;
   }
 
   async respondToInquiry(id: string, data: RespondToInquiryInput) {
@@ -57,7 +57,7 @@ class InquiryService {
       data: Inquiry;
     }>(API_ENDPOINTS.INQUIRIES.RESPOND(id), data);
 
-    return response.data;
+    return response.data.data;
   }
 }
 

@@ -119,7 +119,7 @@ export const CompanyToursTable = () => {
         {
             header: t('company.operations.tours.table.created', 'Created'),
             cell: (tour) => (
-                <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground text-sm whitespace-nowrap">
                     <Calendar className="h-3.5 w-3.5" />
                     {formatDate(tour.createdAt)}
                 </div>

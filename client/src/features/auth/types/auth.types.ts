@@ -19,6 +19,7 @@ export interface IUser {
   guideProfileId?: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null; // For soft-deleted users
 }
 
 export type UserRole = 'USER' | 'COMPANY' | 'ADMIN' | 'GUIDE' | 'DRIVER' | 'TOUR_AGENT';

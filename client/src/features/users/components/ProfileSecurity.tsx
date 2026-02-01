@@ -46,9 +46,9 @@ export const ProfileSecurity = ({ user }: ProfileSecurityProps) => {
                     <CardTitle>{t('profile.security.password_title', 'Password')}</CardTitle>
                     <CardDescription>{t('profile.security.password_desc', 'Manage your password and account security')}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="p-2 rounded-full bg-primary/10 text-primary">
+                <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <div className="p-2 rounded-full bg-primary/10 text-primary flex-shrink-0">
                             <Key className="w-5 h-5" />
                         </div>
                         <div>
@@ -56,7 +56,7 @@ export const ProfileSecurity = ({ user }: ProfileSecurityProps) => {
                             <p className="text-sm text-muted-foreground">{t('profile.security.last_changed_never', 'Last changed: Never')}</p>
                         </div>
                     </div>
-                    <Button variant="outline" onClick={handleResetPassword} disabled={forgotPassword.isPending}>
+                    <Button variant="outline" onClick={handleResetPassword} disabled={forgotPassword.isPending} className="w-full sm:w-auto">
                         {t('auth.change_password', 'Change Password')}
                     </Button>
                 </CardContent>

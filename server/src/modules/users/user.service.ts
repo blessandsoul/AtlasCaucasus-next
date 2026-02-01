@@ -12,6 +12,7 @@ import { getMediaByEntity } from "../media/media.repo.js";
 
 async function toSafeUser(user: User): Promise<SafeUser> {
   const media = await getMediaByEntity("user", user.id);
+  const avatar = media.length > 0 ? media[0] : undefined;
   return {
     id: user.id,
     email: user.email,
@@ -23,7 +24,8 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     emailVerified: user.emailVerified,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
-    avatar: media.length > 0 ? media[0] : undefined, // First image as avatar
+    avatar, // First image as avatar
+    avatarUrl: avatar?.url ?? null, // Convenience URL field for frontend
 
     // Profiles
     companyProfile: user.companyProfile,
@@ -190,4 +192,18 @@ export async function deleteUser(id: string): Promise<void> {
   }
 
   await userRepo.softDeleteUser(id);
+}
+
+// Admin-only: restore soft-deleted user
+export async function restoreUser(id: string): Promise<SafeUser> {
+  const deletedUser = await userRepo.findDeletedUserById(id);
+  if (!deletedUser) {
+    throw new NotFoundError(
+      "Deleted user not found",
+      "DELETED_USER_NOT_FOUND"
+    );
+  }
+
+  const user = await userRepo.restoreUser(id);
+  return await toSafeUser(user);
 }

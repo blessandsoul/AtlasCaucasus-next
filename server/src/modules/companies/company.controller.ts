@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { successResponse, paginatedResponse } from "../../libs/response.js";
 import { ValidationError, BadRequestError } from "../../libs/errors.js";
+import { validateUuidParam } from "../../libs/validation.js";
 import * as companyService from "./company.service.js";
 import { updateCompanySchema, companyQuerySchema } from "./company.schemas.js";
 import {
@@ -36,7 +37,7 @@ export async function getById(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     const company = await companyService.getCompanyById(id);
 
@@ -52,7 +53,7 @@ export async function getMyCompany(
     const company = await companyService.getMyCompany(request.user.id);
 
     return reply.send(
-        successResponse("Company retrieved successfully", { company })
+        successResponse("Company retrieved successfully", company)
     );
 }
 
@@ -60,7 +61,7 @@ export async function update(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     const parsed = updateCompanySchema.safeParse(request.body);
     if (!parsed.success) {
@@ -83,7 +84,7 @@ export async function deleteCompany(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     await companyService.deleteCompany(id, request.user.id, request.user.roles);
 
@@ -96,7 +97,7 @@ export async function getTourAgents(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     const tourAgents = await companyService.getTourAgents(
         id,
@@ -105,7 +106,7 @@ export async function getTourAgents(
     );
 
     return reply.send(
-        successResponse("Tour agents retrieved successfully", { tourAgents })
+        successResponse("Tour agents retrieved successfully", tourAgents)
     );
 }
 
@@ -117,7 +118,7 @@ export async function uploadPhotos(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     // Get all files from multipart request
     const parts = request.files();
@@ -159,7 +160,7 @@ export async function getPhotos(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     // Verify company exists
     await companyService.getCompanyById(id);
@@ -173,7 +174,9 @@ export async function deletePhoto(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id, photoId } = request.params as { id: string; photoId: string };
+    const params = request.params as { id: string; photoId: string };
+    const id = validateUuidParam(params.id);
+    const photoId = validateUuidParam(params.photoId);
 
     // Verify company exists
     await companyService.getCompanyById(id);
@@ -191,7 +194,7 @@ export async function uploadLogo(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     // Get file from multipart request
     const file = await request.file();
@@ -227,7 +230,7 @@ export async function deleteLogo(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     await companyService.deleteCompanyLogo(
         id,

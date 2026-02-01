@@ -4,6 +4,7 @@ import type { CreateTourData, UpdateTourData, SafeTour, TourDifficulty } from ".
 import { getMediaByEntity, getMediaByEntityIds } from "../media/media.repo.js";
 import type { SafeMedia } from "../media/media.types.js";
 import { logger } from "../../libs/logger.js";
+import { ValidationError } from "../../libs/errors.js";
 
 // Convert Prisma Tour to SafeTour
 function toSafeTour(tour: PrismaTour): SafeTour {
@@ -78,7 +79,7 @@ export async function createTour(
 
   // Validate price is within DECIMAL(10,2) range
   if (isNaN(priceValue) || priceValue < 0 || priceValue > 99999999.99) {
-    throw new Error(`Invalid price value: ${priceValue}. Must be between 0 and 99999999.99`);
+    throw new ValidationError(`Invalid price value: ${priceValue}. Must be between 0 and 99999999.99`, "INVALID_PRICE");
   }
 
   const tour = await prisma.tour.create({

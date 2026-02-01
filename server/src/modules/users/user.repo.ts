@@ -22,6 +22,8 @@ function toUser(prismaUser: PrismaUser & { companyProfile?: any; guideProfile?: 
     verificationTokenExpiresAt: prismaUser.verificationTokenExpiresAt,
     resetPasswordToken: prismaUser.resetPasswordToken,
     resetPasswordTokenExpiresAt: prismaUser.resetPasswordTokenExpiresAt,
+    invitationToken: prismaUser.invitationToken,
+    invitationTokenExpiresAt: prismaUser.invitationTokenExpiresAt,
     failedLoginAttempts: prismaUser.failedLoginAttempts,
     lockedUntil: prismaUser.lockedUntil,
     roles: (prismaUser as any).roles?.map((r: any) => r.role as UserRole) || [],
@@ -112,6 +114,8 @@ export async function updateUser(id: string, data: UpdateUserData): Promise<User
       verificationTokenExpiresAt: data.verificationTokenExpiresAt,
       resetPasswordToken: data.resetPasswordToken,
       resetPasswordTokenExpiresAt: data.resetPasswordTokenExpiresAt,
+      invitationToken: data.invitationToken,
+      invitationTokenExpiresAt: data.invitationTokenExpiresAt,
       failedLoginAttempts: data.failedLoginAttempts,
       lockedUntil: data.lockedUntil,
       tokenVersion: data.tokenVersion,
@@ -140,6 +144,41 @@ export async function softDeleteUser(id: string): Promise<User> {
     where: { id },
     data: {
       deletedAt: new Date(),
+    },
+  });
+
+  return toUser(user);
+}
+
+export async function findDeletedUserById(id: string): Promise<User | null> {
+  const user = await prisma.user.findFirst({
+    where: {
+      id,
+      deletedAt: { not: null },
+    },
+    include: {
+      roles: true,
+      companyProfile: true,
+      guideProfile: true,
+      driverProfile: true,
+    },
+  });
+
+  return user ? toUser(user) : null;
+}
+
+export async function restoreUser(id: string): Promise<User> {
+  const user = await prisma.user.update({
+    where: { id },
+    data: {
+      deletedAt: null,
+      isActive: true,
+    },
+    include: {
+      roles: true,
+      companyProfile: true,
+      guideProfile: true,
+      driverProfile: true,
     },
   });
 
@@ -367,6 +406,62 @@ export async function findUserWithProfiles(id: string): Promise<User | null> {
 }
 
 // ==========================================
+// USER WITH ALL RELATIONS FOR SAFE USER
+// ==========================================
+
+export interface UserWithRelationsForSafeUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string | null;
+  isActive: boolean;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  roles: UserRole[];
+  driverProfileId: string | undefined;
+  guideProfileId: string | undefined;
+}
+
+/**
+ * Fetches user with all relations needed for SafeUser in a single query.
+ * Reduces N+1 problem by batching roles, guide, and driver profile lookups.
+ */
+export async function findUserWithRelationsForSafeUser(
+  userId: string
+): Promise<UserWithRelationsForSafeUser | null> {
+  const user = await prisma.user.findFirst({
+    where: {
+      id: userId,
+      deletedAt: null,
+    },
+    include: {
+      roles: { select: { role: true } },
+      guideProfile: { select: { id: true } },
+      driverProfile: { select: { id: true } },
+    },
+  });
+
+  if (!user) return null;
+
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    phoneNumber: user.phoneNumber,
+    isActive: user.isActive,
+    emailVerified: user.emailVerified,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    roles: user.roles.map((r) => r.role as UserRole),
+    driverProfileId: user.driverProfile?.id,
+    guideProfileId: user.guideProfile?.id,
+  };
+}
+
+// ==========================================
 // TOUR AGENT (Sub-accounts for companies)
 // ==========================================
 
@@ -411,4 +506,30 @@ export async function getTourAgentsByCompany(companyUserId: string): Promise<Use
   });
 
   return users.map(toUser);
+}
+
+// ==========================================
+// INVITATION TOKEN
+// ==========================================
+
+export async function findUserByInvitationTokenHash(tokenHash: string): Promise<User | null> {
+  const user = await prisma.user.findFirst({
+    where: {
+      invitationToken: tokenHash,
+      invitationTokenExpiresAt: { gt: new Date() },
+      deletedAt: null,
+    },
+  });
+
+  return user ? toUser(user) : null;
+}
+
+export async function clearInvitationToken(userId: string): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      invitationToken: null,
+      invitationTokenExpiresAt: null,
+    },
+  });
 }

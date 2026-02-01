@@ -7,11 +7,7 @@ import { setCredentials } from '../store/authSlice';
 import { ROUTES } from '@/lib/constants/routes';
 import type { ILoginRequest } from '../types/auth.types';
 import { useTranslation } from 'react-i18next';
-
-// Note: startTokenRefreshMonitoring logic involves interval/timers, assume it is not strictly required for MVP login/logout or handled elsewhere.
-// If needed I would verify if `lib/utils/token-refresh.ts` exists. Since I haven't ported it, I will omit it for now or comment it out.
-// But Login/Logout requirement implies auth persistence works.
-// For now I will simply dispatch credentials.
+import { resetRefreshAttempts, startTokenRefreshMonitoring } from '@/lib/utils/token-refresh';
 
 export const useLogin = () => {
     const { t } = useTranslation();
@@ -32,7 +28,9 @@ export const useLogin = () => {
                 tokens: response.tokens,
             }));
 
-            // TODO: Start automatic token refresh monitoring if implemented in Next.js client
+            // Reset refresh attempt counter and start token refresh monitoring
+            resetRefreshAttempts();
+            startTokenRefreshMonitoring();
 
             // Show success message
             toast.success(t('auth.login_success') || 'Logged in successfully');

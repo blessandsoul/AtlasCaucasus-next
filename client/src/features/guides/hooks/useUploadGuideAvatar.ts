@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { guideService } from '../services/guide.service';
-import { getErrorMessage } from '@/lib/utils/error';
+import { getFileUploadErrorMessage } from '@/features/media';
 
 export const useUploadGuideAvatar = (guideId: string) => {
     const queryClient = useQueryClient();
@@ -25,7 +25,7 @@ export const useUploadGuideAvatar = (guideId: string) => {
             toast.success(t('profile.avatar.upload_success', 'Avatar uploaded successfully'));
         },
         onError: (error) => {
-            toast.error(getErrorMessage(error));
+            toast.error(getFileUploadErrorMessage(error));
         },
     });
 };

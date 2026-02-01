@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { mediaService } from '../services/media.service';
 import { getErrorMessage } from '@/lib/utils/error';
+import { getFileUploadErrorMessage } from '../utils/validation';
 import type { MediaEntityType } from '../types/media.types';
 
 export const useMedia = (entityType: MediaEntityType, entityId: string) => {
@@ -34,7 +35,7 @@ export const useUploadMedia = () => {
       toast.success(t('media.upload_success', 'File uploaded successfully'));
     },
     onError: (error) => {
-      toast.error(getErrorMessage(error));
+      toast.error(getFileUploadErrorMessage(error));
     },
   });
 };
@@ -72,7 +73,7 @@ export const useBatchUpload = () => {
       }
     },
     onError: (error) => {
-      toast.error(getErrorMessage(error));
+      toast.error(getFileUploadErrorMessage(error));
     },
   });
 };

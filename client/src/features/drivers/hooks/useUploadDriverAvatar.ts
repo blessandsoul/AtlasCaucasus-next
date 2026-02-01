@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { driverService } from '../services/driver.service';
-import { getErrorMessage } from '@/lib/utils/error';
+import { getFileUploadErrorMessage } from '@/features/media';
 
 export const useUploadDriverAvatar = (driverId: string) => {
     const queryClient = useQueryClient();
@@ -25,7 +25,7 @@ export const useUploadDriverAvatar = (driverId: string) => {
             toast.success(t('profile.avatar.upload_success', 'Avatar uploaded successfully'));
         },
         onError: (error) => {
-            toast.error(getErrorMessage(error));
+            toast.error(getFileUploadErrorMessage(error));
         },
     });
 };

@@ -4,13 +4,35 @@ import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMockTranslation } from '@/hooks/use-mock-translation';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Plane, TrendingUp, Sun, Mountain, Building2, Calendar, Users, Search, X } from 'lucide-react';
+import { Plane, TrendingUp, Sun, Mountain, Building2, Calendar, Users, Search, X, MapPin } from 'lucide-react';
 import { colors } from '@/lib/colors';
 import { LocationAutocomplete } from '@/components/common/LocationAutocomplete';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import type { LocationSearchResult } from '@/features/search/types/search.types';
 import { cn } from '@/lib/utils';
+import { useLocations } from '@/features/locations/hooks/useLocations';
+
+// Helper to determine icon based on name
+const getLocationIcon = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('turkey') || lowerName.includes('sun')) return Sun;
+    if (lowerName.includes('armenia') || lowerName.includes('mountain')) return Mountain;
+    if (lowerName.includes('azerbaijan') || lowerName.includes('city')) return Building2;
+    if (lowerName.includes('greece') || lowerName.includes('island')) return Plane;
+    if (lowerName.includes('georgia')) return TrendingUp;
+    return MapPin; // Default
+};
+
+const getLocationIconColor = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('turkey')) return "text-orange-400";
+    if (lowerName.includes('armenia')) return "text-yellow-600";
+    if (lowerName.includes('azerbaijan')) return "text-blue-500";
+    if (lowerName.includes('greece')) return "text-sky-500";
+    if (lowerName.includes('georgia')) return "text-emerald-600";
+    return "text-muted-foreground";
+};
 
 export const HeroSection = () => {
     const { t } = useMockTranslation();
@@ -25,6 +47,13 @@ export const HeroSection = () => {
     const [guestsFocused, setGuestsFocused] = useState(false);
 
     const guestsInputRef = useRef<HTMLInputElement>(null);
+
+    // Fetch dynamic locations
+    const { data: locationsData, isLoading: isLoadingLocations } = useLocations({
+        isActive: true,
+        limit: 5 // Limit to 5 for the hero section chips
+    });
+    const locations = locationsData?.items || [];
 
     // Auto-focus flow: Location -> Date -> Guests
     const handleLocationSelect = useCallback(() => {
@@ -211,32 +240,54 @@ export const HeroSection = () => {
                 </div>
 
                 {/* Trending Section */}
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-backwards">
-                    <button className="inline-flex items-center gap-2 rounded-full bg-background px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm border border-border/50 hover:shadow-md hover:text-foreground transition-all cursor-pointer">
-                        <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
-                        {t('home.hero.countries.georgia')}
-                        <TrendingUp className="h-3 w-3 ml-0.5 text-emerald-600" />
-                    </button>
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-backwards min-h-[40px]">
+                    {isLoadingLocations ? (
+                        // Simple Skeleton Loading
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="h-9 w-24 rounded-full bg-muted/50 animate-pulse" />
+                        ))
+                    ) : (
+                        <>
+                            {/* Static 'All' or 'Georgia' can be kept if needed, but user asked for dynamic resources. 
+                                We can add a "All Destinations" or similar if we want, but let's stick to the fetched list functionality first.
+                                Or we can hardcode Georgia if it's special, but safer to rely on DB. 
+                            */}
 
-                    <button className="inline-flex items-center gap-2 rounded-full bg-background px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm border border-border/50 hover:shadow-md hover:text-foreground transition-all cursor-pointer">
-                        <Sun className="h-3.5 w-3.5 text-orange-400" />
-                        {t('home.hero.countries.turkey')}
-                    </button>
+                            {locations?.map((location) => {
+                                const Icon = getLocationIcon(location.name);
+                                const isSelected = selectedLocation?.id === location.id;
 
-                    <button className="inline-flex items-center gap-2 rounded-full bg-background px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm border border-border/50 hover:shadow-md hover:text-foreground transition-all cursor-pointer">
-                        <Mountain className="h-3.5 w-3.5 text-yellow-600" />
-                        {t('home.hero.countries.armenia')}
-                    </button>
+                                return (
+                                    <button
+                                        key={location.id}
+                                        onClick={() => {
+                                            const params = new URLSearchParams();
+                                            params.set('locationId', location.id);
+                                            router.push(`/explore/tours?${params.toString()}`);
+                                        }}
+                                        className={cn(
+                                            "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium shadow-sm border transition-all cursor-pointer",
+                                            isSelected
+                                                ? "bg-primary text-primary-foreground border-primary"
+                                                : "bg-background text-muted-foreground border-border/50 hover:shadow-md hover:text-foreground"
+                                        )}
+                                    >
+                                        <Icon className={cn(
+                                            "h-3.5 w-3.5",
+                                            isSelected ? "text-primary-foreground" : getLocationIconColor(location.name)
+                                        )} />
+                                        {location.name}
+                                    </button>
+                                );
+                            })}
 
-                    <button className="inline-flex items-center gap-2 rounded-full bg-background px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm border border-border/50 hover:shadow-md hover:text-foreground transition-all cursor-pointer">
-                        <Building2 className="h-3.5 w-3.5 text-blue-500" />
-                        {t('home.hero.countries.azerbaijan')}
-                    </button>
-
-                    <button className="inline-flex items-center gap-2 rounded-full bg-background px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm border border-border/50 hover:shadow-md hover:text-foreground transition-all cursor-pointer">
-                        <Plane className="h-3.5 w-3.5 text-sky-500" />
-                        {t('home.hero.countries.greece')}
-                    </button>
+                            {(!locations || locations.length === 0) && (
+                                <span className="text-sm text-muted-foreground">
+                                    {t('home.hero.no_destinations', 'No featured destinations available')}
+                                </span>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         </section>

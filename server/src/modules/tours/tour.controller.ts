@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { successResponse, paginatedResponse } from "../../libs/response.js";
 import { PaginationSchema } from "../../libs/pagination.js";
 import { ValidationError, NotFoundError } from "../../libs/errors.js";
+import { validateUuidParam } from "../../libs/validation.js";
 import {
   createTourForUser,
   getTourByIdPublic,
@@ -39,7 +40,7 @@ export async function getTourByIdHandler(
   request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const { id } = request.params;
+  const id = validateUuidParam(request.params.id);
 
   const tour = await getTourByIdPublic(id);
 
@@ -85,7 +86,7 @@ export async function updateTourHandler(
   request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const { id } = request.params;
+  const id = validateUuidParam(request.params.id);
 
   const parsed = updateTourSchema.safeParse(request.body);
   if (!parsed.success) {
@@ -101,7 +102,7 @@ export async function deleteTourHandler(
   request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const { id } = request.params;
+  const id = validateUuidParam(request.params.id);
 
   const tour = await softDeleteTourForUser(request.user, id);
 
@@ -141,7 +142,7 @@ export async function listCompanyToursHandler(
   request: FastifyRequest<{ Params: IdParams }>,
   reply: FastifyReply,
 ): Promise<void> {
-  const { id } = request.params;
+  const id = validateUuidParam(request.params.id);
 
   // Validate pagination params
   const paginationParsed = PaginationSchema.safeParse(request.query);

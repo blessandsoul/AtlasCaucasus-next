@@ -26,4 +26,5 @@ export interface BatchUploadResult {
 export interface FileValidationResult {
   valid: boolean;
   error?: string;
+  detectedType?: string; // Detected MIME type from magic bytes
 }

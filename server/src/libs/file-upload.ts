@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { fileTypeFromBuffer } from "file-type";
 import { env } from "../config/env.js";
 import type { MediaEntityType } from "../modules/media/media.types.js";
 import { logger } from "./logger.js";
@@ -32,6 +33,13 @@ export function sanitizeFilename(filename: string): string {
     const ext = path.extname(sanitized);
     const name = sanitized.slice(0, 200 - ext.length);
     sanitized = name + ext;
+  }
+
+  // SECURITY: Prevent double extensions (e.g., "malicious.php.jpg" -> "malicious_php.jpg")
+  // This prevents attackers from hiding executable extensions
+  const parts = sanitized.split(".");
+  if (parts.length > 2) {
+    sanitized = parts.slice(0, -1).join("_") + "." + parts[parts.length - 1];
   }
 
   // Ensure filename is not empty
@@ -105,6 +113,8 @@ function getDefaultNameForEntity(entityType: MediaEntityType): string {
     guide: "guide-photo",
     driver: "driver-photo",
     user: "user-avatar",
+    "guide-avatar": "guide-avatar",
+    "driver-avatar": "driver-avatar",
   };
   return defaults[entityType] || "image";
 }
@@ -142,13 +152,82 @@ export function generateSeoFriendlyFilename(
 // ==========================================
 
 /**
- * Validate file MIME type
- * @param mimeType - File MIME type
+ * Validate file MIME type from Content-Type header (basic check, can be spoofed)
+ * @param mimeType - File MIME type from header
  * @param allowedTypes - Array of allowed MIME types
  * @returns True if valid, false otherwise
+ * @deprecated Use validateFileTypeFromBuffer for secure validation
  */
 export function validateFileType(mimeType: string, allowedTypes: readonly string[]): boolean {
   return allowedTypes.includes(mimeType);
+}
+
+/**
+ * Validate file type by reading magic bytes from buffer (secure validation)
+ * This prevents MIME type spoofing by checking actual file content
+ * @param buffer - File buffer to analyze
+ * @param allowedTypes - Array of allowed MIME types
+ * @returns Object with validation result and detected MIME type
+ */
+export async function validateFileTypeFromBuffer(
+  buffer: Buffer,
+  allowedTypes: readonly string[]
+): Promise<{ valid: boolean; detectedType: string | null; error?: string }> {
+  try {
+    const result = await fileTypeFromBuffer(buffer);
+
+    if (!result) {
+      return {
+        valid: false,
+        detectedType: null,
+        error: "Could not determine file type from content",
+      };
+    }
+
+    const isValid = allowedTypes.includes(result.mime);
+
+    if (!isValid) {
+      return {
+        valid: false,
+        detectedType: result.mime,
+        error: `File type ${result.mime} is not allowed. Allowed types: ${allowedTypes.join(", ")}`,
+      };
+    }
+
+    return {
+      valid: true,
+      detectedType: result.mime,
+    };
+  } catch (err) {
+    logger.error({ err }, "Error validating file type from buffer");
+    return {
+      valid: false,
+      detectedType: null,
+      error: "Error analyzing file content",
+    };
+  }
+}
+
+/**
+ * Common allowed image MIME types for uploads
+ */
+export const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+] as const;
+
+/**
+ * Validate that buffer contains a valid image by checking magic bytes
+ * Convenience wrapper around validateFileTypeFromBuffer for images
+ * @param buffer - File buffer to analyze
+ * @returns Object with validation result
+ */
+export async function validateImageBuffer(
+  buffer: Buffer
+): Promise<{ valid: boolean; detectedType: string | null; error?: string }> {
+  return validateFileTypeFromBuffer(buffer, ALLOWED_IMAGE_TYPES);
 }
 
 /**

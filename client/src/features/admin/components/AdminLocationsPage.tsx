@@ -149,7 +149,7 @@ export const AdminLocationsPage = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
                         {t('admin.locations.title', 'Locations')}
@@ -158,15 +158,15 @@ export const AdminLocationsPage = () => {
                         {t('admin.locations.subtitle', 'Manage locations available in the system.')}
                     </p>
                 </div>
-                <Button onClick={handleCreate}>
+                <Button onClick={handleCreate} className="w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
                     {t('admin.locations.add_new', 'Add Location')}
                 </Button>
             </div>
 
             {/* Filter controls */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1">
                     <Button
                         variant={!includeInactive ? "default" : "outline"}
                         size="sm"
@@ -174,6 +174,7 @@ export const AdminLocationsPage = () => {
                             setIncludeInactive(false);
                             setPage(1);
                         }}
+                        className="whitespace-nowrap"
                     >
                         {t('common.active', 'Active')}
                     </Button>
@@ -184,6 +185,7 @@ export const AdminLocationsPage = () => {
                             setIncludeInactive(true);
                             setPage(1);
                         }}
+                        className="whitespace-nowrap"
                     >
                         {t('admin.locations.all_locations', 'All Locations')}
                     </Button>

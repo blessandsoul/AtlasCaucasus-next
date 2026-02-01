@@ -11,7 +11,6 @@ import { getMediaUrl } from '@/lib/utils/media';
 import { cn } from '@/lib/utils';
 import {
   ALLOWED_IMAGE_TYPES,
-  MAX_FILE_SIZE,
   validateImageFile,
 } from '@/features/media';
 
@@ -60,7 +59,7 @@ export const AvatarUpload = ({
             validation.error?.includes('type')
               ? 'profile.avatar.invalid_type'
               : 'profile.avatar.file_too_large',
-            validation.error
+            validation.error || ''
           )
         );
         if (fileInputRef.current) {
@@ -103,7 +102,7 @@ export const AvatarUpload = ({
 
   return (
     <div className={cn('space-y-3', className)}>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col xs:flex-row items-center gap-4">
         {/* Avatar Preview */}
         <div
           className={cn(
@@ -130,8 +129,8 @@ export const AvatarUpload = ({
         </div>
 
         {/* Upload Controls */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+        <div className="space-y-2 text-center xs:text-left">
+          <div className="flex items-center justify-center xs:justify-start gap-2">
             <input
               ref={fileInputRef}
               type="file"

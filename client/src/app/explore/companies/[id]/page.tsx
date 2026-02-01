@@ -4,7 +4,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCompany } from '@/features/companies/hooks/useCompanies';
 import { useCompanyTours } from '@/features/tours/hooks/useTours';
 import { TourCard } from '@/features/tours/components/TourCard';
-import { ReviewsSection } from '@/features/reviews';
+import { ReviewsSection, useReviewStats } from '@/features/reviews';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Pagination } from '@/components/common/Pagination';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ import { getMediaUrl } from '@/lib/utils/media';
 import { useCallback } from 'react';
 import { ChatButton } from '@/features/chat/components/ChatButton';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { isValidUuid } from '@/lib/utils/validation';
 
 export default function CompanyDetailsPage() {
   const params = useParams();
@@ -32,16 +33,23 @@ export default function CompanyDetailsPage() {
   const searchParams = useSearchParams();
   const id = params.id as string;
 
+  // Validate UUID format before making API calls
+  const isValidId = isValidUuid(id);
+
   const activeTab = searchParams.get('tab') || 'about';
   const toursPage = parseInt(searchParams.get('toursPage') || '1', 10);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const toursLimit = isMobile ? 10 : 3;
 
-  const { data: company, isLoading, error } = useCompany(id);
-  const { data: toursData, isLoading: isToursLoading } = useCompanyTours(id, {
-    page: isMobile ? 1 : toursPage,
-    limit: toursLimit,
-  });
+  const { data: company, isLoading, error } = useCompany(isValidId ? id : '');
+  const { data: toursData, isLoading: isToursLoading } = useCompanyTours(
+    isValidId ? id : '',
+    {
+      page: isMobile ? 1 : toursPage,
+      limit: toursLimit,
+    }
+  );
+  const { data: reviewStats } = useReviewStats('COMPANY', isValidId ? id : '');
 
   const handleTabChange = useCallback(
     (tab: string) => {
@@ -72,7 +80,7 @@ export default function CompanyDetailsPage() {
     );
   }
 
-  if (error || !company) {
+  if (!isValidId || error || !company) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <h2 className="text-2xl font-bold">Company not found</h2>
@@ -234,8 +242,16 @@ export default function CompanyDetailsPage() {
                       value:
                         toursData?.pagination.totalItems?.toString() || '0',
                     },
-                    { label: 'Reviews', value: '0' },
-                    { label: 'Rating', value: 'N/A' },
+                    {
+                      label: 'Reviews',
+                      value: reviewStats?.reviewCount?.toString() || '0',
+                    },
+                    {
+                      label: 'Rating',
+                      value: reviewStats?.averageRating
+                        ? reviewStats.averageRating.toFixed(1)
+                        : 'N/A',
+                    },
                     { label: 'Response', value: '100%' },
                   ].map((stat, i) => (
                     <div

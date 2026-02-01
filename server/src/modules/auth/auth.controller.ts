@@ -8,6 +8,7 @@ import {
   companyRegisterSchema,
   claimRoleSchema,
   createTourAgentSchema,
+  acceptInvitationSchema,
   loginSchema,
   refreshSchema,
   logoutSchema,
@@ -22,6 +23,20 @@ function getLoginMeta(request: FastifyRequest) {
     userAgent: request.headers["user-agent"],
     ipAddress: request.ip,
   };
+}
+
+// ==========================================
+// CSRF TOKEN
+// ==========================================
+
+export async function getCsrfToken(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  // Generate CSRF token using the plugin's method
+  const token = await reply.generateCsrf();
+
+  return reply.send(successResponse("CSRF token generated", { csrfToken: token }));
 }
 
 // ==========================================
@@ -83,7 +98,7 @@ export async function claimRole(
   const user = await authService.claimRole(request.user.id, parsed.data);
 
   return reply.send(
-    successResponse(`Successfully claimed ${parsed.data.role} role`, { user })
+    successResponse(`Successfully claimed ${parsed.data.role} role`, user)
   );
 }
 
@@ -103,10 +118,7 @@ export async function createTourAgent(
   const result = await authService.createTourAgent(request.user.id, parsed.data);
 
   return reply.status(201).send(
-    successResponse("Tour agent created successfully. Invitation email sent.", {
-      user: result.user,
-      temporaryPassword: result.temporaryPassword, // Only shown once
-    })
+    successResponse("Tour agent created successfully. Invitation email sent.", result)
   );
 }
 
@@ -121,7 +133,27 @@ export async function getTourAgents(
   const tourAgents = await authService.getTourAgents(request.user.id);
 
   return reply.send(
-    successResponse("Tour agents retrieved", { tourAgents })
+    successResponse("Tour agents retrieved", tourAgents)
+  );
+}
+
+// ==========================================
+// ACCEPT TOUR AGENT INVITATION
+// ==========================================
+
+export async function acceptInvitation(
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<void> {
+  const parsed = acceptInvitationSchema.safeParse(request.body);
+  if (!parsed.success) {
+    throw new ValidationError(parsed.error.errors[0].message);
+  }
+
+  const result = await authService.acceptInvitation(parsed.data, getLoginMeta(request));
+
+  return reply.send(
+    successResponse("Invitation accepted. You can now use your account.", result)
   );
 }
 
@@ -181,7 +213,7 @@ export async function me(
 ): Promise<void> {
   const user = await authService.getCurrentUser(request.user.id);
 
-  return reply.send(successResponse("Current user retrieved", { user }));
+  return reply.send(successResponse("Current user retrieved", user));
 }
 
 export async function logoutAll(

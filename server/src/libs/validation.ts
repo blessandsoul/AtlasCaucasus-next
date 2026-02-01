@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ValidationError } from "./errors.js";
 
 /**
  * Strong password validation schema
@@ -68,6 +69,70 @@ export const passwordRequirements = [
     "At least one special character (!@#$%^&*)",
 ];
 
+/**
+ * UUID validation schema for route parameters
+ * Used to validate :id params across all routes
+ */
+export const uuidSchema = z
+    .string()
+    .uuid("Invalid ID format - must be a valid UUID");
+
+/**
+ * Common route parameter schemas
+ */
+export const UuidParamSchema = z.object({
+    id: uuidSchema,
+});
+
+/**
+ * Optional UUID schema (for optional params)
+ */
+export const optionalUuidSchema = z
+    .string()
+    .uuid("Invalid ID format - must be a valid UUID")
+    .optional();
+
+/**
+ * Pagination query schema
+ */
+export const PaginationQuerySchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
 export type StrongPassword = z.infer<typeof strongPasswordSchema>;
 export type ValidEmail = z.infer<typeof emailSchema>;
 export type ValidName = z.infer<typeof nameSchema>;
+export type UuidParam = z.infer<typeof UuidParamSchema>;
+export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
+
+// ==========================================
+// VALIDATION HELPER FUNCTIONS
+// ==========================================
+
+/**
+ * Validate and return a UUID from route params
+ * @throws ValidationError if the ID is not a valid UUID
+ */
+export function validateUuidParam(id: string): string {
+    const result = uuidSchema.safeParse(id);
+    if (!result.success) {
+        throw new ValidationError("Invalid ID format - must be a valid UUID", "INVALID_UUID");
+    }
+    return result.data;
+}
+
+/**
+ * Validate route params containing an ID
+ * @throws ValidationError if the ID is not a valid UUID
+ */
+export function validateIdParams(params: { id: string }): { id: string } {
+    const result = UuidParamSchema.safeParse(params);
+    if (!result.success) {
+        throw new ValidationError(
+            result.error.errors[0]?.message || "Invalid ID format",
+            "INVALID_UUID"
+        );
+    }
+    return result.data;
+}

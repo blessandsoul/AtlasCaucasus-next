@@ -75,7 +75,7 @@ export default function SentInquiriesPage() {
                         {t('inquiries.sent.empty', "You haven't sent any inquiries yet")}
                     </p>
                     <Link href={ROUTES.INQUIRIES.CREATE}>
-                        <Button>{t('inquiries.sent.first_inquiry', 'Send Your First Inquiry')}</Button>
+                        <Button className="whitespace-normal h-auto text-center">{t('inquiries.sent.first_inquiry', 'Send Your First Inquiry')}</Button>
                     </Link>
                 </CardContent>
             </Card>
@@ -83,7 +83,7 @@ export default function SentInquiriesPage() {
     }
 
     return (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
             {inquiries.map((inquiry) => (
                 <Link key={inquiry.id} href={ROUTES.INQUIRIES.DETAILS(inquiry.id)}>
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer">

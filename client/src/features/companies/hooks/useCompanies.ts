@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { companyService } from '../services/company.service';
 import { getErrorMessage } from '@/lib/utils/error';
+import { getFileUploadErrorMessage } from '@/features/media';
 import { ROUTES } from '@/lib/constants/routes';
 import type { CompaniesResponse, CompanyFilters, IUpdateCompanyRequest, CreateAgentFormData } from '../types/company.types';
 
@@ -104,7 +105,7 @@ export const useUploadCompanyPhotos = () => {
       toast.success(t('common.photo_uploaded', 'Photo uploaded successfully'));
     },
     onError: (error) => {
-      toast.error(getErrorMessage(error));
+      toast.error(getFileUploadErrorMessage(error));
     },
   });
 };
@@ -142,20 +143,28 @@ export const useUploadCompanyLogo = () => {
       toast.success(t('company.logo_uploaded', 'Logo uploaded successfully'));
     },
     onError: (error) => {
-      toast.error(getErrorMessage(error));
+      toast.error(getFileUploadErrorMessage(error));
     },
   });
 };
 
 // Tour agent management hooks
 export const useCreateTourAgent = () => {
+  const { t } = useTranslation();
+
   return useMutation({
     mutationFn: (data: CreateAgentFormData) => companyService.createTourAgent(data),
     onSuccess: (response) => {
-      toast.success('Tour agent created successfully!', {
-        description: `Temporary password: ${response.temporaryPassword}`,
-        duration: 10000,
-      });
+      toast.success(
+        t('company.tour_agent_created', 'Tour agent created successfully!'),
+        {
+          description: t(
+            'company.tour_agent_password_sent',
+            `A temporary password has been sent to ${response.user.email}. Please ask them to check their email.`
+          ),
+          duration: 8000,
+        }
+      );
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));

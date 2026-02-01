@@ -2,6 +2,7 @@
 
 import { store } from '@/store';
 import { queryClient } from '@/lib/api/query-client';
+import { logout, updateTokens } from '@/features/auth/store/authSlice';
 import {
     MessageType,
     type ConnectionStatus,
@@ -186,6 +187,13 @@ class WebSocketManager {
         this.stopHeartbeat();
         this.socket = null;
 
+        // Handle authentication failure - try to refresh token
+        if (event.code === 1008) {
+            console.log('WebSocket: Authentication failed, attempting token refresh');
+            this.handleAuthFailure();
+            return;
+        }
+
         // Don't reconnect if closed normally or max attempts reached
         if (
             event.code !== 1000 &&
@@ -198,8 +206,50 @@ class WebSocketManager {
         }
     }
 
+    private async handleAuthFailure(): Promise<void> {
+        const refreshToken = store.getState().auth.tokens?.refreshToken;
+
+        if (!refreshToken) {
+            console.log('WebSocket: No refresh token, logging out');
+            store.dispatch(logout());
+            this.setStatus('disconnected');
+            return;
+        }
+
+        try {
+            const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+            const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Token refresh failed');
+            }
+
+            const data = await response.json();
+            const { accessToken, refreshToken: newRefreshToken } = data.data;
+
+            // Update Redux store with new tokens
+            store.dispatch(updateTokens({ accessToken, refreshToken: newRefreshToken }));
+
+            console.log('WebSocket: Token refreshed, reconnecting');
+            // Reset reconnect attempts since we have a fresh token
+            this.reconnectAttempts = 0;
+            this.scheduleReconnect();
+        } catch (error) {
+            console.error('WebSocket: Token refresh failed', error);
+            store.dispatch(logout());
+            this.setStatus('disconnected');
+        }
+    }
+
     private handleError(event: Event): void {
-        console.error('WebSocket error:', event);
+        // Browser doesn't expose error details for security reasons
+        // The actual error reason will come in the close event
+        console.error('WebSocket error - connection failed. Check if server is running at',
+            process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', ''));
         this.setStatus('error');
     }
 

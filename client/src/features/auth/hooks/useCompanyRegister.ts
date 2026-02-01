@@ -25,8 +25,11 @@ export const useCompanyRegister = () => {
 
             // TODO: Start automatic token refresh monitoring if implemented in Next.js client
 
-            // Show success message
-            toast.success(t('auth.registration_success') || 'Registration successful!');
+            // Show success message with verification expiry notice
+            toast.success(
+                t('auth.registration_success') || 'Registration successful! Please verify your email within 7 days.',
+                { duration: 5000 }
+            );
 
             // Navigate to email verification pending page
             router.push(ROUTES.VERIFY_EMAIL_PENDING);

@@ -82,15 +82,15 @@ export const GuideProfileTab = () => {
     resolver: zodResolver(guideFormSchema),
     values: guide
       ? {
-          bio: guide.bio || '',
-          yearsOfExperience: guide.yearsOfExperience || 0,
-          languages: Array.isArray(guide.languages)
-            ? guide.languages.join(', ')
-            : typeof guide.languages === 'string'
-              ? guide.languages
-              : '',
-          phoneNumber: guide.phoneNumber || '',
-        }
+        bio: guide.bio || '',
+        yearsOfExperience: guide.yearsOfExperience || 0,
+        languages: Array.isArray(guide.languages)
+          ? guide.languages.join(', ')
+          : typeof guide.languages === 'string'
+            ? guide.languages
+            : '',
+        phoneNumber: guide.phoneNumber || '',
+      }
       : undefined,
   });
 
@@ -191,7 +191,7 @@ export const GuideProfileTab = () => {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <CardTitle>{t('guide.profile.title', 'Guide Profile')}</CardTitle>
             <CardDescription>
@@ -254,7 +254,7 @@ export const GuideProfileTab = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
                 <Button type="button" variant="outline" onClick={handleCancel}>
                   {t('common.cancel', 'Cancel')}
                 </Button>
@@ -332,7 +332,7 @@ export const GuideProfileTab = () => {
 
       {/* Photos Section */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <CardTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />

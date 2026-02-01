@@ -148,6 +148,12 @@ export const changePasswordSchema = z.object({
   newPassword: strongPasswordSchema,
 });
 
+// Accept tour agent invitation (set password via magic link)
+export const acceptInvitationSchema = z.object({
+  token: tokenSchema,
+  password: strongPasswordSchema,
+});
+
 // ==========================================
 // TYPE EXPORTS
 // ==========================================
@@ -166,6 +172,7 @@ export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type AcceptInvitationInput = z.infer<typeof acceptInvitationSchema>;
 
 export interface LoginMeta {
   userAgent?: string;

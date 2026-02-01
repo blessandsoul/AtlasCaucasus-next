@@ -2,15 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Plus } from 'lucide-react';
+import { Users, Plus, RotateCcw } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { StatusIndicator } from '@/components/common/StatusIndicator';
-
-// ... existing imports ...
-
-
-
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import type { ColumnDef } from '@/components/common/DataTable';
@@ -21,6 +16,7 @@ import { useOnlineUsers } from '@/features/presence';
 import { CreateUserDialog } from '../components/CreateUserDialog';
 import { EditUserDialog } from '../components/EditUserDialog';
 import { DeleteUserDialog } from '../components/DeleteUserDialog';
+import { RestoreUserDialog } from '../components/RestoreUserDialog';
 import { UserDetailsModal } from '../components/UserDetailsModal';
 import { formatDate } from '@/lib/utils/format';
 import type { IUser } from '@/features/auth/types/auth.types';
@@ -33,6 +29,7 @@ export const AdminUsersPage = () => {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState<IUser | null>(null);
     const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
+    const [userToRestore, setUserToRestore] = useState<IUser | null>(null);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
     const { data, isLoading, error } = useUsers({
@@ -85,16 +82,36 @@ export const AdminUsersPage = () => {
         {
             header: t('admin.users.table.status', 'Status'),
             cell: (user) => (
-                <div className="flex justify-center">
-                    <StatusIndicator isActive={user.isActive} />
+                <div className="flex justify-center items-center gap-2">
+                    {user.deletedAt ? (
+                        <>
+                            <Badge variant="destructive" className="text-xs">
+                                {t('admin.users.deleted', 'Deleted')}
+                            </Badge>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setUserToRestore(user);
+                                }}
+                                title={t('admin.users.restore', 'Restore')}
+                                className="h-7 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                            >
+                                <RotateCcw className="h-3.5 w-3.5" />
+                            </Button>
+                        </>
+                    ) : (
+                        <StatusIndicator isActive={user.isActive} />
+                    )}
                 </div>
             ),
-            className: "w-[100px] text-center"
+            className: "w-[150px] text-center"
         },
         {
             header: t('admin.users.table.joined', 'Joined'),
             cell: (user) => (
-                <div className="text-muted-foreground">
+                <div className="text-muted-foreground whitespace-nowrap">
                     {formatDate(user.createdAt)}
                 </div>
             )
@@ -107,7 +124,7 @@ export const AdminUsersPage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">
                         {t('admin.users.title', 'Users')}
@@ -116,26 +133,28 @@ export const AdminUsersPage = () => {
                         {t('admin.users.subtitle', 'Manage users and roles.')}
                     </p>
                 </div>
-                <div className="flex items-center gap-4">
-                    {onlineCount > 0 && (
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground hidden sm:flex">
-                            <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
-                            <span>
-                                {t('admin.users.online_count', '{{count}} online', {
-                                    count: onlineCount,
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground order-2 sm:order-1">
+                        {onlineCount > 0 && (
+                            <div className="flex items-center gap-1.5">
+                                <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+                                <span>
+                                    {t('admin.users.online_count', '{{count}} online', {
+                                        count: onlineCount,
+                                    })}
+                                </span>
+                            </div>
+                        )}
+                        {pagination && (
+                            <p>
+                                {t('admin.users.showing_count', 'Showing {{count}} of {{total}} users', {
+                                    count: users.length,
+                                    total: pagination.totalItems,
                                 })}
-                            </span>
-                        </div>
-                    )}
-                    {pagination && (
-                        <p className="text-sm text-muted-foreground hidden sm:block">
-                            {t('admin.users.showing_count', 'Showing {{count}} of {{total}} users', {
-                                count: users.length,
-                                total: pagination.totalItems,
-                            })}
-                        </p>
-                    )}
-                    <Button onClick={() => setCreateDialogOpen(true)}>
+                            </p>
+                        )}
+                    </div>
+                    <Button onClick={() => setCreateDialogOpen(true)} className="w-full sm:w-auto order-1 sm:order-2">
                         <Plus className="h-4 w-4 mr-2" />
                         {t('admin.users.createUser', 'Create User')}
                     </Button>
@@ -178,6 +197,12 @@ export const AdminUsersPage = () => {
                 user={userToDelete}
                 open={!!userToDelete}
                 onOpenChange={(open) => !open && setUserToDelete(null)}
+            />
+
+            <RestoreUserDialog
+                user={userToRestore}
+                open={!!userToRestore}
+                onOpenChange={(open) => !open && setUserToRestore(null)}
             />
 
             <UserDetailsModal

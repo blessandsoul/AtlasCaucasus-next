@@ -4,6 +4,8 @@ import rateLimit from "@fastify/rate-limit";
 import fastifyWebSocket from "@fastify/websocket";
 import fastifyStatic from "@fastify/static";
 import fastifyCors from "@fastify/cors";
+import fastifyCookie from "@fastify/cookie";
+import fastifyCsrf from "@fastify/csrf-protection";
 import fastifyMultipart from "@fastify/multipart";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -52,8 +54,14 @@ function buildApp() {
 
   app.register(fastifyCors, {
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, Postman, etc.)
+      // Handle requests with no origin header
       if (!origin) {
+        // In production: reject null origins (security risk - can be exploited via sandboxed iframes)
+        // In development: allow for Postman, curl, mobile apps testing
+        if (env.NODE_ENV === "production") {
+          logger.warn("CORS: Rejected request with null origin in production");
+          return callback(new Error("CORS: Origin header required"), false);
+        }
         return callback(null, true);
       }
 
@@ -70,15 +78,56 @@ function buildApp() {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-CSRF-Token'],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  });
+
+  // Cookie support (required for CSRF protection)
+  app.register(fastifyCookie, {
+    secret: env.ACCESS_TOKEN_SECRET, // Use access token secret for cookie signing
+    parseOptions: {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "strict",
+    },
+  });
+
+  // CSRF protection for state-changing requests
+  // Client must send X-CSRF-Token header with value from /api/v1/auth/csrf-token endpoint
+  app.register(fastifyCsrf, {
+    sessionPlugin: "@fastify/cookie",
+    cookieOpts: {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    },
+    getToken: (request: FastifyRequest) => {
+      // Accept CSRF token from X-CSRF-Token header
+      return request.headers["x-csrf-token"] as string;
+    },
   });
 
   // Security headers with Helmet
   app.register(helmet, {
-    contentSecurityPolicy: false, // Disable CSP for API
+    // Minimal CSP for API server
+    // Even though APIs primarily return JSON, CSP provides defense-in-depth
+    // against XSS if any endpoint accidentally returns HTML
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],          // Block everything by default
+        frameAncestors: ["'none'"],      // Prevent clickjacking (X-Frame-Options replacement)
+        baseUri: ["'none'"],             // Prevent base tag injection
+        formAction: ["'none'"],          // Prevent form submissions (API doesn't serve forms)
+        // For static file serving (test.html, uploads)
+        scriptSrc: ["'self'"],           // Allow scripts only from same origin
+        styleSrc: ["'self'", "'unsafe-inline'"], // Allow styles for test.html
+        imgSrc: ["'self'", "data:", "blob:"],    // Allow images from self, data URIs, blobs
+        connectSrc: ["'self'"],          // Allow fetch/XHR to same origin
+      },
+    },
     crossOriginEmbedderPolicy: false, // API doesn't need this
-    crossOriginResourcePolicy: false, // Allow cross-origin resource loading (images, etc.)
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin resource loading for uploaded images
   });
 
   // Serve static files from public directory

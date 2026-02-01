@@ -41,7 +41,7 @@ export class NotificationController {
         const userId = request.user.id;
         const count = await notificationService.getUnreadCount(userId);
 
-        return reply.send(successResponse("Unread count retrieved", { count }));
+        return reply.send(successResponse("Unread count retrieved", count));
     }
 
     /**

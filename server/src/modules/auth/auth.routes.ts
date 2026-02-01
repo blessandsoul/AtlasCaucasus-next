@@ -6,6 +6,14 @@ import { createRateLimitConfig } from "../../config/rateLimit.js";
 
 export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   // ==========================================
+  // CSRF TOKEN ENDPOINT
+  // ==========================================
+
+  // Get CSRF token for state-changing requests
+  // Client should call this and include the token in X-CSRF-Token header
+  fastify.get("/auth/csrf-token", authController.getCsrfToken);
+
+  // ==========================================
   // CORE AUTH ENDPOINTS
   // ==========================================
 
@@ -89,6 +97,13 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       preHandler: [authGuard, requireVerifiedEmail, requireRole("COMPANY")]
     },
     authController.getTourAgents
+  );
+
+  // Accept tour agent invitation and set password (public - no auth required)
+  fastify.post(
+    "/auth/accept-invitation",
+    { config: createRateLimitConfig("resetPassword") }, // Same limit as password reset
+    authController.acceptInvitation
   );
 
   // ==========================================

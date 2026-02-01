@@ -82,10 +82,10 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                         </h2>
                         <div className="space-y-1">
                             <SidebarItem
-                                icon={LayoutDashboard}
-                                label={t('dashboard.menu.dashboard', 'Dashboard')}
-                                href={ROUTES.DASHBOARD}
-                                isActive={pathname === ROUTES.DASHBOARD}
+                                icon={Star}
+                                label={t('dashboard.menu.reviews', 'My Reviews')}
+                                href={ROUTES.REVIEWS}
+                                isActive={pathname === ROUTES.REVIEWS}
                                 onClick={onItemClick}
                             />
                             <SidebarItem
@@ -93,13 +93,6 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                                 label={t('dashboard.menu.inquiries', 'Inquiries')}
                                 href={ROUTES.INQUIRIES.ROOT}
                                 isActive={pathname.startsWith(ROUTES.INQUIRIES.ROOT)}
-                                onClick={onItemClick}
-                            />
-                            <SidebarItem
-                                icon={Star}
-                                label={t('dashboard.menu.reviews', 'My Reviews')}
-                                href={ROUTES.REVIEWS}
-                                isActive={pathname === ROUTES.REVIEWS}
                                 onClick={onItemClick}
                             />
                         </div>

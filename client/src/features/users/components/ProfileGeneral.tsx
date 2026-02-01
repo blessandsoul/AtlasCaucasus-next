@@ -54,14 +54,14 @@ export const ProfileGeneral = ({ user }: ProfileGeneralProps) => {
                     <CardTitle>{t('profile.general.avatar_title', 'Profile Picture')}</CardTitle>
                     <CardDescription>{t('profile.general.avatar_desc', 'Your profile picture and basic information')}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex items-center gap-6">
+                <CardContent className="flex flex-col sm:flex-row items-center gap-6">
                     <AvatarUpload
                         currentAvatarUrl={user.avatarUrl}
                         firstName={user.firstName}
                         lastName={user.lastName}
                         size="lg"
                     />
-                    <div className="space-y-1">
+                    <div className="space-y-1 text-center sm:text-left">
                         <h3 className="font-semibold text-lg">{user.firstName} {user.lastName}</h3>
                         <p className="text-sm text-muted-foreground">{user.roles.join(' • ')}</p>
                     </div>

@@ -345,10 +345,7 @@ export async function uploadUserAvatarHandler(
   const media = await uploadUserAvatar(request.user, userId, uploadedFile);
 
   return reply.status(201).send(
-    successResponse("User avatar uploaded successfully", {
-      avatarUrl: media.url,
-      media
-    })
+    successResponse("User avatar uploaded successfully", media)
   );
 }
 
@@ -378,10 +375,7 @@ export async function uploadDriverAvatarHandler(
   const media = await uploadDriverAvatar(request.user, driverId, uploadedFile);
 
   return reply.status(201).send(
-    successResponse("Driver avatar uploaded successfully", {
-      avatarUrl: media.url,
-      media
-    })
+    successResponse("Driver avatar uploaded successfully", media)
   );
 }
 
@@ -411,9 +405,6 @@ export async function uploadGuideAvatarHandler(
   const media = await uploadGuideAvatar(request.user, guideId, uploadedFile);
 
   return reply.status(201).send(
-    successResponse("Guide avatar uploaded successfully", {
-      avatarUrl: media.url,
-      media
-    })
+    successResponse("Guide avatar uploaded successfully", media)
   );
 }

@@ -22,6 +22,7 @@ export interface AuthResponse {
   user: SafeUser;
   accessToken: string;
   refreshToken: string;
+  warnings?: string[];
 }
 
 // JWT decoded user (used in auth middleware)

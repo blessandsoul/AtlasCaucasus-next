@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, Check, X, MessageSquare } from 'lucide-react';
+import { isValidUuid } from '@/lib/utils/validation';
 import type { InquiryStatus, InquiryTargetType, RespondToInquiryInput } from '@/features/inquiries/types/inquiry.types';
 
 const getStatusBadgeVariant = (status: InquiryStatus) => {
@@ -52,7 +53,10 @@ export default function InquiryDetailsPage() {
     const router = useRouter();
     const { user } = useAuth();
     const id = params.id as string;
-    const { data: inquiry, isLoading, error } = useInquiry(id || '');
+
+    // Validate UUID format before making API call
+    const isValidId = isValidUuid(id);
+    const { data: inquiry, isLoading, error } = useInquiry(isValidId ? id : '');
     const respondMutation = useRespondToInquiry();
     const [responseMessage, setResponseMessage] = useState('');
     const [showResponseForm, setShowResponseForm] = useState(false);
@@ -65,7 +69,7 @@ export default function InquiryDetailsPage() {
         );
     }
 
-    if (error || !inquiry) {
+    if (!isValidId || error || !inquiry) {
         return (
             <div className="text-center py-8">
                 <p className="text-destructive">{t('inquiries.error.load_single', 'Failed to load inquiry')}</p>

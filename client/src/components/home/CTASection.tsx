@@ -33,7 +33,7 @@ export const CTASection = () => {
                 viewport={{ once: true }}
                 className="container mx-auto px-4 relative z-10 text-center"
             >
-                <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 drop-shadow-lg leading-tight pb-2">
+                <h2 className="text-2xl min-[420px]:text-4xl md:text-6xl font-bold text-white mb-8 drop-shadow-lg leading-tight pb-2">
                     {t('home.cta.title')}
                 </h2>
                 <p className="text-white/90 text-xl max-w-2xl mx-auto mb-10 drop-shadow-md">

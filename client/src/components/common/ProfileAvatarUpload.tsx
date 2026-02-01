@@ -62,7 +62,7 @@ export const ProfileAvatarUpload = ({
             validation.error?.includes('type')
               ? 'profile.avatar.invalid_type'
               : 'profile.avatar.file_too_large',
-            validation.error
+            validation.error || ''
           )
         );
         if (fileInputRef.current) {
@@ -100,11 +100,11 @@ export const ProfileAvatarUpload = ({
 
   return (
     <div className={cn('space-y-3', className)}>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col xs:flex-row items-center gap-4">
         {/* Avatar Preview */}
         <div
           className={cn(
-            'relative rounded-full overflow-hidden border-2 flex items-center justify-center bg-primary/10',
+            'relative rounded-full overflow-hidden border-2 flex items-center justify-center bg-primary/10 flex-shrink-0',
             sizeClasses[size],
             isLoading && 'opacity-50'
           )}

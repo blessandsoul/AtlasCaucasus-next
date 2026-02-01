@@ -14,7 +14,7 @@ import * as userRepo from "../users/user.repo.js";
 import * as sessionRepo from "./session.repo.js";
 import * as mediaRepo from "../media/media.repo.js";
 import * as securityService from "./security.service.js";
-import { sendTourAgentInvitation } from "../../libs/email.js";
+import { sendTourAgentInvitationLink } from "../../libs/email.js";
 import type { SafeUser, User, UserRole } from "../users/user.types.js";
 import type {
   AccessTokenPayload,
@@ -36,38 +36,50 @@ import type {
 // ==========================================
 
 async function toSafeUser(user: User): Promise<SafeUser> {
-  const roles = await userRepo.getUserRoles(user.id);
+  // Optimized: Fetch user with roles, guide, driver profiles in a single query
+  // This reduces N+1 from 4 queries to 2 queries (user+relations, media)
+  const [userWithRelations, avatarMedia] = await Promise.all([
+    userRepo.findUserWithRelationsForSafeUser(user.id),
+    mediaRepo.getMediaByEntity("user", user.id),
+  ]);
 
-  let driverProfileId: string | undefined;
-  let guideProfileId: string | undefined;
-
-  if (roles.includes("DRIVER")) {
-    const driver = await userRepo.getDriverProfile(user.id);
-    driverProfileId = driver?.id;
+  // Fallback if user not found (shouldn't happen, but be safe)
+  if (!userWithRelations) {
+    const roles = await userRepo.getUserRoles(user.id);
+    const avatar = avatarMedia.length > 0 ? avatarMedia[0] : undefined;
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+      roles,
+      isActive: user.isActive,
+      emailVerified: user.emailVerified,
+      driverProfileId: undefined,
+      guideProfileId: undefined,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      avatar,
+      avatarUrl: avatar?.url ?? null,
+    };
   }
 
-  if (roles.includes("GUIDE")) {
-    const guide = await userRepo.getGuideProfile(user.id);
-    guideProfileId = guide?.id;
-  }
-
-  // Fetch user avatar from media table
-  const avatarMedia = await mediaRepo.getMediaByEntity("user", user.id);
   const avatar = avatarMedia.length > 0 ? avatarMedia[0] : undefined;
 
   return {
-    id: user.id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
-    roles,
-    isActive: user.isActive,
-    emailVerified: user.emailVerified,
-    driverProfileId,
-    guideProfileId,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
+    id: userWithRelations.id,
+    email: userWithRelations.email,
+    firstName: userWithRelations.firstName,
+    lastName: userWithRelations.lastName,
+    phoneNumber: userWithRelations.phoneNumber,
+    roles: userWithRelations.roles,
+    isActive: userWithRelations.isActive,
+    emailVerified: userWithRelations.emailVerified,
+    driverProfileId: userWithRelations.driverProfileId,
+    guideProfileId: userWithRelations.guideProfileId,
+    createdAt: userWithRelations.createdAt,
+    updatedAt: userWithRelations.updatedAt,
     avatar,
     avatarUrl: avatar?.url ?? null,
   };
@@ -112,9 +124,9 @@ function getRefreshTokenExpiresAt(): Date {
   return new Date(Date.now() + value * multipliers[unit]);
 }
 
-function generateSecurePassword(): string {
-  // Generate a secure random password for tour agents
-  return crypto.randomBytes(12).toString("base64").slice(0, 16);
+function generateInvitationToken(): string {
+  // Generate a secure invitation token for tour agents
+  return crypto.randomBytes(32).toString("hex");
 }
 
 async function createSessionAndTokens(
@@ -173,19 +185,29 @@ export async function register(
     role: "USER",
   });
 
-  // Send verification email (async, don't block registration)
-  securityService.sendVerification(user).catch((err) => {
+  // Send verification email with proper error handling
+  const warnings: string[] = [];
+  try {
+    await securityService.sendVerification(user);
+  } catch (err) {
     logger.error({ err, userId: user.id }, "Failed to send verification email");
-  });
+    warnings.push("Verification email could not be sent. Please request a new one from your account settings.");
+  }
 
   const tokens = await createSessionAndTokens(user, meta);
 
   logger.info({ userId: user.id }, "User registered successfully");
 
-  return {
+  const response: AuthResponse = {
     user: await toSafeUser(user),
     ...tokens,
   };
+
+  if (warnings.length > 0) {
+    response.warnings = warnings;
+  }
+
+  return response;
 }
 
 // ==========================================
@@ -221,19 +243,29 @@ export async function registerCompany(
     phoneNumber: input.phoneNumber,
   });
 
-  // Send verification email
-  securityService.sendVerification(user).catch((err) => {
+  // Send verification email with proper error handling
+  const warnings: string[] = [];
+  try {
+    await securityService.sendVerification(user);
+  } catch (err) {
     logger.error({ err, userId: user.id }, "Failed to send verification email");
-  });
+    warnings.push("Verification email could not be sent. Please request a new one from your account settings.");
+  }
 
   const tokens = await createSessionAndTokens(user, meta);
 
   logger.info({ userId: user.id, companyName: input.companyName }, "Company registered successfully");
 
-  return {
+  const response: AuthResponse = {
     user: await toSafeUser(user),
     ...tokens,
   };
+
+  if (warnings.length > 0) {
+    response.warnings = warnings;
+  }
+
+  return response;
 }
 
 // ==========================================
@@ -299,7 +331,8 @@ export async function claimRole(
 
 export interface TourAgentResult {
   user: SafeUser;
-  temporaryPassword: string;
+  invitationSent: boolean;
+  warnings?: string[];
 }
 
 export async function createTourAgent(
@@ -321,38 +354,61 @@ export async function createTourAgent(
     throw new ConflictError("Email already registered", "EMAIL_EXISTS");
   }
 
-  // Generate a temporary password
-  const temporaryPassword = generateSecurePassword();
-  const passwordHash = await argon2.hash(temporaryPassword);
+  // Generate invitation token instead of temporary password
+  // The tour agent will set their own password via the invitation link
+  const invitationToken = generateInvitationToken();
+  const invitationTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  // Create tour agent account with a placeholder password hash
+  // The actual password will be set when they accept the invitation
+  const placeholderPasswordHash = await argon2.hash(crypto.randomBytes(32).toString("hex"));
 
   // Create tour agent account
   const tourAgent = await userRepo.createTourAgent({
     email: input.email,
-    passwordHash,
+    passwordHash: placeholderPasswordHash,
     firstName: input.firstName,
     lastName: input.lastName,
     phoneNumber: input.phoneNumber,
     parentCompanyId: companyUserId,
   });
 
-  // Send invitation email with temporary password
-  sendTourAgentInvitation(
-    input.email,
-    input.firstName,
-    temporaryPassword
-  ).catch((err) => {
-    logger.error({ err, tourAgentId: tourAgent.id }, "Failed to send tour agent invitation");
+  // Store hashed invitation token in database
+  await userRepo.updateUser(tourAgent.id, {
+    invitationToken: hashToken(invitationToken),
+    invitationTokenExpiresAt,
   });
+
+  // Send invitation email with magic link (NOT the password)
+  const warnings: string[] = [];
+  let invitationSent = false;
+  try {
+    await sendTourAgentInvitationLink(
+      input.email,
+      input.firstName,
+      invitationToken
+    );
+    invitationSent = true;
+  } catch (err) {
+    logger.error({ err, tourAgentId: tourAgent.id }, "Failed to send tour agent invitation");
+    warnings.push("Invitation email could not be sent. Please contact support to resend the invitation.");
+  }
 
   logger.info(
     { companyUserId, tourAgentId: tourAgent.id },
     "Tour agent created successfully"
   );
 
-  return {
+  const result: TourAgentResult = {
     user: await toSafeUser(tourAgent),
-    temporaryPassword, // Return to company so they can share if email fails
+    invitationSent,
   };
+
+  if (warnings.length > 0) {
+    result.warnings = warnings;
+  }
+
+  return result;
 }
 
 // ==========================================
@@ -409,12 +465,16 @@ export async function refresh(refreshToken: string): Promise<AuthTokens> {
     ) as RefreshTokenPayload;
   } catch (err) {
     // Log the actual JWT error for debugging
+    // SECURITY: Use hash prefix instead of token preview to avoid leaking token data to logs
     const jwtError = err as Error & { name?: string };
+    const tokenHashPrefix = refreshToken
+      ? crypto.createHash("sha256").update(refreshToken).digest("hex").substring(0, 8)
+      : "empty";
     logger.warn(
       {
         err,
         errorName: jwtError.name,
-        tokenPreview: refreshToken ? `${refreshToken.substring(0, 20)}...` : 'empty'
+        tokenHashPrefix,
       },
       "Invalid refresh token"
     );
@@ -432,6 +492,18 @@ export async function refresh(refreshToken: string): Promise<AuthTokens> {
   const session = await sessionRepo.findActiveSessionById(payload.sessionId);
   if (!session) {
     throw new UnauthorizedError("Session not found or revoked", "SESSION_REVOKED");
+  }
+
+  // Validate refresh token hash matches stored hash (prevents session hijacking)
+  const providedHash = hashToken(refreshToken);
+  if (session.refreshTokenHash !== providedHash) {
+    // Possible token theft - revoke the session immediately
+    await sessionRepo.revokeSession(session.id);
+    logger.warn(
+      { sessionId: session.id, userId: payload.userId },
+      "Refresh token hash mismatch - possible token theft, session revoked"
+    );
+    throw new UnauthorizedError("Invalid refresh token", "INVALID_REFRESH_TOKEN");
   }
 
   const user = await userRepo.findUserById(payload.userId);
@@ -488,6 +560,54 @@ export async function logoutAll(userId: string): Promise<{ revokedCount: number 
   await userRepo.incrementTokenVersion(userId);
   const revokedCount = await sessionRepo.revokeAllUserSessions(userId);
   return { revokedCount };
+}
+
+// ==========================================
+// ACCEPT TOUR AGENT INVITATION
+// ==========================================
+
+export interface AcceptInvitationInput {
+  token: string;
+  password: string;
+}
+
+export async function acceptInvitation(
+  input: AcceptInvitationInput,
+  meta?: LoginMeta
+): Promise<AuthResponse> {
+  // Hash the provided token to compare with stored hash
+  const tokenHash = hashToken(input.token);
+
+  // Find user with valid invitation token
+  const user = await userRepo.findUserByInvitationTokenHash(tokenHash);
+  if (!user) {
+    throw new BadRequestError("Invalid or expired invitation token", "INVALID_INVITATION_TOKEN");
+  }
+
+  // Hash the new password
+  const passwordHash = await argon2.hash(input.password);
+
+  // Update user with new password and clear invitation token
+  await userRepo.updateUser(user.id, {
+    passwordHash,
+    emailVerified: true, // Mark email as verified since they received the invitation email
+  });
+  await userRepo.clearInvitationToken(user.id);
+
+  // Create session and tokens
+  const updatedUser = await userRepo.findUserById(user.id);
+  if (!updatedUser) {
+    throw new NotFoundError("User not found", "USER_NOT_FOUND");
+  }
+
+  const tokens = await createSessionAndTokens(updatedUser, meta);
+
+  logger.info({ userId: user.id }, "Tour agent accepted invitation and set password");
+
+  return {
+    user: await toSafeUser(updatedUser),
+    ...tokens,
+  };
 }
 
 // ==========================================

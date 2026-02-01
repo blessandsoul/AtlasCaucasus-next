@@ -263,7 +263,7 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                     {isAuthenticated && user ? (
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-3 px-1">
-                                                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold overflow-hidden">
+                                                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold overflow-hidden flex-shrink-0">
                                                     {user.avatarUrl ? (
                                                         <img
                                                             src={getMediaUrl(user.avatarUrl)}

@@ -171,7 +171,7 @@ export async function sendPasswordResetEmail(
 export async function sendSecurityAlertEmail(
   email: string,
   firstName: string,
-  alertType: "login_from_new_ip" | "password_changed" | "all_sessions_logged_out" | "account_locked",
+  alertType: "login_from_new_ip" | "password_changed" | "all_sessions_logged_out" | "account_locked" | "account_unlocked",
   details: string
 ): Promise<boolean> {
   const alertTitles: Record<string, string> = {
@@ -179,6 +179,7 @@ export async function sendSecurityAlertEmail(
     password_changed: "Password Changed",
     all_sessions_logged_out: "All Sessions Logged Out",
     account_locked: "Account Temporarily Locked",
+    account_unlocked: "Account Unlocked",
   };
 
   const html = `
@@ -213,14 +214,15 @@ export async function sendSecurityAlertEmail(
 }
 
 /**
- * Send tour agent invitation email with temporary credentials
+ * Send tour agent invitation email with secure magic link
+ * SECURITY: No password is sent in the email - the tour agent sets their own password
  */
-export async function sendTourAgentInvitation(
+export async function sendTourAgentInvitationLink(
   email: string,
   firstName: string,
-  temporaryPassword: string
+  invitationToken: string
 ): Promise<boolean> {
-  const loginUrl = `${env.FRONTEND_URL || "http://localhost:3000"}/login`;
+  const acceptUrl = `${env.FRONTEND_URL || "http://localhost:3000"}/accept-invitation?token=${invitationToken}`;
 
   const html = `
     <!DOCTYPE html>
@@ -235,24 +237,25 @@ export async function sendTourAgentInvitation(
       </div>
       <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
         <h2 style="color: #333;">Welcome ${firstName}!</h2>
-        <p>Your company has created a Tour Agent account for you on Tourism Georgia. You can now log in and start managing tours.</p>
-        
+        <p>Your company has created a Tour Agent account for you on Tourism Georgia. Click the button below to set up your password and start managing tours.</p>
+
         <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #667eea;">
-          <h3 style="margin-top: 0; color: #667eea;">Your Login Credentials</h3>
+          <h3 style="margin-top: 0; color: #667eea;">Your Account</h3>
           <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Temporary Password:</strong> <code style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px;">${temporaryPassword}</code></p>
         </div>
-        
+
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${loginUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-            Log In Now
+          <a href="${acceptUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Set Up Your Account
           </a>
         </div>
-        
-        <p style="color: #dc3545; font-weight: bold;">⚠️ Important: Please change your password after your first login!</p>
-        
+
         <p style="color: #666; font-size: 14px;">
-          If you have any questions, please contact your company administrator.
+          This invitation link will expire in 7 days. If you didn't expect this invitation, you can safely ignore this email.
+        </p>
+        <p style="color: #666; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${acceptUrl}" style="color: #667eea;">${acceptUrl}</a>
         </p>
       </div>
     </body>
@@ -261,8 +264,8 @@ export async function sendTourAgentInvitation(
 
   return sendEmail({
     to: email,
-    subject: "Your Tour Agent Account - Tourism Georgia",
+    subject: "Set Up Your Tour Agent Account - Tourism Georgia",
     html,
-    text: `Hello ${firstName}! Your tour agent account has been created. Email: ${email}, Temporary Password: ${temporaryPassword}. Please login at ${loginUrl} and change your password.`,
+    text: `Hello ${firstName}! Your tour agent account has been created. Please set up your password by visiting: ${acceptUrl}. This link expires in 7 days.`,
   });
 }

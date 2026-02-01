@@ -1,5 +1,8 @@
 import type { JwtUser } from "../auth/auth.types.js";
-import type { SafeMedia, UploadedFile } from "./media.types.js";
+import type { SafeMedia, UploadedFile, BaseMediaEntityType } from "./media.types.js";
+import type { CompanyResponse } from "../companies/company.types.js";
+import type { GuideResponse } from "../guides/guide.types.js";
+import type { DriverResponse } from "../drivers/driver.types.js";
 import {
   uploadMediaForEntity,
   getMediaForEntity,
@@ -7,23 +10,58 @@ import {
   deleteAllMediaForEntity,
 } from "./media.service.js";
 import { slugify } from "../../libs/file-upload.js";
-
-// ==========================================
-// TOUR MEDIA HELPERS
-// ==========================================
-
-/**
- * Upload image for a tour
- * @param currentUser - Authenticated user
- * @param tourId - Tour ID
- * @param file - Uploaded file
- * @returns Created media record
- */
 import { getTourById } from "../tours/tour.repo.js";
 import { findById as getCompanyById } from "../companies/company.repo.js";
 import { findById as getGuideById } from "../guides/guide.repo.js";
 import { findById as getDriverById } from "../drivers/driver.repo.js";
 import { NotFoundError, ForbiddenError } from "../../libs/errors.js";
+
+// ==========================================
+// TYPE-SAFE OWNERSHIP HELPERS
+// ==========================================
+
+/**
+ * Check if user owns the company (type-safe)
+ */
+function isCompanyOwner(company: CompanyResponse, userId: string): boolean {
+  return company.userId === userId;
+}
+
+/**
+ * Check if user owns the guide profile (type-safe)
+ */
+function isGuideOwner(guide: GuideResponse, userId: string): boolean {
+  return guide.userId === userId;
+}
+
+/**
+ * Check if user owns the driver profile (type-safe)
+ */
+function isDriverOwner(driver: DriverResponse, userId: string): boolean {
+  return driver.userId === userId;
+}
+
+/**
+ * Get display name for guide (type-safe)
+ */
+function getGuideDisplayName(guide: GuideResponse): string {
+  const firstName = guide.user?.firstName || "";
+  const lastName = guide.user?.lastName || "";
+  return `guide-${firstName}-${lastName}`.trim();
+}
+
+/**
+ * Get display name for driver (type-safe)
+ */
+function getDriverDisplayName(driver: DriverResponse): string {
+  const firstName = driver.user?.firstName || "";
+  const lastName = driver.user?.lastName || "";
+  return `driver-${firstName}-${lastName}`.trim();
+}
+
+// ==========================================
+// TOUR MEDIA HELPERS
+// ==========================================
 
 /**
  * Generate SEO-friendly entity slug from title/name
@@ -102,14 +140,13 @@ export async function uploadCompanyLogo(
     throw new NotFoundError("Company not found", "COMPANY_NOT_FOUND");
   }
 
-  // Check ownership (assuming company has userId)
-  // Casting to any because CompanyResponse type might be loose, but database schema has userId
-  if ((company as any).userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
+  // Check ownership (type-safe)
+  if (!isCompanyOwner(company, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
     throw new ForbiddenError("You can only upload logos for your own company", "NOT_COMPANY_OWNER");
   }
 
   // Generate SEO-friendly slug from company name
-  const entitySlug = generateEntitySlug((company as any).companyName || "company", "company");
+  const entitySlug = generateEntitySlug(company.companyName || "company", "company");
 
   return uploadMediaForEntity(currentUser, "company", companyId, file, entitySlug);
 }
@@ -152,13 +189,13 @@ export async function uploadGuidePhoto(
     throw new NotFoundError("Guide profile not found", "GUIDE_NOT_FOUND");
   }
 
-  // Check ownership
-  if ((guide as any).userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
+  // Check ownership (type-safe)
+  if (!isGuideOwner(guide, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
     throw new ForbiddenError("You can only upload photos for your own guide profile", "NOT_GUIDE_OWNER");
   }
 
-  // Generate SEO-friendly slug from guide name
-  const guideName = `guide-${(guide as any).user?.firstName || ""}-${(guide as any).user?.lastName || ""}`.trim();
+  // Generate SEO-friendly slug from guide name (type-safe)
+  const guideName = getGuideDisplayName(guide);
   const entitySlug = slugify(guideName || "guide", 40);
 
   return uploadMediaForEntity(currentUser, "guide", guideId, file, entitySlug);
@@ -202,13 +239,13 @@ export async function uploadDriverPhoto(
     throw new NotFoundError("Driver profile not found", "DRIVER_NOT_FOUND");
   }
 
-  // Check ownership
-  if ((driver as any).userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
+  // Check ownership (type-safe)
+  if (!isDriverOwner(driver, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
     throw new ForbiddenError("You can only upload photos for your own driver profile", "NOT_DRIVER_OWNER");
   }
 
-  // Generate SEO-friendly slug from driver name
-  const driverName = `driver-${(driver as any).user?.firstName || ""}-${(driver as any).user?.lastName || ""}`.trim();
+  // Generate SEO-friendly slug from driver name (type-safe)
+  const driverName = getDriverDisplayName(driver);
   const entitySlug = slugify(driverName || "driver", 40);
 
   return uploadMediaForEntity(currentUser, "driver", driverId, file, entitySlug);
@@ -252,16 +289,16 @@ export async function uploadDriverAvatar(
     throw new NotFoundError("Driver profile not found", "DRIVER_NOT_FOUND");
   }
 
-  // Check ownership
-  if ((driver as any).userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
+  // Check ownership (type-safe)
+  if (!isDriverOwner(driver, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
     throw new ForbiddenError("You can only upload avatar for your own driver profile", "NOT_DRIVER_OWNER");
   }
 
   // Delete existing avatar(s) before uploading new one
   await deleteAllMediaForEntity("driver-avatar", driverId);
 
-  // Generate SEO-friendly slug from driver name
-  const driverName = `driver-${(driver as any).user?.firstName || ""}-${(driver as any).user?.lastName || ""}`.trim();
+  // Generate SEO-friendly slug from driver name (type-safe)
+  const driverName = getDriverDisplayName(driver);
   const entitySlug = slugify(driverName || "driver-avatar", 40);
 
   return uploadMediaForEntity(currentUser, "driver-avatar", driverId, file, entitySlug);
@@ -305,16 +342,16 @@ export async function uploadGuideAvatar(
     throw new NotFoundError("Guide profile not found", "GUIDE_NOT_FOUND");
   }
 
-  // Check ownership
-  if ((guide as any).userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
+  // Check ownership (type-safe)
+  if (!isGuideOwner(guide, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
     throw new ForbiddenError("You can only upload avatar for your own guide profile", "NOT_GUIDE_OWNER");
   }
 
   // Delete existing avatar(s) before uploading new one
   await deleteAllMediaForEntity("guide-avatar", guideId);
 
-  // Generate SEO-friendly slug from guide name
-  const guideName = `guide-${(guide as any).user?.firstName || ""}-${(guide as any).user?.lastName || ""}`.trim();
+  // Generate SEO-friendly slug from guide name (type-safe)
+  const guideName = getGuideDisplayName(guide);
   const entitySlug = slugify(guideName || "guide-avatar", 40);
 
   return uploadMediaForEntity(currentUser, "guide-avatar", guideId, file, entitySlug);
@@ -398,7 +435,7 @@ export async function deleteUserAvatar(userId: string): Promise<void> {
  */
 export async function uploadMultipleFiles(
   currentUser: JwtUser,
-  entityType: "tour" | "company" | "guide" | "driver" | "user",
+  entityType: BaseMediaEntityType,
   entityId: string,
   files: UploadedFile[]
 ): Promise<SafeMedia[]> {
@@ -420,29 +457,29 @@ export async function uploadMultipleFiles(
     case "company": {
       const company = await getCompanyById(entityId);
       if (!company) throw new NotFoundError("Company not found");
-      if ((company as any).userId !== currentUser.id && !isAdmin) {
+      if (!isCompanyOwner(company, currentUser.id) && !isAdmin) {
         throw new ForbiddenError("Not authorized to upload to this company");
       }
-      entitySlug = generateEntitySlug((company as any).companyName || "company", "company");
+      entitySlug = generateEntitySlug(company.companyName || "company", "company");
       break;
     }
     case "guide": {
       const guide = await getGuideById(entityId);
       if (!guide) throw new NotFoundError("Guide not found");
-      if ((guide as any).userId !== currentUser.id && !isAdmin) {
+      if (!isGuideOwner(guide, currentUser.id) && !isAdmin) {
         throw new ForbiddenError("Not authorized to upload to this guide profile");
       }
-      const guideName = `guide-${(guide as any).user?.firstName || ""}-${(guide as any).user?.lastName || ""}`.trim();
+      const guideName = getGuideDisplayName(guide);
       entitySlug = slugify(guideName || "guide", 40);
       break;
     }
     case "driver": {
       const driver = await getDriverById(entityId);
       if (!driver) throw new NotFoundError("Driver not found");
-      if ((driver as any).userId !== currentUser.id && !isAdmin) {
+      if (!isDriverOwner(driver, currentUser.id) && !isAdmin) {
         throw new ForbiddenError("Not authorized to upload to this driver profile");
       }
-      const driverName = `driver-${(driver as any).user?.firstName || ""}-${(driver as any).user?.lastName || ""}`.trim();
+      const driverName = getDriverDisplayName(driver);
       entitySlug = slugify(driverName || "driver", 40);
       break;
     }

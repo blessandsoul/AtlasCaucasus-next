@@ -21,6 +21,11 @@ export {
 export {
   validateImageFile,
   validateBatchFiles,
+  validateFileContent,
+  validateImageFileSecure,
+  validateBatchFilesSecure,
+  getFileUploadErrorMessage,
+  isFileValidationError,
   ALLOWED_IMAGE_TYPES,
   MAX_FILE_SIZE,
   MAX_BATCH_FILES,

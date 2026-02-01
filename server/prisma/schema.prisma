@@ -102,6 +102,10 @@ model User {
   resetPasswordToken          String?   @map("reset_password_token") @db.VarChar(64)
   resetPasswordTokenExpiresAt DateTime? @map("reset_password_token_expires_at")
 
+  // Tour agent invitation (magic link to set password)
+  invitationToken          String?   @map("invitation_token") @db.VarChar(64)
+  invitationTokenExpiresAt DateTime? @map("invitation_token_expires_at")
+
   // Account lockout (brute force protection)
   failedLoginAttempts Int       @default(0) @map("failed_login_attempts")
   lockedUntil         DateTime? @map("locked_until")
@@ -136,6 +140,7 @@ model User {
   @@index([parentCompanyId])
   @@index([verificationToken])
   @@index([resetPasswordToken])
+  @@index([invitationToken])
   @@map("users")
 }
 
@@ -568,6 +573,74 @@ model Review {
   @@index([userId])
   @@index([rating])
   @@map("reviews")
+}
+
+// ==========================================
+// AUDIT LOG
+// ==========================================
+
+enum AuditAction {
+  // Authentication
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  TOKEN_REFRESH
+  PASSWORD_CHANGE
+  PASSWORD_RESET_REQUEST
+  PASSWORD_RESET_COMPLETE
+  EMAIL_VERIFICATION
+
+  // User Management
+  USER_CREATE
+  USER_UPDATE
+  USER_DELETE
+  USER_RESTORE
+  USER_ROLE_ADD
+  USER_ROLE_REMOVE
+  ACCOUNT_LOCK
+  ACCOUNT_UNLOCK
+
+  // Profile Management
+  COMPANY_CREATE
+  COMPANY_UPDATE
+  COMPANY_VERIFY
+  GUIDE_CREATE
+  GUIDE_UPDATE
+  GUIDE_VERIFY
+  DRIVER_CREATE
+  DRIVER_UPDATE
+  DRIVER_VERIFY
+
+  // Content Management
+  TOUR_CREATE
+  TOUR_UPDATE
+  TOUR_DELETE
+  MEDIA_UPLOAD
+  MEDIA_DELETE
+
+  // Admin Actions
+  ADMIN_ACTION
+}
+
+model AuditLog {
+  id           String      @id @default(uuid())
+  action       AuditAction
+  userId       String?     @map("user_id") // Who performed the action (null for system/anonymous)
+  targetType   String?     @map("target_type") @db.VarChar(50) // Entity type affected (user, tour, company, etc.)
+  targetId     String?     @map("target_id") @db.VarChar(255) // ID of the affected entity
+  ipAddress    String?     @map("ip_address") @db.VarChar(45)
+  userAgent    String?     @map("user_agent") @db.VarChar(512)
+  metadata     String?     @db.Text // JSON with additional context
+  status       String      @default("SUCCESS") @db.VarChar(20) // SUCCESS, FAILED, BLOCKED
+  errorMessage String?     @map("error_message") @db.Text
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@index([status])
+  @@map("audit_logs")
 }
 
 // ==========================================

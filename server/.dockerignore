@@ -1,0 +1,14 @@
+node_modules
+src
+prisma
+.env
+.env.local
+.env.example
+*.log
+logs
+.git
+.gitignore
+README.md
+tsconfig.json
+docker
+docker-compose.yml

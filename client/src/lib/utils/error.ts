@@ -29,3 +29,14 @@ export const getErrorCode = (error: unknown): string | undefined => {
 export const isErrorCode = (error: unknown, code: string): boolean => {
     return getErrorCode(error) === code;
 };
+
+/**
+ * Extracts additional details from an API error response.
+ * Useful for extracting lockoutEndsAt, remainingAttempts, retryAfter, etc.
+ */
+export const getErrorDetails = (error: unknown): Record<string, unknown> | undefined => {
+    if (axios.isAxiosError(error)) {
+        return error.response?.data?.error?.details;
+    }
+    return undefined;
+};

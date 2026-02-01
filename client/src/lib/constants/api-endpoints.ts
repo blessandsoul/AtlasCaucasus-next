@@ -141,4 +141,8 @@ export const API_ENDPOINTS = {
     READY: '/health/ready',
     LIVE: '/health/live',
   },
+  ADMIN: {
+    AUDIT_LOGS: '/admin/audit-logs',
+    RESTORE_USER: (id: string) => `/admin/users/${id}/restore`,
+  },
 } as const;

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { tourService } from '../services/tour.service';
 import { getErrorMessage } from '@/lib/utils/error';
+import { getFileUploadErrorMessage } from '@/features/media';
 import type { TourFilters, UpdateTourInput, MyToursParams, ToursResponse, CreateTourInput } from '../types/tour.types';
 
 interface UseToursParams extends TourFilters {
@@ -119,7 +120,7 @@ export const useUploadTourImage = () => {
             toast.success(t('tours.create.image_upload_success', 'Images uploaded successfully!'));
         },
         onError: (error) => {
-            toast.error(getErrorMessage(error));
+            toast.error(getFileUploadErrorMessage(error));
         },
     });
 };

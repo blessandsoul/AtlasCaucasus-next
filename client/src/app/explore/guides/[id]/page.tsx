@@ -8,12 +8,16 @@ import { GuideInfo } from '@/features/guides/components/GuideInfo';
 import { GuideSidebar } from '@/features/guides/components/GuideSidebar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
+import { isValidUuid } from '@/lib/utils/validation';
 
 export default function GuideDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { data: guide, isLoading, error } = useGuide(id);
+
+  // Validate UUID format before making API call
+  const isValidId = isValidUuid(id);
+  const { data: guide, isLoading, error } = useGuide(isValidId ? id : '');
 
   if (isLoading) {
     return (
@@ -23,7 +27,7 @@ export default function GuideDetailsPage() {
     );
   }
 
-  if (error || !guide) {
+  if (!isValidId || error || !guide) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center px-4">
         <h2 className="text-2xl font-bold text-foreground">Guide not found</h2>

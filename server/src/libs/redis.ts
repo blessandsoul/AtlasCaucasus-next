@@ -2,6 +2,12 @@ import { createClient, RedisClientType } from "redis";
 import { env } from "../config/env.js";
 import { logger } from "./logger.js";
 
+// SECURITY: Require Redis password in production
+if (env.NODE_ENV === "production" && !env.REDIS_PASSWORD) {
+    logger.fatal("SECURITY: REDIS_PASSWORD required in production");
+    process.exit(1);
+}
+
 // Main Redis client for general operations
 const redisClient: RedisClientType = createClient({
     socket: {

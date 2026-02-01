@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateUser } from '@/features/auth/store/authSlice';
 import { userService } from '../services/user.service';
-import { getErrorMessage } from '@/lib/utils/error';
+import { getFileUploadErrorMessage } from '@/features/media';
 
 export const useUploadAvatar = () => {
     const queryClient = useQueryClient();
@@ -30,7 +30,7 @@ export const useUploadAvatar = () => {
             toast.success(t('profile.avatar.upload_success', 'Avatar uploaded successfully'));
         },
         onError: (error) => {
-            toast.error(getErrorMessage(error));
+            toast.error(getFileUploadErrorMessage(error));
         },
     });
 };

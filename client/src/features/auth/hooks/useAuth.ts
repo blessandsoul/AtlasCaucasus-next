@@ -5,6 +5,8 @@ import { authService } from '../services/auth.service';
 import { logout as logoutAction, updateUser } from '../store/authSlice';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { clearCsrfToken } from '@/lib/api/csrf';
+import { stopTokenRefreshMonitoring } from '@/lib/utils/token-refresh';
 
 export const useAuth = () => {
     const { t } = useTranslation();
@@ -34,8 +36,12 @@ export const useAuth = () => {
             // Still logout locally even if server request fails
             console.error('Logout error:', error);
         } finally {
+            // Stop token refresh monitoring
+            stopTokenRefreshMonitoring();
             // Clear Redux state
             dispatch(logoutAction());
+            // Clear CSRF token
+            clearCsrfToken();
             // Clear localStorage
             localStorage.removeItem('auth');
             // Navigate to home

@@ -9,10 +9,15 @@ import {
 } from "./media.repo.js";
 import { NotFoundError, ForbiddenError, ValidationError } from "../../libs/errors.js";
 import {
+  verifyMediaEntityOwnership,
+  type MediaEntityType as AuthMediaEntityType,
+} from "../../libs/authorization.js";
+import {
   sanitizeFilename,
   generateUniqueFilename,
   generateSeoFriendlyFilename,
   validateFileType,
+  validateFileTypeFromBuffer,
   validateFileSize,
   saveFile,
   deleteFile,
@@ -27,7 +32,7 @@ export async function uploadMediaForEntity(
   file: UploadedFile,
   entitySlug?: string // Optional: SEO-friendly slug of entity
 ): Promise<SafeMedia> {
-  // Validate file type
+  // Quick validation of Content-Type header (can be spoofed, but fast rejection)
   if (!validateFileType(file.mimetype, FILE_VALIDATION.ALLOWED_MIME_TYPES)) {
     throw new ValidationError(
       `Invalid file type. Allowed types: ${FILE_VALIDATION.ALLOWED_MIME_TYPES.join(", ")}`
@@ -40,6 +45,23 @@ export async function uploadMediaForEntity(
       `File too large. Maximum size: ${FILE_VALIDATION.MAX_SIZE / (1024 * 1024)}MB`
     );
   }
+
+  // SECURITY: Validate actual file content by reading magic bytes
+  // This prevents MIME type spoofing attacks (e.g., uploading .php disguised as .jpg)
+  const magicByteValidation = await validateFileTypeFromBuffer(
+    file.buffer,
+    FILE_VALIDATION.ALLOWED_MIME_TYPES
+  );
+
+  if (!magicByteValidation.valid) {
+    throw new ValidationError(
+      magicByteValidation.error ||
+        `Invalid file content. Detected type: ${magicByteValidation.detectedType || "unknown"}`
+    );
+  }
+
+  // Use the detected MIME type from magic bytes (more reliable than header)
+  const actualMimeType = magicByteValidation.detectedType || file.mimetype;
 
   // Generate filename
   const sanitizedName = sanitizeFilename(file.originalFilename);
@@ -56,11 +78,11 @@ export async function uploadMediaForEntity(
   // Save file to disk
   const filePath = await saveFile(file.buffer, entityType, uniqueFilename);
 
-  // Create media record in database
+  // Create media record in database (use actual MIME type from magic bytes)
   const mediaData: CreateMediaData = {
     filename: uniqueFilename,
     originalName: file.originalFilename,
-    mimeType: file.mimetype,
+    mimeType: actualMimeType,
     size: file.size,
     url: filePath,
     entityType,
@@ -79,7 +101,7 @@ export async function getMediaForEntity(
   return getMediaByEntity(entityType, entityId);
 }
 
-// Delete media (only owner or admin)
+// Delete media (only entity owner or admin)
 export async function deleteMediaById(
   currentUser: JwtUser,
   mediaId: string
@@ -90,14 +112,20 @@ export async function deleteMediaById(
     throw new NotFoundError("Media not found", "MEDIA_NOT_FOUND");
   }
 
-  // Check ownership
-  const isOwner = media.uploadedBy === currentUser.id;
-  const isAdmin = currentUser.roles.includes("ADMIN");
+  // SECURITY FIX: Check ENTITY ownership, not just who uploaded the media
+  // This ensures that if a tour/company/etc is transferred to a new owner,
+  // the new owner can manage media and the old owner cannot
+  const canDelete = await verifyMediaEntityOwnership(
+    media.entityType as AuthMediaEntityType,
+    media.entityId,
+    currentUser.id,
+    currentUser.roles
+  );
 
-  if (!isOwner && !isAdmin) {
+  if (!canDelete) {
     throw new ForbiddenError(
-      "You can only delete your own media",
-      "NOT_MEDIA_OWNER"
+      "You can only delete media for your own entities",
+      "NOT_ENTITY_OWNER"
     );
   }
 

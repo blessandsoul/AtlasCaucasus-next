@@ -3,13 +3,18 @@
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, CheckCircle2, XCircle, Mail } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Mail, Clock } from 'lucide-react';
 import { authService } from '@/features/auth/services/auth.service';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ROUTES } from '@/lib/constants/routes';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
+import { ERROR_CODES } from '@/lib/constants/error-codes';
 
-type VerificationStatus = 'verifying' | 'success' | 'error' | 'invalid';
+type VerificationStatus = 'verifying' | 'success' | 'error' | 'expired' | 'invalid';
 
 function VerifyEmailContent() {
     const { t } = useTranslation();
@@ -17,6 +22,9 @@ function VerifyEmailContent() {
     const router = useRouter();
     const [status, setStatus] = useState<VerificationStatus>('verifying');
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [resendEmail, setResendEmail] = useState('');
+    const [isResending, setIsResending] = useState(false);
+    const [resendSuccess, setResendSuccess] = useState(false);
     const hasVerified = useRef(false);
 
     useEffect(() => {
@@ -42,17 +50,46 @@ function VerifyEmailContent() {
                 setTimeout(() => {
                     router.push(ROUTES.LOGIN);
                 }, 3000);
-            } catch (error: any) {
-                setStatus('error');
-                setErrorMessage(
-                    error?.response?.data?.error?.message ||
-                    'Verification failed. The link may be expired or invalid.'
-                );
+            } catch (error: unknown) {
+                const errorCode = getErrorCode(error);
+
+                if (errorCode === ERROR_CODES.VERIFICATION_TOKEN_EXPIRED) {
+                    setStatus('expired');
+                    setErrorMessage(
+                        t('auth.verification_link_expired') ||
+                        'Your verification link has expired.'
+                    );
+                } else {
+                    setStatus('error');
+                    setErrorMessage(getErrorMessage(error));
+                }
             }
         };
 
         verifyEmail();
-    }, [searchParams, router]);
+    }, [searchParams, router, t]);
+
+    const handleResendVerification = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!resendEmail.trim()) {
+            toast.error(t('auth.email_required') || 'Please enter your email address');
+            return;
+        }
+
+        setIsResending(true);
+        setResendSuccess(false);
+
+        try {
+            await authService.resendVerification(resendEmail.trim());
+            setResendSuccess(true);
+            toast.success(t('auth.verification_email_sent') || 'Verification email sent!');
+        } catch (error) {
+            toast.error(getErrorMessage(error));
+        } finally {
+            setIsResending(false);
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -97,6 +134,73 @@ function VerifyEmailContent() {
                             >
                                 {t('auth.continue_to_login') || 'Continue to login'}
                             </Button>
+                        </div>
+                    )}
+
+                    {/* Expired Token State */}
+                    {status === 'expired' && (
+                        <div className="text-center py-8">
+                            <Clock className="h-16 w-16 text-warning mx-auto mb-4" />
+                            <h2 className="text-xl font-semibold text-foreground mb-2">
+                                {t('auth.verification_link_expired_title') || 'Verification link expired'}
+                            </h2>
+                            <p className="text-muted-foreground mb-6">
+                                {errorMessage}
+                            </p>
+
+                            {resendSuccess ? (
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-center gap-2 text-success">
+                                        <CheckCircle2 className="h-5 w-5" />
+                                        <span className="font-medium">
+                                            {t('auth.verification_email_sent') || 'Verification email sent!'}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                        {t('auth.check_inbox_and_spam') || 'Please check your inbox and spam folder.'}
+                                    </p>
+                                    <Button
+                                        onClick={() => router.push(ROUTES.LOGIN)}
+                                        variant="outline"
+                                        className="w-full mt-4"
+                                    >
+                                        {t('auth.go_to_login') || 'Go to login'}
+                                    </Button>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleResendVerification} className="space-y-4 text-left">
+                                    <div>
+                                        <Label htmlFor="resend-email" className="text-sm font-medium">
+                                            {t('auth.enter_email_to_resend') || 'Enter your email to resend verification'}
+                                        </Label>
+                                        <Input
+                                            id="resend-email"
+                                            type="email"
+                                            placeholder="your@email.com"
+                                            value={resendEmail}
+                                            onChange={(e) => setResendEmail(e.target.value)}
+                                            className="mt-1.5"
+                                            required
+                                        />
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        disabled={isResending}
+                                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                                    >
+                                        {isResending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        {t('auth.resend_verification_email') || 'Resend verification email'}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={() => router.push(ROUTES.LOGIN)}
+                                        variant="outline"
+                                        className="w-full"
+                                    >
+                                        {t('auth.go_to_login') || 'Go to login'}
+                                    </Button>
+                                </form>
+                            )}
                         </div>
                     )}
 

@@ -10,12 +10,16 @@ import { TourInfo } from '@/features/tours/components/TourInfo';
 import { ReviewsSection } from '@/features/reviews';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
+import { isValidUuid } from '@/lib/utils/validation';
 
 export default function TourDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { data: tour, isLoading, error } = useTour(id);
+
+  // Validate UUID format before making API call
+  const isValidId = isValidUuid(id);
+  const { data: tour, isLoading, error } = useTour(isValidId ? id : '');
 
   if (isLoading) {
     return (
@@ -25,7 +29,7 @@ export default function TourDetailsPage() {
     );
   }
 
-  if (error || !tour) {
+  if (!isValidId || error || !tour) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <h2 className="text-2xl font-bold">Tour not found</h2>

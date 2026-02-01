@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { successResponse, paginatedResponse } from "../../libs/response.js";
 import { ValidationError, BadRequestError } from "../../libs/errors.js";
+import { validateUuidParam } from "../../libs/validation.js";
 import * as guideService from "./guide.service.js";
 import { updateGuideSchema, guideQuerySchema } from "./guide.schemas.js";
 import {
@@ -32,7 +33,7 @@ export async function getById(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     const guide = await guideService.getGuideById(id);
 
@@ -52,7 +53,7 @@ export async function update(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     const parsed = updateGuideSchema.safeParse(request.body);
     if (!parsed.success) {
@@ -73,7 +74,7 @@ export async function deleteGuide(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     await guideService.deleteGuide(id, request.user.id, request.user.roles);
 
@@ -88,7 +89,7 @@ export async function uploadPhotos(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     // Get all files from multipart request
     const parts = request.files();
@@ -130,7 +131,7 @@ export async function getPhotos(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id } = request.params as { id: string };
+    const id = validateUuidParam((request.params as { id: string }).id);
 
     // Verify guide exists
     await guideService.getGuideById(id);
@@ -144,7 +145,9 @@ export async function deletePhoto(
     request: FastifyRequest,
     reply: FastifyReply
 ): Promise<void> {
-    const { id, photoId } = request.params as { id: string; photoId: string };
+    const params = request.params as { id: string; photoId: string };
+    const id = validateUuidParam(params.id);
+    const photoId = validateUuidParam(params.photoId);
 
     // Verify guide exists
     await guideService.getGuideById(id);

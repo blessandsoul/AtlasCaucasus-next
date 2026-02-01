@@ -64,7 +64,8 @@ export interface CreateTourAgentResponse {
     lastName: string;
     roles: string[];
   };
-  temporaryPassword: string;
+  // Note: temporaryPassword is no longer returned by the API
+  // It is now sent directly to the user's email for security
 }
 
 export interface CompanyFilters {

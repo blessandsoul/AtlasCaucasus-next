@@ -78,6 +78,10 @@ export interface User {
   resetPasswordToken: string | null;
   resetPasswordTokenExpiresAt: Date | null;
 
+  // Tour agent invitation
+  invitationToken: string | null;
+  invitationTokenExpiresAt: Date | null;
+
   // Account lockout
   failedLoginAttempts: number;
   lockedUntil: Date | null;
@@ -132,6 +136,9 @@ export interface UpdateUserData {
   // Password reset
   resetPasswordToken?: string | null;
   resetPasswordTokenExpiresAt?: Date | null;
+  // Tour agent invitation
+  invitationToken?: string | null;
+  invitationTokenExpiresAt?: Date | null;
   // Account lockout
   failedLoginAttempts?: number;
   lockedUntil?: Date | null;

@@ -17,7 +17,14 @@
     "prisma:studio": "prisma studio",
     "prisma:reset": "prisma migrate reset --force",
     "prisma:seed": "tsx prisma/seed.ts",
-    "cleanup:media": "tsx src/scripts/cleanup-media.ts"
+    "cleanup:media": "tsx src/scripts/cleanup-media.ts",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop tourism-server",
+    "pm2:restart": "pm2 restart tourism-server",
+    "pm2:reload": "pm2 reload tourism-server",
+    "pm2:delete": "pm2 delete tourism-server",
+    "pm2:logs": "pm2 logs tourism-server",
+    "pm2:monit": "pm2 monit"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -26,7 +33,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.2.0",
+    "@fastify/csrf-protection": "^7.1.0",
     "@fastify/helmet": "^13.0.2",
     "@fastify/multipart": "^9.3.0",
     "@fastify/rate-limit": "^10.3.0",
@@ -36,10 +45,12 @@
     "argon2": "^0.41.1",
     "dotenv": "^16.4.5",
     "fastify": "^5.2.1",
+    "file-type": "^21.3.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
     "pino": "^9.6.0",
+    "pm2": "^6.0.14",
     "redis": "^5.10.0",
     "resend": "^6.6.0",
     "uuid": "^11.0.5",

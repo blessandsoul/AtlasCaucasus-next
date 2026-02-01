@@ -1,7 +1,16 @@
 import { z } from "zod";
 import { env } from "../../config/env.js";
 
-// Allowed entity types (includes avatar variants for separate storage)
+// Base entity types for standard media uploads
+export const baseEntityTypeSchema = z.enum([
+  "tour",
+  "company",
+  "guide",
+  "driver",
+  "user",
+]);
+
+// All entity types (includes avatar variants for separate storage)
 export const entityTypeSchema = z.enum([
   "tour",
   "company",
@@ -12,8 +21,14 @@ export const entityTypeSchema = z.enum([
   "guide-avatar",
 ]);
 
-// Upload schema (for query/body params)
+// Upload schema for generic multi-upload endpoint (base types only)
 export const uploadMediaSchema = z.object({
+  entityType: baseEntityTypeSchema,
+  entityId: z.string().uuid("Invalid entity ID"),
+});
+
+// Upload schema with all entity types (for specialized endpoints)
+export const uploadMediaAllTypesSchema = z.object({
   entityType: entityTypeSchema,
   entityId: z.string().uuid("Invalid entity ID"),
 });

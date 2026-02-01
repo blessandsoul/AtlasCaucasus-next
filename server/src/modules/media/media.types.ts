@@ -15,8 +15,11 @@ export interface SafeMedia {
   updatedAt: Date;
 }
 
-// Entity types that can have media
-export type MediaEntityType = "tour" | "company" | "guide" | "driver" | "user";
+// Base entity types for standard media uploads (tours, profiles, etc.)
+export type BaseMediaEntityType = "tour" | "company" | "guide" | "driver" | "user";
+
+// All entity types including avatar variants (for separate avatar storage)
+export type MediaEntityType = BaseMediaEntityType | "guide-avatar" | "driver-avatar";
 
 // Upload data (what we need to create a media record)
 export interface CreateMediaData {

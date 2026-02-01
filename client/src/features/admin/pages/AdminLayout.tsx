@@ -31,7 +31,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     return (
         <div className="space-y-6">
             <div className="border-b">
-                <nav className="flex space-x-4" aria-label="Tabs">
+                <nav className="flex space-x-4 overflow-x-auto pb-1" aria-label="Tabs">
                     {tabs.map((tab) => {
                         const isActive = pathname === tab.href;
                         return (
@@ -39,7 +39,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                                 key={tab.href}
                                 href={tab.href}
                                 className={cn(
-                                    'flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
+                                    'flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap',
                                     isActive
                                         ? 'border-primary text-primary'
                                         : 'border-transparent text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground'

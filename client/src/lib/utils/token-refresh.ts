@@ -2,7 +2,8 @@
 
 import { jwtDecode } from 'jwt-decode';
 import { store } from '@/store';
-import { updateTokens } from '@/features/auth/store/authSlice';
+import { logout, updateTokens } from '@/features/auth/store/authSlice';
+import { clearCsrfToken } from '@/lib/api/csrf';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
@@ -10,8 +11,17 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8
 // Refresh token 5 minutes before expiration
 const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 
+// Rate limiting configuration
+// Server allows 3 refresh requests per 15 minutes, we stay under that with 2
+const MAX_REFRESH_ATTEMPTS = 2;
+const REFRESH_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+// Track refresh attempts with timestamps
+const refreshAttempts: number[] = [];
+
 let refreshTimer: ReturnType<typeof setTimeout> | null = null;
 let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
 
 interface TokenPayload {
     exp: number;
@@ -47,48 +57,147 @@ const getTimeUntilRefresh = (token: string): number => {
 };
 
 /**
- * Refresh the access token using refresh token
+ * Clean up old refresh attempts outside the time window
  */
-const refreshAccessToken = async (): Promise<boolean> => {
-    if (isRefreshing) {
+const cleanupOldAttempts = (): void => {
+    const now = Date.now();
+    const cutoff = now - REFRESH_WINDOW_MS;
+
+    // Remove attempts older than the window
+    while (refreshAttempts.length > 0 && refreshAttempts[0] < cutoff) {
+        refreshAttempts.shift();
+    }
+};
+
+/**
+ * Check if we can attempt a token refresh (within rate limits)
+ */
+const canAttemptRefresh = (): boolean => {
+    cleanupOldAttempts();
+    return refreshAttempts.length < MAX_REFRESH_ATTEMPTS;
+};
+
+/**
+ * Get the number of refresh attempts in the current window
+ */
+export const getRefreshAttemptCount = (): number => {
+    cleanupOldAttempts();
+    return refreshAttempts.length;
+};
+
+/**
+ * Calculate exponential backoff delay based on attempt count
+ */
+const getBackoffDelay = (attemptCount: number): number => {
+    // Exponential backoff: 1s, 2s, 4s, 8s... capped at 30s
+    const baseDelay = 1000;
+    const delay = Math.min(baseDelay * Math.pow(2, attemptCount), 30000);
+    return delay;
+};
+
+/**
+ * Handle logout due to refresh failure
+ */
+const handleRefreshFailure = (reason: string): void => {
+    console.warn(`Token refresh failed: ${reason}`);
+    store.dispatch(logout());
+    clearCsrfToken();
+
+    if (typeof window !== 'undefined') {
+        // Add reason to URL for user feedback
+        const encodedReason = encodeURIComponent(reason);
+        window.location.href = `/login?reason=${encodedReason}`;
+    }
+};
+
+/**
+ * Reset refresh attempts (call on successful login)
+ */
+export const resetRefreshAttempts = (): void => {
+    refreshAttempts.length = 0;
+};
+
+/**
+ * Refresh the access token using refresh token
+ * Implements rate limiting and exponential backoff
+ */
+export const refreshAccessToken = async (): Promise<boolean> => {
+    // If a refresh is already in progress, wait for it
+    if (isRefreshing && refreshPromise) {
+        return refreshPromise;
+    }
+
+    // Check rate limit before attempting
+    if (!canAttemptRefresh()) {
+        handleRefreshFailure('session_expired');
         return false;
     }
 
     isRefreshing = true;
 
-    try {
-        const state = store.getState();
-        const refreshToken = state.auth.tokens?.refreshToken;
+    refreshPromise = (async (): Promise<boolean> => {
+        try {
+            const state = store.getState();
+            const refreshToken = state.auth.tokens?.refreshToken;
 
-        if (!refreshToken) {
-            throw new Error('No refresh token available');
+            if (!refreshToken) {
+                handleRefreshFailure('no_refresh_token');
+                return false;
+            }
+
+            // Record this attempt
+            const attemptCount = refreshAttempts.length;
+            refreshAttempts.push(Date.now());
+
+            // Apply exponential backoff if this isn't the first attempt
+            if (attemptCount > 0) {
+                const backoffDelay = getBackoffDelay(attemptCount);
+                await new Promise(resolve => setTimeout(resolve, backoffDelay));
+            }
+
+            const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+                refreshToken,
+            });
+
+            const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+
+            // Update Redux store (this will also update localStorage)
+            store.dispatch(
+                updateTokens({
+                    accessToken,
+                    refreshToken: newRefreshToken,
+                })
+            );
+
+            // Schedule next refresh
+            scheduleTokenRefresh(accessToken);
+
+            return true;
+        } catch (error: unknown) {
+            console.error('Failed to refresh token:', error);
+
+            // Check if this is a rate limit error from server
+            const axiosError = error as { response?: { data?: { error?: { code?: string } } } };
+            const errorCode = axiosError?.response?.data?.error?.code;
+
+            if (errorCode === 'RATE_LIMIT_EXCEEDED') {
+                handleRefreshFailure('rate_limited');
+            }
+
+            // Don't logout on first failure - let the component handle retry
+            // But if we've exhausted our attempts, logout
+            if (!canAttemptRefresh()) {
+                handleRefreshFailure('session_expired');
+            }
+
+            return false;
+        } finally {
+            isRefreshing = false;
+            refreshPromise = null;
         }
+    })();
 
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refreshToken,
-        });
-
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-
-        // Update Redux store (this will also update localStorage)
-        store.dispatch(
-            updateTokens({
-                accessToken,
-                refreshToken: newRefreshToken,
-            })
-        );
-
-        // Schedule next refresh
-        scheduleTokenRefresh(accessToken);
-
-        return true;
-    } catch (error) {
-        console.error('Failed to refresh token:', error);
-        // Don't clear auth here - let the 401 interceptor handle it
-        return false;
-    } finally {
-        isRefreshing = false;
-    }
+    return refreshPromise;
 };
 
 /**

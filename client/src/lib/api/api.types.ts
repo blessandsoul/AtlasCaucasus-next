@@ -36,3 +36,13 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
 }
+
+// Pagination metadata
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}

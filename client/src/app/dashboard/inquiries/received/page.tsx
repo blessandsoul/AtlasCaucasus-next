@@ -80,7 +80,7 @@ export default function ReceivedInquiriesPage() {
     }
 
     return (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
             {inquiries.map((item) => (
                 <Link key={item.id} href={ROUTES.INQUIRIES.DETAILS(item.inquiryId)}>
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
