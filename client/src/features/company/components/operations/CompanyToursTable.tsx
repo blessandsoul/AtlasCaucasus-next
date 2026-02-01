@@ -6,7 +6,7 @@ import { Map, Calendar } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusIndicator } from '@/components/common/StatusIndicator';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -110,16 +110,11 @@ export const CompanyToursTable = () => {
         {
             header: t('company.operations.tours.table.status', 'Status'),
             cell: (tour) => (
-                <Badge
-                    variant={tour.isActive ? "outline" : "secondary"}
-                    className={tour.isActive
-                        ? "text-green-600 border-green-200 bg-green-50"
-                        : "text-muted-foreground bg-muted"
-                    }
-                >
-                    {tour.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
-                </Badge>
-            )
+                <div className="flex justify-center">
+                    <StatusIndicator isActive={tour.isActive} />
+                </div>
+            ),
+            className: "w-[100px] text-center"
         },
         {
             header: t('company.operations.tours.table.created', 'Created'),

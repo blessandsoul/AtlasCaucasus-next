@@ -127,6 +127,26 @@ export const useDeleteCompanyPhoto = () => {
   });
 };
 
+// Logo management hook
+export const useUploadCompanyLogo = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: ({ companyId, file }: { companyId: string; file: File }) =>
+      companyService.uploadLogo(companyId, file),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['company', variables.companyId] });
+      queryClient.invalidateQueries({ queryKey: ['my-company'] });
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      toast.success(t('company.logo_uploaded', 'Logo uploaded successfully'));
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+};
+
 // Tour agent management hooks
 export const useCreateTourAgent = () => {
   return useMutation({

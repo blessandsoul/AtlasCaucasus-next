@@ -88,33 +88,34 @@ export const HeroSection = () => {
                     {t('home.hero.subtitle')}
                 </p>
 
-                <div className="w-full max-w-[896px] rounded-2xl md:rounded-full bg-background border shadow-lg flex flex-col md:flex-row items-stretch md:items-center pr-0 md:pr-2 pb-2 md:pb-0">
+                <div className="w-full max-w-[896px] bg-background border shadow-lg flex flex-col md:flex-row items-stretch md:items-center rounded-3xl md:rounded-full p-2 md:p-0 md:pr-2">
                     {/* Where - Location Autocomplete */}
                     <LocationAutocomplete
                         value={selectedLocation}
                         onChange={setSelectedLocation}
                         onSelect={handleLocationSelect}
-                        triggerClassName="rounded-t-2xl md:rounded-l-full md:rounded-tr-none md:rounded-br-none"
+                        className="flex-1 min-h-[72px] md:min-h-0"
+                        triggerClassName="h-full flex items-center px-4 md:px-6 rounded-2xl md:rounded-l-full md:rounded-r-none hover:bg-muted/50 transition-colors"
                     />
 
                     {/* Divider */}
                     <div className="hidden md:block w-px h-10 bg-border shrink-0" />
-                    <div className="block md:hidden h-px w-full bg-border shrink-0" />
+                    <div className="block md:hidden w-full h-px bg-border shrink-0 my-1" />
 
                     {/* When - Date Picker */}
                     <Popover open={dateOpen} onOpenChange={setDateOpen}>
                         <PopoverTrigger asChild>
                             <div className={cn(
-                                'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 cursor-pointer transition-colors h-full py-4 md:py-3',
+                                'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 cursor-pointer transition-colors min-h-[72px] md:min-h-0 rounded-2xl md:rounded-none',
                                 dateOpen ? 'bg-muted/50' : 'hover:bg-muted/50'
                             )}>
                                 <Calendar className="text-muted-foreground w-5 h-5 shrink-0" />
-                                <div className="flex flex-col text-left min-w-0 flex-1">
-                                    <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                <div className="flex flex-col text-left min-w-0 flex-1 py-2">
+                                    <span className="text-xs font-bold text-foreground uppercase tracking-wider mb-0.5">
                                         {t('home.hero.search.when')}
                                     </span>
                                     <span className={cn(
-                                        'text-sm truncate',
+                                        'text-sm truncate font-medium',
                                         selectedDate ? 'text-foreground' : 'text-muted-foreground'
                                     )}>
                                         {selectedDate ? formatDate(selectedDate) : t('home.hero.search.dates_placeholder')}
@@ -144,19 +145,19 @@ export const HeroSection = () => {
 
                     {/* Divider */}
                     <div className="hidden md:block w-px h-10 bg-border shrink-0" />
-                    <div className="block md:hidden h-px w-full bg-border shrink-0" />
+                    <div className="block md:hidden w-full h-px bg-border shrink-0 my-1" />
 
                     {/* Who - Guest Count (Inline Input) */}
                     <div
                         className={cn(
-                            'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 transition-colors h-full py-4 md:py-3 rounded-b-2xl md:rounded-none',
+                            'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 transition-colors min-h-[72px] md:min-h-0 rounded-2xl md:rounded-none',
                             guestsFocused ? 'bg-muted/50' : 'hover:bg-muted/50'
                         )}
                         onClick={() => guestsInputRef.current?.focus()}
                     >
                         <Users className="text-muted-foreground w-5 h-5 shrink-0" />
-                        <div className="flex flex-col text-left min-w-0 flex-1">
-                            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                        <div className="flex flex-col text-left min-w-0 flex-1 py-2">
+                            <span className="text-xs font-bold text-foreground uppercase tracking-wider mb-0.5">
                                 {t('home.hero.search.who')}
                             </span>
                             <input
@@ -169,7 +170,7 @@ export const HeroSection = () => {
                                 onFocus={() => setGuestsFocused(true)}
                                 onBlur={() => setGuestsFocused(false)}
                                 placeholder={t('home.hero.search.guests_placeholder')}
-                                className="text-sm bg-transparent border-none outline-none w-full text-foreground placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="text-sm font-medium bg-transparent border-none outline-none w-full text-foreground placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-0"
                             />
                         </div>
                         {guests && (
@@ -187,10 +188,11 @@ export const HeroSection = () => {
                     <button
                         onClick={handleSearch}
                         style={{ backgroundColor: colors.secondary }}
-                        className="hover:opacity-90 text-primary-foreground rounded-xl md:rounded-full px-5 lg:px-8 py-3.5 flex items-center justify-center md:justify-start gap-2 font-medium shadow-md transition-all md:ml-2 cursor-pointer mt-2 md:my-2 mx-4 md:mx-0 shrink-0"
+                        className="hover:opacity-90 text-primary-foreground rounded-2xl md:rounded-full px-5 lg:px-8 h-[64px] md:h-14 flex items-center justify-center gap-2 font-medium shadow-md transition-all mt-2 md:mt-0 md:ml-2 cursor-pointer shrink-0 w-full md:w-auto"
                     >
                         <Search className="w-5 h-5" />
-                        {t('home.hero.search.search_button')}
+                        <span className="md:hidden">Search</span>
+                        <span className="hidden md:inline">{t('home.hero.search.search_button')}</span>
                     </button>
                 </div>
 

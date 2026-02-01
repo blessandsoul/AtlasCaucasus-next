@@ -40,6 +40,9 @@ import {
   useUploadGuidePhotos,
   useDeleteGuidePhoto,
 } from '../../hooks/useGuides';
+import { useUploadGuideAvatar } from '../../hooks/useUploadGuideAvatar';
+import { useDeleteGuideAvatar } from '../../hooks/useDeleteGuideAvatar';
+import { ProfileAvatarUpload } from '@/components/common/ProfileAvatarUpload';
 import { getErrorMessage } from '@/lib/utils/error';
 import { getMediaUrl } from '@/lib/utils/media';
 
@@ -67,6 +70,8 @@ export const GuideProfileTab = () => {
   const deleteMutation = useDeleteGuide();
   const uploadPhotosMutation = useUploadGuidePhotos();
   const deletePhotoMutation = useDeleteGuidePhoto();
+  const uploadAvatarMutation = useUploadGuideAvatar(guide?.id || '');
+  const deleteAvatarMutation = useDeleteGuideAvatar(guide?.id || '');
 
   const {
     register,
@@ -164,6 +169,27 @@ export const GuideProfileTab = () => {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      {/* Avatar Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('guide.profile.avatar', 'Profile Photo')}</CardTitle>
+          <CardDescription>
+            {t('guide.profile.avatar_desc', 'Your primary profile photo shown to customers')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProfileAvatarUpload
+            currentAvatarUrl={guide.avatarUrl}
+            firstName={guide.user?.firstName || ''}
+            lastName={guide.user?.lastName || ''}
+            onUpload={(file) => uploadAvatarMutation.mutate(file)}
+            onDelete={() => deleteAvatarMutation.mutate()}
+            isUploading={uploadAvatarMutation.isPending}
+            isDeleting={deleteAvatarMutation.isPending}
+          />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>

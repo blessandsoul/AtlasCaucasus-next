@@ -26,7 +26,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { useUpdateTour } from '../hooks/useTours';
+import { TourImageManager } from './TourImageManager';
 import type { Tour, UpdateTourInput } from '../types/tour.types';
 
 const editTourSchema = z.object({
@@ -289,6 +291,13 @@ export const EditTourDialog = ({ tour, open, onOpenChange }: EditTourDialogProps
                             </div>
                         </div>
                     </div>
+
+                    {tour && (
+                        <>
+                            <Separator className="my-4" />
+                            <TourImageManager tourId={tour.id} />
+                        </>
+                    )}
 
                     <DialogFooter className="pt-4">
                         <Button

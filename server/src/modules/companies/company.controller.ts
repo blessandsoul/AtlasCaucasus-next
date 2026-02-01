@@ -182,3 +182,58 @@ export async function deletePhoto(
 
     return reply.send(successResponse("Photo deleted successfully", deleted));
 }
+
+// ==========================================
+// LOGO MANAGEMENT
+// ==========================================
+
+export async function uploadLogo(
+    request: FastifyRequest,
+    reply: FastifyReply
+): Promise<void> {
+    const { id } = request.params as { id: string };
+
+    // Get file from multipart request
+    const file = await request.file();
+
+    if (!file) {
+        throw new BadRequestError("No logo file provided", "NO_FILE_PROVIDED");
+    }
+
+    const buffer = await file.toBuffer();
+    const uploadedFile: UploadedFile = {
+        fieldname: file.fieldname,
+        filename: file.filename,
+        originalFilename: file.filename,
+        encoding: file.encoding,
+        mimetype: file.mimetype,
+        size: buffer.length,
+        buffer,
+    };
+
+    const result = await companyService.uploadCompanyLogo(
+        id,
+        request.user.id,
+        request.user.roles,
+        uploadedFile
+    );
+
+    return reply.status(201).send(
+        successResponse("Logo uploaded successfully", result)
+    );
+}
+
+export async function deleteLogo(
+    request: FastifyRequest,
+    reply: FastifyReply
+): Promise<void> {
+    const { id } = request.params as { id: string };
+
+    await companyService.deleteCompanyLogo(
+        id,
+        request.user.id,
+        request.user.roles
+    );
+
+    return reply.send(successResponse("Logo deleted successfully", null));
+}

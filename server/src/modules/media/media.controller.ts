@@ -22,6 +22,8 @@ import {
   uploadGuidePhoto,
   uploadDriverPhoto,
   uploadUserAvatar,
+  uploadDriverAvatar,
+  uploadGuideAvatar,
 } from "./media.helpers.js";
 
 interface UploadMediaParams {
@@ -343,6 +345,75 @@ export async function uploadUserAvatarHandler(
   const media = await uploadUserAvatar(request.user, userId, uploadedFile);
 
   return reply.status(201).send(
-    successResponse("User avatar uploaded successfully", media)
+    successResponse("User avatar uploaded successfully", {
+      avatarUrl: media.url,
+      media
+    })
+  );
+}
+
+// Specialized endpoint: Upload driver avatar
+export async function uploadDriverAvatarHandler(
+  request: FastifyRequest<{ Params: { driverId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { driverId } = request.params;
+
+  const data = await request.file();
+  if (!data) {
+    throw new BadRequestError("No file provided", "NO_FILE_PROVIDED");
+  }
+
+  const buffer = await data.toBuffer();
+  const uploadedFile: UploadedFile = {
+    fieldname: data.fieldname,
+    filename: data.filename,
+    originalFilename: data.filename,
+    encoding: data.encoding,
+    mimetype: data.mimetype,
+    size: buffer.length,
+    buffer,
+  };
+
+  const media = await uploadDriverAvatar(request.user, driverId, uploadedFile);
+
+  return reply.status(201).send(
+    successResponse("Driver avatar uploaded successfully", {
+      avatarUrl: media.url,
+      media
+    })
+  );
+}
+
+// Specialized endpoint: Upload guide avatar
+export async function uploadGuideAvatarHandler(
+  request: FastifyRequest<{ Params: { guideId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { guideId } = request.params;
+
+  const data = await request.file();
+  if (!data) {
+    throw new BadRequestError("No file provided", "NO_FILE_PROVIDED");
+  }
+
+  const buffer = await data.toBuffer();
+  const uploadedFile: UploadedFile = {
+    fieldname: data.fieldname,
+    filename: data.filename,
+    originalFilename: data.filename,
+    encoding: data.encoding,
+    mimetype: data.mimetype,
+    size: buffer.length,
+    buffer,
+  };
+
+  const media = await uploadGuideAvatar(request.user, guideId, uploadedFile);
+
+  return reply.status(201).send(
+    successResponse("Guide avatar uploaded successfully", {
+      avatarUrl: media.url,
+      media
+    })
   );
 }

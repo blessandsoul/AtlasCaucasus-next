@@ -27,6 +27,8 @@ export interface Tour {
     nextAvailableDate: string | null;
     startDate: string | null;
     images?: TourImage[];
+    averageRating: string | null;
+    reviewCount: number;
 }
 
 export interface TourImage {

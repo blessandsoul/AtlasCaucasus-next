@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/users/${id}`,
     UPDATE_ROLE: (id: string) => `/users/${id}/role`,
     REMOVE_ROLE: (id: string, role: string) => `/users/${id}/roles/${role}`,
+    UPLOAD_AVATAR: (userId: string) => `/users/${userId}/avatar`,
   },
   TOURS: {
     LIST: '/tours',
@@ -42,6 +43,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/tours/${id}`,
     DELETE: (id: string) => `/tours/${id}`,
     UPLOAD_IMAGE: (id: string) => `/tours/${id}/images`,
+    DELETE_IMAGE: (imageId: string) => `/media/${imageId}`,
   },
   COMPANIES: {
     LIST: '/companies',
@@ -52,6 +54,7 @@ export const API_ENDPOINTS = {
     TOURS: (id: string) => `/companies/${id}/tours`,
     PHOTOS: (id: string) => `/companies/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/companies/${id}/photos/${photoId}`,
+    UPLOAD_LOGO: (id: string) => `/companies/${id}/logo`,
   },
   GUIDES: {
     LIST: '/guides',
@@ -61,6 +64,7 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/guides/${id}`,
     PHOTOS: (id: string) => `/guides/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/guides/${id}/photos/${photoId}`,
+    UPLOAD_AVATAR: (id: string) => `/guides/${id}/avatar`,
   },
   DRIVERS: {
     LIST: '/drivers',
@@ -70,6 +74,7 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/drivers/${id}`,
     PHOTOS: (id: string) => `/drivers/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/drivers/${id}/photos/${photoId}`,
+    UPLOAD_AVATAR: (id: string) => `/drivers/${id}/avatar`,
   },
   LOCATIONS: {
     LIST: '/locations',
@@ -112,5 +117,28 @@ export const API_ENDPOINTS = {
     MARK_READ: (id: string) => `/notifications/${id}/read`,
     MARK_ALL_READ: '/notifications/read-all',
     DELETE: (id: string) => `/notifications/${id}`,
+  },
+  REVIEWS: {
+    LIST: '/reviews',
+    STATS: '/reviews/stats',
+    CREATE: '/reviews',
+    MY_REVIEWS: '/reviews/my',
+    CHECK: '/reviews/check',
+    UPDATE: (id: string) => `/reviews/${id}`,
+    DELETE: (id: string) => `/reviews/${id}`,
+  },
+  MEDIA: {
+    GET: (entityType: string, entityId: string) => `/media/${entityType}/${entityId}`,
+    UPLOAD: (entityType: string, entityId: string) => `/media/${entityType}/${entityId}`,
+    BATCH_UPLOAD: (entityType: string, entityId: string) =>
+      `/media/${entityType}/${entityId}/batch`,
+    DELETE: (id: string) => `/media/${id}`,
+  },
+  HEALTH: {
+    BASIC: '/health',
+    DETAILED: '/health/detailed',
+    METRICS: '/health/metrics',
+    READY: '/health/ready',
+    LIVE: '/health/live',
   },
 } as const;

@@ -1,8 +1,16 @@
 import { z } from "zod";
 import { env } from "../../config/env.js";
 
-// Allowed entity types
-export const entityTypeSchema = z.enum(["tour", "company", "guide", "driver", "user"]);
+// Allowed entity types (includes avatar variants for separate storage)
+export const entityTypeSchema = z.enum([
+  "tour",
+  "company",
+  "guide",
+  "driver",
+  "user",
+  "driver-avatar",
+  "guide-avatar",
+]);
 
 // Upload schema (for query/body params)
 export const uploadMediaSchema = z.object({

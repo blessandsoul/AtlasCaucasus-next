@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { MapPin, Calendar, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusIndicator } from '@/components/common/StatusIndicator';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -125,16 +125,11 @@ export const AdminLocationsPage = () => {
         {
             header: t('admin.locations.table.status', 'Status'),
             cell: (location) => (
-                <Badge
-                    variant={location.isActive ? "outline" : "secondary"}
-                    className={location.isActive
-                        ? "text-green-600 border-green-200 bg-green-50"
-                        : "text-muted-foreground bg-muted"
-                    }
-                >
-                    {location.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
-                </Badge>
-            )
+                <div className="flex justify-center">
+                    <StatusIndicator isActive={location.isActive} />
+                </div>
+            ),
+            className: "w-[100px] text-center"
         },
         {
             header: t('admin.locations.table.created', 'Created'),

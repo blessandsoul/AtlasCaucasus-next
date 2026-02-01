@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '@/lib/constants/routes';
@@ -16,6 +17,7 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useLoading } from '@/context/LoadingContext';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { colors } from '@/lib/colors';
+import { getMediaUrl } from '@/lib/utils/media';
 import { useAppDispatch } from '@/store/hooks';
 import { openDrawer } from '@/features/chat/store/chatSlice';
 import { useChats } from '@/features/chat/hooks/useChats';
@@ -23,6 +25,10 @@ import { useUnreadCount, notificationKeys } from '@/features/notifications/hooks
 import { MessageType } from '@/lib/websocket/websocket.types';
 
 export const Header = () => {
+    const pathname = usePathname();
+    const isDashboard = pathname?.startsWith(ROUTES.DASHBOARD);
+    // Apply compact header style for Dashboard and Tour Details (mobile only)
+    const useCompactHeader = isDashboard || /^\/explore\/tours\/[^/]+$/.test(pathname || '');
     const { t, i18n } = useTranslation();
     const { scrollY } = useScroll();
     const [hidden, setHidden] = useState(false);
@@ -122,14 +128,14 @@ export const Header = () => {
             }}
             animate={hidden ? "hidden" : "visible"}
             transition={{ duration: 0.35, ease: "easeInOut" }}
-            className="fixed top-0 z-50 w-full pt-6 px-4 flex justify-center bg-transparent pointer-events-none"
+            className={`fixed top-0 z-50 w-full px-4 flex justify-center bg-transparent pointer-events-none ${useCompactHeader ? 'pt-1 lg:pt-6' : 'pt-6'}`}
         >
-            <div className="container mx-auto flex min-h-16 h-auto py-2 items-center justify-between pointer-events-auto px-0 lg:px-6 lg:rounded-2xl lg:border lg:bg-background lg:backdrop-blur-md lg:shadow-lg transition-all duration-300">
+            <div className={`container mx-auto flex lg:grid lg:grid-cols-3 h-auto py-2 items-center pointer-events-auto px-0 lg:px-6 lg:rounded-2xl lg:border lg:bg-background lg:backdrop-blur-md lg:shadow-lg transition-all duration-300 ${useCompactHeader ? 'min-h-0 lg:min-h-16' : 'min-h-16'}`}>
 
                 {/* Brand Section */}
                 <Link
                     href={ROUTES.HOME}
-                    className="hidden lg:flex items-center gap-3 group bg-background/90 backdrop-blur-md border shadow-sm rounded-full p-2 pr-4 lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:rounded-none transition-all"
+                    className="hidden lg:flex lg:justify-self-start items-center gap-3 group bg-background/90 backdrop-blur-md border shadow-sm rounded-full p-2 pr-4 lg:bg-transparent lg:border-none lg:shadow-none lg:p-0 lg:rounded-none transition-all"
                 >
                     <img src="/atlascaucasus.png" alt={t('header.brand.name')} className="h-8 w-8 object-contain group-hover:scale-105 transition-transform" />
                     <div className="flex flex-col justify-center">
@@ -149,7 +155,7 @@ export const Header = () => {
                 />
 
                 {/* Navigation - Full mode (1024px+) */}
-                <nav className="hidden lg:flex items-center gap-1">
+                <nav className="hidden lg:flex lg:justify-self-center items-center gap-1">
                     <Link href={ROUTES.HOME}>
                         <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
                             <Home className="h-4 w-4" />
@@ -195,7 +201,7 @@ export const Header = () => {
                                 description: t('header.nav_menu.explore.drivers_desc'),
                                 href: ROUTES.EXPLORE.DRIVERS,
                                 icon: <Car className="h-5 w-5" />
-                            }
+                            },
                         ]}
                     />
 
@@ -206,7 +212,7 @@ export const Header = () => {
                 </nav>
 
                 {/* Auth Section */}
-                <div className="hidden lg:flex items-center gap-2">
+                <div className="hidden lg:flex lg:justify-self-end items-center gap-2">
                     {/* Language Selector */}
                     <div className="relative" ref={langRef}>
                         <Button
@@ -287,8 +293,18 @@ export const Header = () => {
                                     className="h-9 w-9 p-0 rounded-full"
                                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                 >
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#22d3ee] text-white">
-                                        <User className="h-5 w-5" />
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary overflow-hidden">
+                                        {user?.avatarUrl ? (
+                                            <img
+                                                src={getMediaUrl(user.avatarUrl)}
+                                                alt={`${user.firstName} ${user.lastName}`}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-sm font-semibold">
+                                                {user?.firstName?.[0]}{user?.lastName?.[0]}
+                                            </span>
+                                        )}
                                     </div>
                                 </Button>
 

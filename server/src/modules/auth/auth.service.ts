@@ -12,6 +12,7 @@ import {
 import { logger } from "../../libs/logger.js";
 import * as userRepo from "../users/user.repo.js";
 import * as sessionRepo from "./session.repo.js";
+import * as mediaRepo from "../media/media.repo.js";
 import * as securityService from "./security.service.js";
 import { sendTourAgentInvitation } from "../../libs/email.js";
 import type { SafeUser, User, UserRole } from "../users/user.types.js";
@@ -50,6 +51,10 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     guideProfileId = guide?.id;
   }
 
+  // Fetch user avatar from media table
+  const avatarMedia = await mediaRepo.getMediaByEntity("user", user.id);
+  const avatar = avatarMedia.length > 0 ? avatarMedia[0] : undefined;
+
   return {
     id: user.id,
     email: user.email,
@@ -63,6 +68,8 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     guideProfileId,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    avatar,
+    avatarUrl: avatar?.url ?? null,
   };
 }
 

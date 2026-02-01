@@ -99,6 +99,10 @@ class TourService {
         return response.data;
     }
 
+    async deleteTourImage(imageId: string): Promise<void> {
+        await apiClient.delete(API_ENDPOINTS.TOURS.DELETE_IMAGE(imageId));
+    }
+
     async getCompanyTours(companyId: string, params: { page?: number; limit?: number } = {}) {
         const response = await apiClient.get<{
             success: boolean;

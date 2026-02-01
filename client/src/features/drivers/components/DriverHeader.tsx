@@ -38,8 +38,9 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
     ? `${driver.user.firstName} ${driver.user.lastName}`
     : 'Unknown Driver';
 
-  const photoUrl = getMediaUrl(driver.photoUrl);
-  const rating = 5.0; // Placeholder
+  // Use avatarUrl first, fallback to photoUrl
+  const photoUrl = getMediaUrl(driver.avatarUrl || driver.photoUrl);
+  const rating = driver.averageRating ? parseFloat(driver.averageRating) : null;
 
   const primaryLocation = driver.locations?.[0];
 
@@ -133,10 +134,12 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
                 <div className="flex items-center gap-1">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                   <span className="text-xl font-bold text-foreground">
-                    {rating.toFixed(1)}
+                    {rating ? rating.toFixed(1) : 'New'}
                   </span>
                 </div>
-                <span className="text-sm text-muted-foreground">New Driver</span>
+                <span className="text-sm text-muted-foreground">
+                  {driver.reviewCount > 0 ? `${driver.reviewCount} review${driver.reviewCount !== 1 ? 's' : ''}` : 'No reviews yet'}
+                </span>
               </div>
             </div>
           </div>
@@ -145,7 +148,7 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
         <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <Button
             size="lg"
-            className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
+            className="w-full sm:flex-1 bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
             onClick={handleSendMessage}
             disabled={isLoading || createChat.isPending}
           >

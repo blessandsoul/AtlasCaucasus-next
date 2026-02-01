@@ -112,6 +112,24 @@ class CompanyService {
   async deletePhoto(id: string, photoId: string): Promise<void> {
     await apiClient.delete(API_ENDPOINTS.COMPANIES.DELETE_PHOTO(id, photoId));
   }
+
+  // Logo management
+  async uploadLogo(companyId: string, file: File): Promise<{ logoUrl: string }> {
+    const formData = new FormData();
+    formData.append('logo', file);
+
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+      data: { logoUrl: string };
+    }>(API_ENDPOINTS.COMPANIES.UPLOAD_LOGO(companyId), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data.data;
+  }
 }
 
 export const companyService = new CompanyService();

@@ -4,11 +4,17 @@ import type { UpdateDriverData, DriverFilters, DriverResponse } from "./driver.t
 import { getMediaByEntity } from "../media/media.repo.js";
 
 async function toDriverResponseWithMedia(driver: any): Promise<DriverResponse> {
+    // Fetch gallery photos (entityType: "driver")
     const media = await getMediaByEntity("driver", driver.id);
+    // Fetch avatar (entityType: "driver-avatar")
+    const avatarMedia = await getMediaByEntity("driver-avatar", driver.id);
+    const avatar = avatarMedia.length > 0 ? avatarMedia[0] : null;
+
     return {
         ...driver,
         locations: driver.locations.map((dl: any) => dl.location),
         photos: media,
+        avatarUrl: avatar?.url ?? null,
     };
 }
 

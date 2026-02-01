@@ -2,6 +2,13 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 export type EntityType = 'tours' | 'hotels' | 'companies' | 'guides' | 'drivers';
@@ -34,7 +41,38 @@ export const EntityTypeTabs = () => {
 
     return (
         <div className="border-b border-gray-200 dark:border-gray-800">
-            <nav className="-mb-px flex space-x-8" aria-label="Entity types">
+            {/* Mobile Dropdown */}
+            <div className="md:hidden pb-4">
+                <Select
+                    value={currentType}
+                    onValueChange={(value) => handleTabChange(value as EntityType)}
+                >
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder={t('explore_page.tabs.select_category')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {TAB_CONFIG.map((tab) => (
+                            <SelectItem
+                                key={tab.value}
+                                value={tab.value}
+                                disabled={tab.disabled}
+                            >
+                                <span className="flex items-center">
+                                    {t(`explore_page.tabs.${tab.value}`)}
+                                    {tab.disabled && (
+                                        <span className="ml-2 text-xs text-gray-400 dark:text-gray-600">
+                                            ({t('explore_page.tabs.coming_soon')})
+                                        </span>
+                                    )}
+                                </span>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            {/* Desktop Tabs */}
+            <nav className="hidden md:flex -mb-px space-x-8" aria-label="Entity types">
                 {TAB_CONFIG.map((tab) => (
                     <button
                         key={tab.value}

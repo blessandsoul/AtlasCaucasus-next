@@ -3,7 +3,14 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, Plus } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
+import { StatusIndicator } from '@/components/common/StatusIndicator';
+
+// ... existing imports ...
+
+
+
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import type { ColumnDef } from '@/components/common/DataTable';
@@ -51,12 +58,13 @@ export const AdminUsersPage = () => {
         {
             header: t('admin.users.table.online', 'Online'),
             cell: (user) => (
-                <OnlineIndicator
-                    isOnline={isUserOnline(user.id)}
-                    showLabel
-                />
+                <div className="flex justify-center">
+                    <OnlineIndicator
+                        isOnline={isUserOnline(user.id)}
+                    />
+                </div>
             ),
-            className: "w-[100px]"
+            className: "w-[100px] text-center"
         },
         {
             header: t('admin.users.table.email', 'Email'),
@@ -77,10 +85,11 @@ export const AdminUsersPage = () => {
         {
             header: t('admin.users.table.status', 'Status'),
             cell: (user) => (
-                <Badge variant={user.isActive ? 'default' : 'destructive'}>
-                    {user.isActive ? t('admin.users.active', 'Active') : t('admin.users.inactive', 'Inactive')}
-                </Badge>
-            )
+                <div className="flex justify-center">
+                    <StatusIndicator isActive={user.isActive} />
+                </div>
+            ),
+            className: "w-[100px] text-center"
         },
         {
             header: t('admin.users.table.joined', 'Joined'),

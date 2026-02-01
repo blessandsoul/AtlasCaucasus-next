@@ -12,7 +12,8 @@ export interface DriverResponse extends Driver {
         emailVerified: boolean;
     };
     locations: Location[];
-    photos?: SafeMedia[]; // Media photos associated with driver
+    photos?: SafeMedia[]; // Media photos associated with driver (gallery)
+    avatarUrl: string | null; // Primary profile photo
 }
 
 export interface UpdateDriverData {

@@ -79,6 +79,20 @@ class DriverService {
   async deletePhoto(id: string, photoId: string): Promise<void> {
     await apiClient.delete(API_ENDPOINTS.DRIVERS.DELETE_PHOTO(id, photoId));
   }
+
+  // Avatar management (primary profile photo)
+  async uploadAvatar(driverId: string, file: File): Promise<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+      data: { avatarUrl: string };
+    }>(API_ENDPOINTS.DRIVERS.UPLOAD_AVATAR(driverId), formData);
+
+    return response.data.data;
+  }
 }
 
 export const driverService = new DriverService();

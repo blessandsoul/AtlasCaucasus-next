@@ -15,6 +15,7 @@ export const ROUTES = {
   DRIVER_DASHBOARD: '/dashboard/driver',
   GUIDE_DASHBOARD: '/dashboard/guide',
   BECOME_PARTNER: '/dashboard/become-partner',
+  REVIEWS: '/dashboard/reviews',
   OPERATIONS: {
     ROOT: '/dashboard/operations',
     AGENTS: '/dashboard/operations/agents',

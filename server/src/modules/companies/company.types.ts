@@ -16,7 +16,7 @@ export interface UpdateCompanyData {
     companyName?: string;
     description?: string;
     registrationNumber?: string;
-    logoUrl?: string;
+    logoUrl?: string | null;
     websiteUrl?: string;
     phoneNumber?: string;
     isVerified?: boolean;

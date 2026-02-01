@@ -11,6 +11,7 @@ import { ROUTES } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { colors } from '@/lib/colors';
+import { getMediaUrl } from '@/lib/utils/media';
 import { useLoading } from '@/context/LoadingContext';
 import { useAppDispatch } from '@/store/hooks';
 import { openDrawer } from '@/features/chat/store/chatSlice';
@@ -262,8 +263,16 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                     {isAuthenticated && user ? (
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-3 px-1">
-                                                <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-primary-foreground font-semibold">
-                                                    {user.firstName[0]}
+                                                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold overflow-hidden">
+                                                    {user.avatarUrl ? (
+                                                        <img
+                                                            src={getMediaUrl(user.avatarUrl)}
+                                                            alt={`${user.firstName} ${user.lastName}`}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <span>{user.firstName[0]}{user.lastName?.[0]}</span>
+                                                    )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm font-semibold truncate">{user.firstName} {user.lastName}</p>

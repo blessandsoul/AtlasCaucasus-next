@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCompany } from '@/features/companies/hooks/useCompanies';
 import { useCompanyTours } from '@/features/tours/hooks/useTours';
 import { TourCard } from '@/features/tours/components/TourCard';
+import { ReviewsSection } from '@/features/reviews';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Pagination } from '@/components/common/Pagination';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ import { formatDate } from '@/lib/utils/format';
 import { getMediaUrl } from '@/lib/utils/media';
 import { useCallback } from 'react';
 import { ChatButton } from '@/features/chat/components/ChatButton';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 export default function CompanyDetailsPage() {
   const params = useParams();
@@ -32,11 +34,12 @@ export default function CompanyDetailsPage() {
 
   const activeTab = searchParams.get('tab') || 'about';
   const toursPage = parseInt(searchParams.get('toursPage') || '1', 10);
-  const toursLimit = 9;
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const toursLimit = isMobile ? 10 : 3;
 
   const { data: company, isLoading, error } = useCompany(id);
   const { data: toursData, isLoading: isToursLoading } = useCompanyTours(id, {
-    page: toursPage,
+    page: isMobile ? 1 : toursPage,
     limit: toursLimit,
   });
 
@@ -257,12 +260,24 @@ export default function CompanyDetailsPage() {
                   </div>
                 ) : toursData && toursData.items.length > 0 ? (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Mobile: Horizontal Scroll */}
+                    <div className="md:hidden flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 scrollbar-hide">
+                      {toursData.items.map((tour) => (
+                        <div key={tour.id} className="snap-center shrink-0 w-[85vw]">
+                          <TourCard tour={tour} />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Tablet/Desktop: Grid */}
+                    <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4">
                       {toursData.items.map((tour) => (
                         <TourCard key={tour.id} tour={tour} />
                       ))}
                     </div>
-                    {toursData.pagination.totalPages > 1 && (
+
+                    {/* Pagination - Hide on Mobile */}
+                    {!isMobile && toursData.pagination.totalPages > 1 && (
                       <Pagination
                         page={toursData.pagination.page}
                         totalPages={toursData.pagination.totalPages}
@@ -280,9 +295,10 @@ export default function CompanyDetailsPage() {
               </TabsContent>
 
               <TabsContent value="reviews" className="mt-8">
-                <div className="p-12 border border-dashed rounded-lg text-center text-muted-foreground bg-muted/30">
-                  <p>No reviews yet.</p>
-                </div>
+                <ReviewsSection
+                  targetType="COMPANY"
+                  targetId={id}
+                />
               </TabsContent>
             </Tabs>
           </div>

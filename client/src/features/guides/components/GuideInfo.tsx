@@ -12,6 +12,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { ImageGallery } from '@/components/common/ImageGallery';
+import { ReviewsSection } from '@/features/reviews';
 import type { Guide, Location, GuideLocation } from '../types/guide.types';
 
 interface GuideInfoProps {
@@ -304,18 +305,12 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="reviews" className="p-6 md:p-8 mt-0">
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-              <Users className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No Reviews Yet
-            </h3>
-            <p className="text-muted-foreground max-w-sm">
-              Be the first to review this guide after your tour experience.
-            </p>
-          </div>
+        <TabsContent value="reviews" className="mt-0">
+          <ReviewsSection
+            targetType="GUIDE"
+            targetId={guide.id}
+            className="border-0 shadow-none"
+          />
         </TabsContent>
       </Tabs>
     </div>

@@ -106,6 +106,7 @@ export interface SafeUser {
   createdAt: Date;
   updatedAt: Date;
   avatar?: SafeMedia; // User avatar (single image)
+  avatarUrl: string | null; // Convenience URL field for frontend
 }
 
 export interface CreateUserData {

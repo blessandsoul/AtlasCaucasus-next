@@ -7,6 +7,7 @@ import { TourHeader } from '@/features/tours/components/TourHeader';
 import { TourGallery } from '@/features/tours/components/TourGallery';
 import { TourSidebar } from '@/features/tours/components/TourSidebar';
 import { TourInfo } from '@/features/tours/components/TourInfo';
+import { ReviewsSection } from '@/features/reviews';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 
@@ -43,7 +44,7 @@ export default function TourDetailsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 mt-24 px-4 md:px-6">
+    <div className="container mx-auto pt-4 lg:pt-28 pb-8 px-4 md:px-6">
       {/* Back Button */}
       <Button
         variant="ghost"
@@ -73,6 +74,13 @@ export default function TourDetailsPage() {
           <TourSidebar tour={tour} onBook={handleBook} />
         </div>
       </div>
+
+      {/* Reviews Section */}
+      <ReviewsSection
+        targetType="TOUR"
+        targetId={id}
+        className="mt-8 md:mt-12"
+      />
     </div>
   );
 }

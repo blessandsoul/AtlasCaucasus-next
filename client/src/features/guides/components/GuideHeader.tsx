@@ -40,7 +40,8 @@ export const GuideHeader = ({ guide, className }: GuideHeaderProps) => {
     ? `${guide.user.firstName} ${guide.user.lastName}`
     : 'Unknown Guide';
 
-  const photoUrl = getMediaUrl(guide.photoUrl);
+  // Use avatarUrl first, fallback to photoUrl
+  const photoUrl = getMediaUrl(guide.avatarUrl || guide.photoUrl);
   const rating = guide.averageRating ? parseFloat(guide.averageRating) : null;
 
   const getLocations = (): Location[] => {
@@ -201,7 +202,7 @@ export const GuideHeader = ({ guide, className }: GuideHeaderProps) => {
         <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <Button
             size="lg"
-            className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
+            className="w-full sm:flex-1 bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
             onClick={handleSendMessage}
             disabled={isLoading || createChat.isPending}
           >

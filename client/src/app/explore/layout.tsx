@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { ExploreHero } from '@/features/explore/components/ExploreHero';
 import { EntityTypeTabs, type EntityType } from '@/features/explore/components/EntityTypeTabs';
 import { ExploreFilters } from '@/features/explore/components/ExploreFilters';
+import { ExploreMobileFilters } from '@/features/explore/components/ExploreMobileFilters';
 
 /**
  * ExploreLayout - Shared layout for /explore/* routes
@@ -47,9 +48,14 @@ export default function ExploreLayout({
             </div>
 
             <div className="container mx-auto py-8 px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+                {/* Mobile Filters Trigger (Visible below XL) */}
+                <div className="xl:hidden mb-6">
+                    <ExploreMobileFilters type={currentType} />
+                </div>
+
+                <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 items-start">
                     {/* Sidebar Filters - Persistent across sub-routes */}
-                    <div className="lg:col-span-1 hidden lg:block">
+                    <div className="xl:col-span-1 hidden xl:block">
                         <ExploreFilters type={currentType} />
                     </div>
 

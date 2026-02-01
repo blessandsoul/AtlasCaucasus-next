@@ -59,6 +59,18 @@ class UserService {
     async deleteUser(userId: string) {
         await apiClient.delete(API_ENDPOINTS.USERS.DELETE(userId));
     }
+
+    async uploadAvatar(userId: string, file: File): Promise<{ avatarUrl: string }> {
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        const response = await apiClient.post<ApiResponse<{ avatarUrl: string }>>(
+            API_ENDPOINTS.USERS.UPLOAD_AVATAR(userId),
+            formData
+        );
+
+        return response.data.data;
+    }
 }
 
 export const userService = new UserService();

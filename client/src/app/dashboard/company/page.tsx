@@ -20,6 +20,7 @@ import {
   Upload,
   ImageIcon,
   X,
+  Pencil,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,6 +48,7 @@ import {
   useUploadCompanyPhotos,
   useDeleteCompanyPhoto,
 } from '@/features/companies/hooks/useCompanies';
+import { CompanyLogoUpload } from '@/features/companies/components/CompanyLogoUpload';
 import { ROUTES } from '@/lib/constants/routes';
 import { formatDate } from '@/lib/utils/format';
 import { getErrorMessage } from '@/lib/utils/error';
@@ -86,12 +88,12 @@ export default function CompanyManagementPage() {
     resolver: zodResolver(updateCompanySchema),
     values: company
       ? {
-          companyName: company.companyName,
-          description: company.description || '',
-          registrationNumber: company.registrationNumber || '',
-          websiteUrl: company.websiteUrl || '',
-          phoneNumber: company.phoneNumber || '',
-        }
+        companyName: company.companyName,
+        description: company.description || '',
+        registrationNumber: company.registrationNumber || '',
+        websiteUrl: company.websiteUrl || '',
+        phoneNumber: company.phoneNumber || '',
+      }
       : undefined,
   });
 
@@ -232,20 +234,26 @@ export default function CompanyManagementPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>{t('company.management.company_info', 'Company Information')}</CardTitle>
-            <CardDescription>
-              {t(
-                'company.management.company_info_desc',
-                'Update your company details and contact information'
-              )}
-            </CardDescription>
+
           </div>
           {!isEditing && (
-            <Button variant="outline" onClick={() => setIsEditing(true)}>
-              {t('common.edit', 'Edit')}
+            <Button variant="outline" size="icon" onClick={() => setIsEditing(true)}>
+              <Pencil className="h-4 w-4" />
             </Button>
           )}
         </CardHeader>
         <CardContent>
+          {/* Logo Upload - Always visible */}
+          <div className="mb-6">
+            <CompanyLogoUpload
+              companyId={company.id}
+              currentLogoUrl={company.logoUrl}
+              size="lg"
+            />
+          </div>
+
+          <Separator className="mb-6" />
+
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Company Name */}
@@ -444,7 +452,7 @@ export default function CompanyManagementPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Upload Button */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <input
               type="file"
               ref={photoInputRef}

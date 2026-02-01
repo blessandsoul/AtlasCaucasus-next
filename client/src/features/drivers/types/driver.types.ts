@@ -46,9 +46,12 @@ export interface Driver {
   };
   locations: Location[];
   photos?: DriverMedia[];
+  avatarUrl: string | null; // Primary profile photo
   pricePerDay?: number;
   currency?: string;
   yearsOfExperience?: number;
+  averageRating: string | null;
+  reviewCount: number;
 }
 
 export interface DriverFilters {

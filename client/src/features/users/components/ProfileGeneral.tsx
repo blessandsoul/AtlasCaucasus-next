@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
-import { User, Mail, Phone, Camera, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, Loader2 } from 'lucide-react';
 import type { IUser } from '@/features/auth/types/auth.types';
 import { useUpdateProfile } from '../hooks/useUpdateProfile';
+import { AvatarUpload } from './AvatarUpload';
 
 const profileSchema = z.object({
     firstName: z.string().min(1, 'First name is required').max(50),
@@ -54,14 +55,12 @@ export const ProfileGeneral = ({ user }: ProfileGeneralProps) => {
                     <CardDescription>{t('profile.general.avatar_desc', 'Your profile picture and basic information')}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex items-center gap-6">
-                    <div className="relative group">
-                        <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-primary text-3xl font-bold border-2 border-border">
-                            {user.firstName[0]}{user.lastName[0]}
-                        </div>
-                        <button className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-not-allowed" title="Upload coming soon">
-                            <Camera className="w-6 h-6" />
-                        </button>
-                    </div>
+                    <AvatarUpload
+                        currentAvatarUrl={user.avatarUrl}
+                        firstName={user.firstName}
+                        lastName={user.lastName}
+                        size="lg"
+                    />
                     <div className="space-y-1">
                         <h3 className="font-semibold text-lg">{user.firstName} {user.lastName}</h3>
                         <p className="text-sm text-muted-foreground">{user.roles.join(' • ')}</p>

@@ -7,10 +7,11 @@ import {
   deleteMediaHandler,
   uploadMultipleMediaHandler,
   uploadTourImageHandler,
-  uploadCompanyLogoHandler,
   uploadGuidePhotoHandler,
   uploadDriverPhotoHandler,
   uploadUserAvatarHandler,
+  uploadDriverAvatarHandler,
+  uploadGuideAvatarHandler,
 } from "./media.controller.js";
 
 interface MediaParams {
@@ -73,12 +74,7 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
     uploadTourImageHandler
   );
 
-  // Companies: Upload company logo
-  fastify.post<{ Params: { companyId: string } }>(
-    "/companies/:companyId/logo",
-    { preHandler: [authGuard, requireVerifiedEmail] },
-    uploadCompanyLogoHandler
-  );
+  // NOTE: Company logo upload is handled in company.routes.ts
 
   // Guides: Upload guide photo
   fastify.post<{ Params: { guideId: string } }>(
@@ -99,5 +95,19 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
     "/users/:userId/avatar",
     { preHandler: [authGuard, requireVerifiedEmail] },
     uploadUserAvatarHandler
+  );
+
+  // Drivers: Upload driver avatar (profile photo - replaces existing)
+  fastify.post<{ Params: { driverId: string } }>(
+    "/drivers/:driverId/avatar",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    uploadDriverAvatarHandler
+  );
+
+  // Guides: Upload guide avatar (profile photo - replaces existing)
+  fastify.post<{ Params: { guideId: string } }>(
+    "/guides/:guideId/avatar",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    uploadGuideAvatarHandler
   );
 }

@@ -96,8 +96,8 @@ export const Footer = () => {
                 <hr className="my-8 border-border" />
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-                    <p>© {currentYear} {t('header.brand.name')}. {t('header.footer.rights_reserved')}</p>
-                    <div className="flex items-center gap-6">
+                    <p className="text-center md:text-left">© {currentYear} {t('header.brand.name')}. {t('header.footer.rights_reserved')}</p>
+                    <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
                         <Link href="#" className="hover:text-foreground transition-colors">{t('header.footer.privacy_policy')}</Link>
                         <Link href="#" className="hover:text-foreground transition-colors">{t('header.footer.terms_of_service')}</Link>
                         <Link href="#" className="hover:text-foreground transition-colors">{t('header.footer.cookie_policy')}</Link>

@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "tourism-server-complete-api",
-		"name": "Tourism Server API - Complete (94 Endpoints)",
-		"description": "Complete API collection for Tourism Server - Production-ready Georgian tourism platform with multi-role authentication, real-time chat, notifications, inquiries, search/aggregator, reviews/ratings, media management, and comprehensive health monitoring. Updated: 2026-01-14",
+		"name": "Tourism Server API - Complete (108 Endpoints)",
+		"description": "Complete API collection for Tourism Server - Production-ready Georgian tourism platform with multi-role authentication, real-time chat, notifications, inquiries, search/aggregator, reviews/ratings, media management, and comprehensive health monitoring.\n\nUpdated: 2026-02-01\n\n## Authentication\n- Bearer token authentication via `Authorization: Bearer {{accessToken}}`\n- Tokens auto-captured from login/register responses\n- Use `noauth` endpoints for public access\n\n## User Roles\n- USER: Regular travelers\n- COMPANY: Tour operators\n- GUIDE: Tour guides\n- DRIVER: Drivers\n- ADMIN: Administrators\n- TOUR_AGENT: Company sub-accounts\n\n## WebSocket\n- Connect: `ws://localhost:3000/ws?token={{accessToken}}`\n- Events: connected, heartbeat, user:online, user:offline, chat:message, notification:new",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -80,12 +80,22 @@
 			"key": "reviewId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "mediaId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "photoId",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
-
 		{
 			"name": "Authentication (15 endpoints)",
+			"description": "User registration, login, token management, role claiming, and password reset flows.",
 			"item": [
 				{
 					"name": "Register User",
@@ -95,10 +105,11 @@
 							"script": {
 								"exec": [
 									"if (pm.response.code === 201) {",
-									"const d = pm.response.json().data;",
-									"if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
-									"if (d.refreshToken) pm.collectionVariables.set('refreshToken', d.refreshToken);",
-									"if (d.user?.id) pm.collectionVariables.set('userId', d.user.id);",
+									"  const d = pm.response.json().data;",
+									"  if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
+									"  if (d.refreshToken) pm.collectionVariables.set('refreshToken', d.refreshToken);",
+									"  if (d.user?.id) pm.collectionVariables.set('userId', d.user.id);",
+									"  console.log('✅ User registered: ' + d.user?.email);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -122,15 +133,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/register",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"register"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
 						},
-						"description": "Register USER role. Returns roles: ['USER']"
+						"description": "Register new USER role. Rate limit: 3/15min. Returns tokens and user object with roles: ['USER']."
 					}
 				},
 				{
@@ -141,9 +147,12 @@
 							"script": {
 								"exec": [
 									"if (pm.response.code === 201) {",
-									"const d = pm.response.json().data;",
-									"if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
-									"if (d.user?.id) pm.collectionVariables.set('companyId', d.user.id);",
+									"  const d = pm.response.json().data;",
+									"  if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
+									"  if (d.refreshToken) pm.collectionVariables.set('refreshToken', d.refreshToken);",
+									"  if (d.user?.id) pm.collectionVariables.set('userId', d.user.id);",
+									"  if (d.company?.id) pm.collectionVariables.set('companyId', d.company.id);",
+									"  console.log('✅ Company registered: ' + d.company?.companyName);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -163,19 +172,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"company@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"Company\",\n  \"lastName\": \"Owner\",\n  \"companyName\": \"Georgian Tours Ltd\",\n  \"description\": \"Premium tour operator\",\n  \"registrationNumber\": \"GE123456789\",\n  \"websiteUrl\": \"https://georgiantours.com\",\n  \"phoneNumber\": \"+995555123456\"\n}"
+							"raw": "{\n  \"email\": \"company@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"Company\",\n  \"lastName\": \"Owner\",\n  \"companyName\": \"Georgian Tours Ltd\",\n  \"description\": \"Premium tour operator in Georgia\",\n  \"registrationNumber\": \"GE123456789\",\n  \"websiteUrl\": \"https://georgiantours.com\",\n  \"phoneNumber\": \"+995555123456\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/register-company",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"register-company"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register-company"]
 						},
-						"description": "Register COMPANY role with profile"
+						"description": "Register COMPANY role with company profile. Rate limit: 3/15min. Creates user with roles: ['USER', 'COMPANY'] and associated company record."
 					}
 				},
 				{
@@ -186,10 +190,11 @@
 							"script": {
 								"exec": [
 									"if (pm.response.code === 200) {",
-									"const d = pm.response.json().data;",
-									"if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
-									"if (d.refreshToken) pm.collectionVariables.set('refreshToken', d.refreshToken);",
-									"if (d.user?.id) pm.collectionVariables.set('userId', d.user.id);",
+									"  const d = pm.response.json().data;",
+									"  if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
+									"  if (d.refreshToken) pm.collectionVariables.set('refreshToken', d.refreshToken);",
+									"  if (d.user?.id) pm.collectionVariables.set('userId', d.user.id);",
+									"  console.log('✅ Logged in as: ' + d.user?.email + ' Roles: ' + d.user?.roles?.join(', '));",
 									"}"
 								],
 								"type": "text/javascript"
@@ -213,19 +218,30 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/login",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"login"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
 						},
-						"description": "Login. Returns user with roles array"
+						"description": "Login with email/password. Rate limit: 5/15min. Returns access/refresh tokens and user with roles array."
 					}
 				},
 				{
 					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.accessToken) pm.collectionVariables.set('accessToken', d.accessToken);",
+									"  if (d.refreshToken) pm.collectionVariables.set('refreshToken', d.refreshToken);",
+									"  console.log('✅ Tokens refreshed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -243,14 +259,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/refresh",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"refresh"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh"]
+						},
+						"description": "Refresh access token using refresh token. Rate limit: 10/15min."
 					}
 				},
 				{
@@ -259,18 +271,29 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/auth/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"me"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me"]
+						},
+						"description": "Get currently authenticated user. Requires valid access token."
 					}
 				},
 				{
 					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  pm.collectionVariables.set('accessToken', '');",
+									"  pm.collectionVariables.set('refreshToken', '');",
+									"  console.log('✅ Logged out - tokens cleared');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -288,15 +311,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/logout",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"logout"
-							]
-						}
-					},
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						},
+						"description": "Logout single session. Rate limit: 20/15min."
+					}
+				},
+				{
+					"name": "Logout All Sessions",
 					"event": [
 						{
 							"listen": "test",
@@ -305,49 +327,40 @@
 									"if (pm.response.code === 200) {",
 									"  pm.collectionVariables.set('accessToken', '');",
 									"  pm.collectionVariables.set('refreshToken', '');",
-									"  pm.collectionVariables.set('userId', '');",
-									"  console.log('✅ Logged out - tokens cleared');",
+									"  console.log('✅ All sessions logged out - tokens cleared');",
 									"}"
 								],
 								"type": "text/javascript"
 							}
 						}
-					]
-				},
-				{
-					"name": "Logout All Sessions",
+					],
 					"request": {
 						"method": "POST",
 						"url": {
 							"raw": "{{baseUrl}}/auth/logout-all",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"logout-all"
-							]
-						}
-					},
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout-all"]
+						},
+						"description": "Logout all sessions. Invalidates all tokens. Rate limit: 20/15min. Requires authentication."
+					}
+				},
+				{
+					"name": "Claim GUIDE Role",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"if (pm.response.code === 200) {",
-									"  pm.collectionVariables.set('accessToken', '');",
-									"  pm.collectionVariables.set('refreshToken', '');",
-									"  pm.collectionVariables.set('userId', '');",
-									"  console.log('✅ Logged out - tokens cleared');",
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.guide?.id) pm.collectionVariables.set('guideId', d.guide.id);",
+									"  console.log('✅ GUIDE role claimed');",
 									"}"
 								],
 								"type": "text/javascript"
 							}
 						}
-					]
-				},
-				{
-					"name": "Claim GUIDE Role",
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -358,22 +371,33 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"role\": \"GUIDE\",\n  \"profile\": {\n    \"bio\": \"Experienced guide with 10 years\",\n    \"languages\": [\"en\", \"ka\", \"ru\"],\n    \"yearsOfExperience\": 10,\n    \"phoneNumber\": \"+995555111222\"\n  }\n}"
+							"raw": "{\n  \"role\": \"GUIDE\",\n  \"profile\": {\n    \"bio\": \"Experienced tour guide with 10 years of experience in Georgian history and culture\",\n    \"languages\": [\"en\", \"ka\", \"ru\"],\n    \"yearsOfExperience\": 10,\n    \"phoneNumber\": \"+995555111222\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/claim-role",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"claim-role"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "claim-role"]
+						},
+						"description": "Claim GUIDE role. Requires verified email. Rate limit: 5/15min. Creates guide profile."
 					}
 				},
 				{
 					"name": "Claim DRIVER Role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.driver?.id) pm.collectionVariables.set('driverId', d.driver.id);",
+									"  console.log('✅ DRIVER role claimed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -384,18 +408,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"role\": \"DRIVER\",\n  \"profile\": {\n    \"bio\": \"Professional driver\",\n    \"vehicleType\": \"Minibus\",\n    \"vehicleCapacity\": 12,\n    \"vehicleMake\": \"Mercedes-Benz\",\n    \"vehicleModel\": \"Sprinter\",\n    \"vehicleYear\": 2022,\n    \"licenseNumber\": \"GE-DRV-123\",\n    \"phoneNumber\": \"+995555333444\"\n  }\n}"
+							"raw": "{\n  \"role\": \"DRIVER\",\n  \"profile\": {\n    \"bio\": \"Professional driver with safe driving record\",\n    \"vehicleType\": \"Minibus\",\n    \"vehicleCapacity\": 12,\n    \"vehicleMake\": \"Mercedes-Benz\",\n    \"vehicleModel\": \"Sprinter\",\n    \"vehicleYear\": 2022,\n    \"licenseNumber\": \"GE-DRV-123\",\n    \"phoneNumber\": \"+995555333444\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/claim-role",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"claim-role"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "claim-role"]
+						},
+						"description": "Claim DRIVER role. Requires verified email. Rate limit: 5/15min. Creates driver profile."
 					}
 				},
 				{
@@ -414,15 +434,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/tour-agents",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"tour-agents"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "tour-agents"]
 						},
-						"description": "COMPANY role required"
+						"description": "Create tour agent sub-account. Requires COMPANY role + verified email. Rate limit: 5/15min. Agent receives invite email."
 					}
 				},
 				{
@@ -431,14 +446,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/auth/tour-agents",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"tour-agents"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "tour-agents"]
+						},
+						"description": "List tour agents for company. Requires COMPANY role + verified email."
 					}
 				},
 				{
@@ -456,18 +467,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"token\": \"64-char-token\"\n}"
+							"raw": "{\n  \"token\": \"paste-64-char-token-from-email-here\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/verify-email",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"verify-email"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "verify-email"]
+						},
+						"description": "Verify email with token from verification email. Rate limit: 3/1hr."
 					}
 				},
 				{
@@ -489,14 +496,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/resend-verification",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"resend-verification"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "resend-verification"]
+						},
+						"description": "Resend email verification. Rate limit: 3/1hr."
 					}
 				},
 				{
@@ -518,18 +521,29 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/forgot-password",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"forgot-password"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "forgot-password"]
+						},
+						"description": "Request password reset email. Rate limit: 3/1hr."
 					}
 				},
 				{
 					"name": "Reset Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  pm.collectionVariables.set('accessToken', '');",
+									"  pm.collectionVariables.set('refreshToken', '');",
+									"  console.log('✅ Password reset - all sessions invalidated');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -543,40 +557,163 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"token\": \"64-char-token\",\n  \"newPassword\": \"NewSecure@Pass123!\"\n}"
+							"raw": "{\n  \"token\": \"paste-64-char-token-from-email-here\",\n  \"newPassword\": \"NewSecure@Pass123!\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/reset-password",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"reset-password"
-							]
-						}
-					},
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "reset-password"]
+						},
+						"description": "Reset password with token from reset email. Rate limit: 3/1hr. Invalidates all sessions."
+					}
+				}
+			]
+		},
+		{
+			"name": "Users (7 endpoints)",
+			"description": "User management. Most endpoints require ADMIN role or self-access.",
+			"item": [
+				{
+					"name": "Create User (Admin)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"if (pm.response.code === 200) {",
-									"  pm.collectionVariables.set('accessToken', '');",
-									"  pm.collectionVariables.set('refreshToken', '');",
-									"  pm.collectionVariables.set('userId', '');",
-									"  console.log('✅ Password reset successful - all tokens cleared (sessions invalidated)');",
+									"if (pm.response.code === 201) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('userId', d.id);",
+									"  console.log('✅ User created: ' + d.email);",
 									"}"
 								],
 								"type": "text/javascript"
 							}
 						}
-					]
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"role\": \"USER\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"]
+						},
+						"description": "Create user with optional role. ADMIN only."
+					}
+				},
+				{
+					"name": "Get All Users (Admin)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/users?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "search", "value": "", "disabled": true},
+								{"key": "role", "value": "USER", "disabled": true},
+								{"key": "isActive", "value": "true", "disabled": true}
+							]
+						},
+						"description": "List all users with pagination. ADMIN only."
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						},
+						"description": "Get user by ID. Self or ADMIN only."
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\",\n  \"phoneNumber\": \"+995555999888\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						},
+						"description": "Update user. Self or ADMIN. Non-admins cannot update: email, roles, isActive."
+					}
+				},
+				{
+					"name": "Update User Role (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"GUIDE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/role",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}", "role"]
+						},
+						"description": "Add role to user. ADMIN only. Role options: USER, COMPANY, GUIDE, DRIVER, ADMIN, TOUR_AGENT."
+					}
+				},
+				{
+					"name": "Remove User Role (Admin)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/roles/GUIDE",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}", "roles", "GUIDE"]
+						},
+						"description": "Remove specific role from user. ADMIN only. Replace 'GUIDE' with role to remove."
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						},
+						"description": "Delete user. Self or ADMIN. Requires verified email."
+					}
 				}
 			]
 		},
 		{
 			"name": "Locations (5 endpoints)",
+			"description": "Georgian locations (cities, regions). Public read, ADMIN write.",
 			"item": [
 				{
 					"name": "List Locations",
@@ -587,38 +724,17 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/locations?page=1&limit=10&country=Georgia",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"locations"
-							],
+							"host": ["{{baseUrl}}"],
+							"path": ["locations"],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "country",
-									"value": "Georgia"
-								},
-								{
-									"key": "region",
-									"value": "Kakheti",
-									"disabled": true
-								},
-								{
-									"key": "search",
-									"value": "Tbilisi",
-									"disabled": true
-								}
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "country", "value": "Georgia"},
+								{"key": "region", "value": "Kakheti", "disabled": true},
+								{"key": "search", "value": "Tbilisi", "disabled": true}
 							]
 						},
-						"description": "Public. Filter by country, region, search"
+						"description": "Public. List locations with filters."
 					}
 				},
 				{
@@ -630,14 +746,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/locations/{{locationId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"locations",
-								"{{locationId}}"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["locations", "{{locationId}}"]
+						},
+						"description": "Public. Get location details."
 					}
 				},
 				{
@@ -648,8 +760,9 @@
 							"script": {
 								"exec": [
 									"if (pm.response.code === 201) {",
-									"const d = pm.response.json().data;",
-									"if (d.id) pm.collectionVariables.set('locationId', d.id);",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('locationId', d.id);",
+									"  console.log('✅ Location created: ' + d.name);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -670,14 +783,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/locations",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"locations"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["locations"]
 						},
-						"description": "ADMIN only"
+						"description": "ADMIN only. Create new location."
 					}
 				},
 				{
@@ -696,15 +805,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/locations/{{locationId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"locations",
-								"{{locationId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["locations", "{{locationId}}"]
 						},
-						"description": "ADMIN only"
+						"description": "ADMIN only. Update location."
 					}
 				},
 				{
@@ -713,21 +817,17 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{baseUrl}}/locations/{{locationId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"locations",
-								"{{locationId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["locations", "{{locationId}}"]
 						},
-						"description": "ADMIN only. Soft delete"
+						"description": "ADMIN only. Soft delete location."
 					}
 				}
 			]
 		},
 		{
-			"name": "Companies (5 endpoints)",
+			"name": "Companies (11 endpoints)",
+			"description": "Tour company profiles with logo/photos. Public read, owner/admin write.",
 			"item": [
 				{
 					"name": "List Companies",
@@ -738,33 +838,43 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/companies?page=1&limit=10&isVerified=true",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"companies"
-							],
+							"host": ["{{baseUrl}}"],
+							"path": ["companies"],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "isVerified",
-									"value": "true"
-								},
-								{
-									"key": "search",
-									"value": "Tours",
-									"disabled": true
-								}
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "isVerified", "value": "true"},
+								{"key": "search", "value": "Tours", "disabled": true}
 							]
 						},
-						"description": "Public. Filter by isVerified, search"
+						"description": "Public. List companies with filters."
+					}
+				},
+				{
+					"name": "Get My Company",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('companyId', d.id);",
+									"  console.log('✅ My company: ' + d.companyName);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/companies/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "my"]
+						},
+						"description": "Get current user's company profile. Requires COMPANY role."
 					}
 				},
 				{
@@ -776,14 +886,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/companies/{{companyId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"companies",
-								"{{companyId}}"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}"]
+						},
+						"description": "Public. Get company details."
 					}
 				},
 				{
@@ -802,15 +908,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/companies/{{companyId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"companies",
-								"{{companyId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}"]
 						},
-						"description": "Owner or ADMIN"
+						"description": "Update company. Owner or ADMIN. Requires verified email."
 					}
 				},
 				{
@@ -819,15 +920,10 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{baseUrl}}/companies/{{companyId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"companies",
-								"{{companyId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}"]
 						},
-						"description": "Owner or ADMIN. Soft delete"
+						"description": "Soft delete company. Owner or ADMIN. Requires verified email."
 					}
 				},
 				{
@@ -836,22 +932,115 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/companies/{{companyId}}/tour-agents",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"companies",
-								"{{companyId}}",
-								"tour-agents"
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "tour-agents"]
+						},
+						"description": "List tour agents for company. Owner or ADMIN."
+					}
+				},
+				{
+					"name": "Get Company Photos",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/photos",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "photos"]
+						},
+						"description": "Public. Get all photos for a company."
+					}
+				},
+				{
+					"name": "Upload Company Photos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('photoId', d.id);",
+									"  console.log('✅ Photo uploaded');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
 							]
 						},
-						"description": "Owner or ADMIN"
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/photos",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "photos"]
+						},
+						"description": "Upload photo for company. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Delete Company Photo",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/photos/{{photoId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "photos", "{{photoId}}"]
+						},
+						"description": "Delete specific photo. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload Company Logo",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/logo",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "logo"]
+						},
+						"description": "Upload/replace company logo. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Delete Company Logo",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/logo",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "logo"]
+						},
+						"description": "Delete company logo. Owner or ADMIN. Requires verified email."
 					}
 				}
 			]
 		},
 		{
-			"name": "Guides (4 endpoints)",
+			"name": "Guides (8 endpoints)",
+			"description": "Tour guide profiles with photos. Public read, owner/admin write.",
 			"item": [
 				{
 					"name": "List Guides",
@@ -862,43 +1051,45 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/guides?page=1&limit=10&isVerified=true",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"guides"
-							],
+							"host": ["{{baseUrl}}"],
+							"path": ["guides"],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "isVerified",
-									"value": "true"
-								},
-								{
-									"key": "locationId",
-									"value": "{{locationId}}",
-									"disabled": true
-								},
-								{
-									"key": "language",
-									"value": "en",
-									"disabled": true
-								},
-								{
-									"key": "minExperience",
-									"value": "5",
-									"disabled": true
-								}
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "isVerified", "value": "true"},
+								{"key": "locationId", "value": "{{locationId}}", "disabled": true},
+								{"key": "language", "value": "en", "disabled": true},
+								{"key": "minExperience", "value": "5", "disabled": true}
 							]
 						},
-						"description": "Public. Filter by location, language, experience"
+						"description": "Public. List guides with filters."
+					}
+				},
+				{
+					"name": "Get My Guide Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('guideId', d.id);",
+									"  console.log('✅ My guide profile loaded');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/guides/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "my"]
+						},
+						"description": "Get current user's guide profile. Requires GUIDE role."
 					}
 				},
 				{
@@ -910,14 +1101,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/guides/{{guideId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"guides",
-								"{{guideId}}"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}"]
+						},
+						"description": "Public. Get guide details."
 					}
 				},
 				{
@@ -932,19 +1119,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"bio\": \"Updated bio\",\n  \"languages\": [\"en\", \"ka\", \"ru\", \"de\"],\n  \"yearsOfExperience\": 12,\n  \"isAvailable\": true,\n  \"locationIds\": [\"{{locationId}}\"]\n}"
+							"raw": "{\n  \"bio\": \"Updated bio with more experience\",\n  \"languages\": [\"en\", \"ka\", \"ru\", \"de\"],\n  \"yearsOfExperience\": 12,\n  \"isAvailable\": true,\n  \"locationIds\": [\"{{locationId}}\"]\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/guides/{{guideId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"guides",
-								"{{guideId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}"]
 						},
-						"description": "Owner or ADMIN. Can update locations"
+						"description": "Update guide. Owner or ADMIN. Requires verified email. Can update locations."
 					}
 				},
 				{
@@ -953,21 +1135,81 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{baseUrl}}/guides/{{guideId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"guides",
-								"{{guideId}}"
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}"]
+						},
+						"description": "Soft delete guide. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Get Guide Photos",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/guides/{{guideId}}/photos",
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}", "photos"]
+						},
+						"description": "Public. Get all photos for a guide."
+					}
+				},
+				{
+					"name": "Upload Guide Photos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('photoId', d.id);",
+									"  console.log('✅ Guide photo uploaded');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
 							]
 						},
-						"description": "Owner or ADMIN. Soft delete"
+						"url": {
+							"raw": "{{baseUrl}}/guides/{{guideId}}/photos",
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}", "photos"]
+						},
+						"description": "Upload photo for guide. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Delete Guide Photo",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/guides/{{guideId}}/photos/{{photoId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}", "photos", "{{photoId}}"]
+						},
+						"description": "Delete specific photo. Owner or ADMIN. Requires verified email."
 					}
 				}
 			]
 		},
 		{
-			"name": "Drivers (4 endpoints)",
+			"name": "Drivers (8 endpoints)",
+			"description": "Driver profiles with photos. Public read, owner/admin write.",
 			"item": [
 				{
 					"name": "List Drivers",
@@ -978,43 +1220,45 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/drivers?page=1&limit=10&isVerified=true",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"drivers"
-							],
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers"],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "isVerified",
-									"value": "true"
-								},
-								{
-									"key": "locationId",
-									"value": "{{locationId}}",
-									"disabled": true
-								},
-								{
-									"key": "vehicleType",
-									"value": "SUV",
-									"disabled": true
-								},
-								{
-									"key": "minCapacity",
-									"value": "4",
-									"disabled": true
-								}
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "isVerified", "value": "true"},
+								{"key": "locationId", "value": "{{locationId}}", "disabled": true},
+								{"key": "vehicleType", "value": "SUV", "disabled": true},
+								{"key": "minCapacity", "value": "4", "disabled": true}
 							]
 						},
-						"description": "Public. Filter by location, vehicle type, capacity"
+						"description": "Public. List drivers with filters."
+					}
+				},
+				{
+					"name": "Get My Driver Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('driverId', d.id);",
+									"  console.log('✅ My driver profile loaded');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/drivers/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "my"]
+						},
+						"description": "Get current user's driver profile. Requires DRIVER role."
 					}
 				},
 				{
@@ -1026,14 +1270,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/drivers/{{driverId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"drivers",
-								"{{driverId}}"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}"]
+						},
+						"description": "Public. Get driver details."
 					}
 				},
 				{
@@ -1052,15 +1292,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/drivers/{{driverId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"drivers",
-								"{{driverId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}"]
 						},
-						"description": "Owner or ADMIN. Can update locations"
+						"description": "Update driver. Owner or ADMIN. Requires verified email. Can update locations."
 					}
 				},
 				{
@@ -1069,66 +1304,46 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{baseUrl}}/drivers/{{driverId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"drivers",
-								"{{driverId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}"]
 						},
-						"description": "Owner or ADMIN. Soft delete"
+						"description": "Soft delete driver. Owner or ADMIN. Requires verified email."
 					}
-				}
-			]
-		},
-		{
-			"name": "Tours (6 endpoints)",
-			"item": [
+				},
 				{
-					"name": "List All Tours",
+					"name": "Get Driver Photos",
 					"request": {
 						"auth": {
 							"type": "noauth"
 						},
 						"method": "GET",
 						"url": {
-							"raw": "{{baseUrl}}/tours?page=1&limit=10",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"tours"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "isActive",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "category",
-									"value": "City Tour",
-									"disabled": true
-								}
-							]
+							"raw": "{{baseUrl}}/drivers/{{driverId}}/photos",
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}", "photos"]
 						},
-						"description": "Public. List all active tours."
+						"description": "Public. Get all photos for a driver."
 					}
 				},
 				{
-					"name": "Upload Tour Image",
+					"name": "Upload Driver Photos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('photoId', d.id);",
+									"  console.log('✅ Driver photo uploaded');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
-						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -1140,17 +1355,68 @@
 							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/tours/{{tourId}}/images",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"tours",
-								"{{tourId}}",
-								"images"
+							"raw": "{{baseUrl}}/drivers/{{driverId}}/photos",
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}", "photos"]
+						},
+						"description": "Upload photo for driver. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Delete Driver Photo",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/drivers/{{driverId}}/photos/{{photoId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}", "photos", "{{photoId}}"]
+						},
+						"description": "Delete specific photo. Owner or ADMIN. Requires verified email."
+					}
+				}
+			]
+		},
+		{
+			"name": "Tours (8 endpoints)",
+			"description": "Tour listings. Public read, authenticated create, owner/admin update.",
+			"item": [
+				{
+					"name": "List All Tours",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tours?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["tours"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "isActive", "value": "true", "disabled": true},
+								{"key": "category", "value": "City Tour", "disabled": true},
+								{"key": "city", "value": "Tbilisi", "disabled": true},
+								{"key": "minPrice", "value": "50", "disabled": true},
+								{"key": "maxPrice", "value": "500", "disabled": true}
 							]
 						},
-						"description": "Upload an image specifically for a tour."
+						"description": "Public. List all active tours with filters."
+					}
+				},
+				{
+					"name": "Get Tour by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tours/{{tourId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["tours", "{{tourId}}"]
+						},
+						"description": "Public. Get tour details."
 					}
 				},
 				{
@@ -1161,8 +1427,9 @@
 							"script": {
 								"exec": [
 									"if (pm.response.code === 201) {",
-									"const d = pm.response.json().data;",
-									"if (d.id) pm.collectionVariables.set('tourId', d.id);",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('tourId', d.id);",
+									"  console.log('✅ Tour created: ' + d.title);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -1179,38 +1446,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Tbilisi City Tour\",\n  \"price\": 50,\n  \"summary\": \"Explore Tbilisi\",\n  \"description\": \"Full day tour\",\n  \"currency\": \"USD\",\n  \"durationMinutes\": 480,\n  \"maxPeople\": 15,\n  \"difficulty\": \"easy\",\n  \"category\": \"City Tour\"\n}"
+							"raw": "{\n  \"title\": \"Tbilisi City Tour\",\n  \"price\": 50,\n  \"summary\": \"Explore the beautiful capital of Georgia\",\n  \"description\": \"Full day tour covering Old Town, Holy Trinity Cathedral, Narikala Fortress, and more\",\n  \"currency\": \"USD\",\n  \"durationMinutes\": 480,\n  \"maxPeople\": 15,\n  \"difficulty\": \"easy\",\n  \"category\": \"City Tour\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/tours",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"tours"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["tours"]
 						},
-						"description": "Auth required"
-					}
-				},
-				{
-					"name": "Get Tour by ID",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"url": {
-							"raw": "{{baseUrl}}/tours/{{tourId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"tours",
-								"{{tourId}}"
-							]
-						},
-						"description": "Public"
+						"description": "Create tour. Requires auth + verified email."
 					}
 				},
 				{
@@ -1219,28 +1462,34 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/me/tours?page=1&limit=10&includeInactive=false",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"me",
-								"tours"
-							],
+							"host": ["{{baseUrl}}"],
+							"path": ["me", "tours"],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "includeInactive",
-									"value": "false"
-								}
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "includeInactive", "value": "false"}
 							]
-						}
+						},
+						"description": "List current user's tours. Requires auth + verified email."
+					}
+				},
+				{
+					"name": "List Company Tours",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/tours?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "tours"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						},
+						"description": "Public. List active tours for a specific company."
 					}
 				},
 				{
@@ -1255,19 +1504,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Updated Tour\",\n  \"price\": 60,\n  \"isActive\": true,\n  \"isFeatured\": true\n}"
+							"raw": "{\n  \"title\": \"Updated Tour Title\",\n  \"price\": 60,\n  \"isActive\": true,\n  \"isFeatured\": true\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/tours/{{tourId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"tours",
-								"{{tourId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["tours", "{{tourId}}"]
 						},
-						"description": "Owner or ADMIN"
+						"description": "Update tour. Owner or ADMIN. Requires verified email."
 					}
 				},
 				{
@@ -1276,168 +1520,54 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{baseUrl}}/tours/{{tourId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"tours",
-								"{{tourId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["tours", "{{tourId}}"]
 						},
-						"description": "Owner or ADMIN. Soft delete"
-					}
-				}
-			]
-		},
-		{
-			"name": "Users (6 endpoints)",
-			"item": [
-				{
-					"name": "Create User (Admin)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"role\": \"USER\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/users",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users"
-							]
-						},
-						"description": "ADMIN only"
+						"description": "Soft delete tour. Owner or ADMIN. Requires verified email."
 					}
 				},
 				{
-					"name": "Get All Users (Admin)",
+					"name": "Upload Tour Image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('mediaId', d.id);",
+									"  console.log('✅ Tour image uploaded');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
-						"url": {
-							"raw": "{{baseUrl}}/users?page=1&limit=10",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users"
-							],
-							"query": [
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
 								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
+									"key": "file",
+									"type": "file",
+									"src": []
 								}
 							]
 						},
-						"description": "ADMIN only"
-					}
-				},
-				{
-					"name": "Get User by ID",
-					"request": {
-						"method": "GET",
 						"url": {
-							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								"{{userId}}"
-							]
+							"raw": "{{baseUrl}}/tours/{{tourId}}/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["tours", "{{tourId}}", "images"]
 						},
-						"description": "Self or ADMIN"
-					}
-				},
-				{
-					"name": "Update User",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								"{{userId}}"
-							]
-						},
-						"description": "Self or ADMIN"
-					}
-				},
-				{
-					"name": "Update User Role (Admin)",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"role\": \"COMPANY\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/users/{{userId}}/role",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								"{{userId}}",
-								"role"
-							]
-						},
-						"description": "ADMIN only"
-					}
-				},
-				{
-					"name": "Delete User",
-					"request": {
-						"method": "DELETE",
-						"url": {
-							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"users",
-								"{{userId}}"
-							]
-						},
-						"description": "Self or ADMIN"
+						"description": "Upload image for tour. Owner or ADMIN. Requires verified email."
 					}
 				}
 			]
 		},
 		{
-			"name": "Presence & WebSocket (5 endpoints)",
-			"description": "Real-time presence tracking and WebSocket connection. WebSocket endpoint: ws://localhost:3000/ws?token={accessToken}",
+			"name": "Presence & WebSocket (6 endpoints)",
+			"description": "Real-time presence tracking. WebSocket: ws://localhost:3000/ws?token={{accessToken}}",
 			"item": [
 				{
 					"name": "Get My Presence",
@@ -1445,15 +1575,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/presence/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"presence",
-								"me"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["presence", "me"]
 						},
-						"description": "Get current user's online status. Requires authentication."
+						"description": "Get current user's online status."
 					}
 				},
 				{
@@ -1462,15 +1587,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/presence/{{userId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"presence",
-								"{{userId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["presence", "{{userId}}"]
 						},
-						"description": "Get specific user's online status. Requires authentication."
+						"description": "Get specific user's online status."
 					}
 				},
 				{
@@ -1489,15 +1609,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/presence/multiple",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"presence",
-								"multiple"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["presence", "multiple"]
 						},
-						"description": "Get online status for multiple users at once. Requires authentication."
+						"description": "Get online status for multiple users at once."
 					}
 				},
 				{
@@ -1506,16 +1621,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/presence/online/all",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"presence",
-								"online",
-								"all"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["presence", "online", "all"]
 						},
-						"description": "Get list of all currently online users. Requires authentication."
+						"description": "Get list of all currently online users."
 					}
 				},
 				{
@@ -1524,46 +1633,34 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/presence/stats",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"presence",
-								"stats"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["presence", "stats"]
 						},
-						"description": "Get WebSocket connection statistics (total connections, unique users). Requires authentication."
+						"description": "Get WebSocket connection statistics."
 					}
 				},
-					{
+				{
 					"name": "WebSocket Connection Info",
 					"request": {
 						"method": "GET",
 						"url": {
 							"raw": "ws://localhost:3000/ws?token={{accessToken}}",
 							"protocol": "ws",
-							"host": [
-								"localhost"
-							],
+							"host": ["localhost"],
 							"port": "3000",
-							"path": [
-								"ws"
-							],
+							"path": ["ws"],
 							"query": [
-								{
-									"key": "token",
-									"value": "{{accessToken}}"
-								}
+								{"key": "token", "value": "{{accessToken}}"}
 							]
 						},
-						"description": "WebSocket endpoint for real-time features. Connect with token in query param. After connecting, send heartbeat messages: {\"type\":\"heartbeat\",\"payload\":{}}. You'll receive: connected, heartbeat, user:online, user:offline messages."
+						"description": "WebSocket endpoint. Send heartbeat: {\"type\":\"heartbeat\"}. Receive: connected, heartbeat, user:online, user:offline, chat:message, notification:new"
 					}
 				}
 			]
 		},
 		{
 			"name": "Chat System (9 endpoints)",
-			"description": "Real-time chat system with direct and group chats, messaging, typing indicators, and read receipts.",
+			"description": "Real-time chat with direct and group chats, typing indicators, and read receipts.",
 			"item": [
 				{
 					"name": "Create Direct Chat",
@@ -1572,10 +1669,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"if (pm.response.code === 201) {",
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
 									"  const d = pm.response.json().data;",
 									"  if (d.id) pm.collectionVariables.set('chatId', d.id);",
-									"  console.log('✅ Direct chat created: ' + d.id);",
+									"  console.log('✅ Direct chat: ' + d.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -1596,15 +1693,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/chats/direct",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"direct"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "direct"]
 						},
-						"description": "Create a 1-on-1 direct chat with another user. Returns existing chat if already exists."
+						"description": "Create 1-on-1 chat. Returns existing if already exists. Rate limit: 20/1min."
 					}
 				},
 				{
@@ -1638,15 +1730,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/chats/group",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"group"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "group"]
 						},
-						"description": "Create group chat. TOUR_AGENT role required. Max 100 participants."
+						"description": "Create group chat. TOUR_AGENT role required. Max 100 participants. Rate limit: 10/1min."
 					}
 				},
 				{
@@ -1655,24 +1742,14 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/chats?page=1&limit=20",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats"
-							],
+							"host": ["{{baseUrl}}"],
+							"path": ["chats"],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "20"
-								}
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
 							]
 						},
-						"description": "Get user's chat inbox with last message and unread count."
+						"description": "Get chat inbox with last message and unread count. Rate limit: 100/1min."
 					}
 				},
 				{
@@ -1681,15 +1758,10 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/chats/{{chatId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"{{chatId}}"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "{{chatId}}"]
 						},
-						"description": "Get chat details with participants. Must be a participant."
+						"description": "Get chat details with participants. Must be a participant. Rate limit: 100/1min."
 					}
 				},
 				{
@@ -1708,16 +1780,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/chats/{{chatId}}/messages",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"{{chatId}}",
-								"messages"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "{{chatId}}", "messages"]
 						},
-						"description": "Send message to chat. Can mention other participants."
+						"description": "Send message to chat. Can mention other participants. Rate limit: 60/1min."
 					}
 				},
 				{
@@ -1726,31 +1792,15 @@
 						"method": "GET",
 						"url": {
 							"raw": "{{baseUrl}}/chats/{{chatId}}/messages?page=1&limit=50",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"{{chatId}}",
-								"messages"
-							],
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "{{chatId}}", "messages"],
 							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "50"
-								},
-								{
-									"key": "before",
-									"value": "message-id-for-cursor",
-									"disabled": true
-								}
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "50"},
+								{"key": "before", "value": "message-id", "disabled": true, "description": "Cursor for infinite scroll"}
 							]
 						},
-						"description": "Get messages for a chat with pagination. Use 'before' for infinite scroll."
+						"description": "Get messages with pagination. Use 'before' cursor for infinite scroll. Rate limit: 100/1min."
 					}
 				},
 				{
@@ -1769,16 +1819,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/chats/{{chatId}}/read",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"{{chatId}}",
-								"read"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "{{chatId}}", "read"]
 						},
-						"description": "Mark messages as read. Optionally specify messageId to mark all messages up to that point."
+						"description": "Mark messages as read. Optional messageId marks up to that point. Rate limit: 60/1min."
 					}
 				},
 				{
@@ -1797,16 +1841,10 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/chats/{{chatId}}/participants",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"{{chatId}}",
-								"participants"
-							]
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "{{chatId}}", "participants"]
 						},
-						"description": "Add participant to group chat. Only chat creator can add. Max 100 participants."
+						"description": "Add participant to group chat. Only creator can add. Max 100. Rate limit: 20/1min."
 					}
 				},
 				{
@@ -1815,1175 +1853,836 @@
 						"method": "DELETE",
 						"url": {
 							"raw": "{{baseUrl}}/chats/{{chatId}}/leave",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"chats",
-								"{{chatId}}",
-								"leave"
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", "{{chatId}}", "leave"]
+						},
+						"description": "Leave a chat. If last participant, chat is deleted. Rate limit: 20/1min."
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications (5 endpoints)",
+			"description": "Push notifications for chat, mentions, inquiries, and system events.",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/notifications?page=1&limit=20&isRead=false",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"},
+								{"key": "isRead", "value": "false"},
+								{"key": "type", "value": "CHAT_MENTION", "disabled": true, "description": "CHAT_MESSAGE, CHAT_MENTION, INQUIRY_RECEIVED, BOOKING_REQUEST, PROFILE_VERIFIED, SYSTEM"}
 							]
 						},
-						"description": "Leave a chat. If last participant leaves, chat is deleted."
+						"description": "Get paginated notifications. Filter by isRead and type. Rate limit: 100/1min."
 					}
-				}
-		]
-	},
-	{
-		"name": "Notifications (5 endpoints)",
-		"item": [
-			{
-				"name": "Get Notifications",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/notifications?page=1&limit=20&isRead=false",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"notifications"
-						],
-						"query": [
-							{
-								"key": "page",
-								"value": "1",
-								"description": "Page number (default: 1)"
-							},
-							{
-								"key": "limit",
-								"value": "20",
-								"description": "Items per page (default: 20, max: 100)"
-							},
-							{
-								"key": "isRead",
-								"value": "false",
-								"description": "Filter by read status (true/false)"
-							},
-							{
-								"key": "type",
-								"value": "CHAT_MENTION",
-								"description": "Filter by type: CHAT_MESSAGE, CHAT_MENTION, INQUIRY_RECEIVED, BOOKING_REQUEST, PROFILE_VERIFIED, SYSTEM",
-								"disabled": true
-							}
-						]
-					},
-					"description": "Get paginated notifications for authenticated user. Supports filtering by isRead and type."
-				}
-			},
-			{
-				"name": "Get Unread Count",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/notifications/unread-count",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"notifications",
-							"unread-count"
-						]
-					},
-					"description": "Get count of unread notifications for the authenticated user. Use this for notification badge."
-				}
-			},
-			{
-				"name": "Mark Notification as Read",
-				"request": {
-					"method": "PATCH",
-					"url": {
-						"raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"notifications",
-							"{{notificationId}}",
-							"read"
-						]
-					},
-					"description": "Mark a single notification as read. Replace {{notificationId}} with actual notification ID."
-				}
-			},
-			{
-				"name": "Mark All as Read",
-				"request": {
-					"method": "PATCH",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						}
-					],
-					"body": {
-						"mode": "raw",
-						"raw": "{\n  \"notificationIds\": [\"id1\", \"id2\"]\n}",
-						"options": {
-							"raw": {
-								"language": "json"
-							}
-						}
-					},
-					"url": {
-						"raw": "{{baseUrl}}/notifications/read-all",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"notifications",
-							"read-all"
-						]
-					},
-					"description": "Mark all notifications as read. Optionally provide notificationIds array to mark only specific ones. If notificationIds is omitted or empty, marks ALL unread notifications as read."
-				}
-			},
-			{
-				"name": "Delete Notification",
-				"request": {
-					"method": "DELETE",
-					"url": {
-						"raw": "{{baseUrl}}/notifications/{{notificationId}}",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"notifications",
-							"{{notificationId}}"
-						]
-					},
-					"description": "Delete a notification. Replace {{notificationId}} with actual notification ID."
-				}
-			}
-		]
-	},
-	{
-		"name": "Inquiries (5 endpoints)",
-		"item": [
-			{
-				"name": "Create Inquiry",
-				"event": [
-					{
-						"listen": "test",
-						"script": {
-							"exec": [
-								"if (pm.response.code === 201) {",
-								"const d = pm.response.json().data;",
-								"if (d.id) pm.collectionVariables.set('inquiryId', d.id);",
-								"}"
-							],
-							"type": "text/javascript"
-						}
-					}
-				],
-				"request": {
-					"method": "POST",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						}
-					],
-					"body": {
-						"mode": "raw",
-						"raw": "{\n  \"targetType\": \"GUIDE\",\n  \"targetIds\": [\"{{guideId}}\"],\n  \"subject\": \"Tour inquiry for Tbilisi\",\n  \"message\": \"I'm interested in a guided tour of Tbilisi old town. Can you provide details about availability and pricing?\"\n}",
-						"options": {
-							"raw": {
-								"language": "json"
-							}
-						}
-					},
-					"url": {
-						"raw": "{{baseUrl}}/inquiries",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"inquiries"
-						]
-					},
-					"description": "Create a new inquiry. Target types: TOUR, GUIDE, DRIVER, COMPANY. Can send to multiple recipients (max 10). If >2 recipients, requiresPayment will be true."
-				}
-			},
-			{
-				"name": "Create Inquiry (Multiple Recipients)",
-				"request": {
-					"method": "POST",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						}
-					],
-					"body": {
-						"mode": "raw",
-						"raw": "{\n  \"targetType\": \"GUIDE\",\n  \"targetIds\": [\"guide-id-1\", \"guide-id-2\", \"guide-id-3\"],\n  \"subject\": \"Wine tour inquiry\",\n  \"message\": \"Looking for a guide for Kakheti wine region. Need availability for next week.\"\n}",
-						"options": {
-							"raw": {
-								"language": "json"
-							}
-						}
-					},
-					"url": {
-						"raw": "{{baseUrl}}/inquiries",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"inquiries"
-						]
-					},
-					"description": "Create inquiry to multiple recipients. If >2 recipients, requiresPayment=true (payment logic TBD)."
-				}
-			},
-			{
-				"name": "Get Sent Inquiries",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/inquiries?page=1&limit=20",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"inquiries"
-						],
-						"query": [
-							{
-								"key": "page",
-								"value": "1"
-							},
-							{
-								"key": "limit",
-								"value": "20"
-							},
-							{
-								"key": "status",
-								"value": "PENDING",
-								"disabled": true
-							},
-							{
-								"key": "targetType",
-								"value": "GUIDE",
-								"disabled": true
-							}
-						]
-					},
-					"description": "Get inquiries sent by current user. Filter by status (PENDING, RESPONDED, ACCEPTED, DECLINED, EXPIRED) or targetType (TOUR, GUIDE, DRIVER, COMPANY)."
-				}
-			},
-			{
-				"name": "Get Received Inquiries",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/inquiries/received?page=1&limit=20",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"inquiries",
-							"received"
-						],
-						"query": [
-							{
-								"key": "page",
-								"value": "1"
-							},
-							{
-								"key": "limit",
-								"value": "20"
-							},
-							{
-								"key": "status",
-								"value": "PENDING",
-								"disabled": true
-							}
-						]
-					},
-					"description": "Get inquiries received by current user (as guide/driver/company). Filter by status."
-				}
-			},
-			{
-				"name": "Get Inquiry by ID",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/inquiries/{{inquiryId}}",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"inquiries",
-							"{{inquiryId}}"
-						]
-					},
-					"description": "Get inquiry details. Only sender or recipients can view."
-				}
-			},
-			{
-				"name": "Respond to Inquiry",
-				"request": {
-					"method": "POST",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						}
-					],
-					"body": {
-						"mode": "raw",
-						"raw": "{\n  \"status\": \"ACCEPTED\",\n  \"message\": \"I'd be happy to guide you! Let's discuss the details. I'm available next week.\"\n}",
-						"options": {
-							"raw": {
-								"language": "json"
-							}
-						}
-					},
-					"url": {
-						"raw": "{{baseUrl}}/inquiries/{{inquiryId}}/respond",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"inquiries",
-							"{{inquiryId}}",
-							"respond"
-						]
-					},
-					"description": "Respond to an inquiry. Status options: RESPONDED (just replied), ACCEPTED (accepted the inquiry), DECLINED (declined the inquiry). Only recipients can respond."
-				}
-			}
-		]
-	},
-	{
-		"name": "Search & Aggregator (3 endpoints)",
-		"item": [
-			{
-				"name": "Search All (Main Page)",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/search?locationId={{locationId}}&category=all&page=1&limit=20",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"search"
-						],
-						"query": [
-							{
-								"key": "locationId",
-								"value": "{{locationId}}",
-								"description": "Filter by location UUID"
-							},
-							{
-								"key": "category",
-								"value": "all",
-								"description": "all, tours, guides, drivers, companies"
-							},
-							{
-								"key": "query",
-								"value": "wine",
-								"description": "Text search across names/descriptions",
-								"disabled": true
-							},
-							{
-								"key": "minPrice",
-								"value": "50",
-								"disabled": true
-							},
-							{
-								"key": "maxPrice",
-								"value": "500",
-								"disabled": true
-							},
-							{
-								"key": "verified",
-								"value": "true",
-								"disabled": true
-							},
-							{
-								"key": "available",
-								"value": "true",
-								"disabled": true
-							},
-							{
-								"key": "sortBy",
-								"value": "relevance",
-								"description": "relevance, price_asc, price_desc, rating, newest",
-								"disabled": true
-							},
-							{
-								"key": "page",
-								"value": "1"
-							},
-							{
-								"key": "limit",
-								"value": "20"
-							}
-						]
-					},
-					"description": "Main search endpoint. Returns aggregated results for tours, guides, drivers, and companies. Use locationId for location-based search (main page use case). Combine with filters for advanced search."
-				}
-			},
-			{
-				"name": "Search Tours Only",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/search?locationId={{locationId}}&category=tours&minPrice=50&maxPrice=500&sortBy=price_asc",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"search"
-						],
-						"query": [
-							{
-								"key": "locationId",
-								"value": "{{locationId}}"
-							},
-							{
-								"key": "category",
-								"value": "tours"
-							},
-							{
-								"key": "minPrice",
-								"value": "50"
-							},
-							{
-								"key": "maxPrice",
-								"value": "500"
-							},
-							{
-								"key": "sortBy",
-								"value": "price_asc"
-							}
-						]
-					},
-					"description": "Search only tours with price filter and sorting."
-				}
-			},
-			{
-				"name": "Search Guides Only",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/search?locationId={{locationId}}&category=guides&verified=true&available=true",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"search"
-						],
-						"query": [
-							{
-								"key": "locationId",
-								"value": "{{locationId}}"
-							},
-							{
-								"key": "category",
-								"value": "guides"
-							},
-							{
-								"key": "verified",
-								"value": "true"
-							},
-							{
-								"key": "available",
-								"value": "true"
-							}
-						]
-					},
-					"description": "Search only verified and available guides in a location."
-				}
-			},
-			{
-				"name": "Text Search",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/search?query=wine&category=all",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"search"
-						],
-						"query": [
-							{
-								"key": "query",
-								"value": "wine"
-							},
-							{
-								"key": "category",
-								"value": "all"
-							}
-						]
-					},
-					"description": "Text search across all categories - searches titles, descriptions, names, bios, etc."
-				}
-			},
-			{
-				"name": "Location Autocomplete",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/search/locations?query=Tbi&limit=10",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"search",
-							"locations"
-						],
-						"query": [
-							{
-								"key": "query",
-								"value": "Tbi",
-								"description": "Search query (min 1 char)"
-							},
-							{
-								"key": "limit",
-								"value": "10",
-								"description": "Max results (1-20)"
-							}
-						]
-					},
-					"description": "Autocomplete for location search input. Returns matching locations by name or region."
-				}
-			},
-			{
-				"name": "Location Stats",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/search/locations/{{locationId}}/stats",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"search",
-							"locations",
-							"{{locationId}}",
-							"stats"
-						]
-					},
-					"description": "Get aggregated counts for a location (tours, guides, drivers). Useful for location preview cards."
-				}
-			}
-		]
-	},
-	{
-		"name": "Reviews & Ratings (7 endpoints)",
-		"item": [
-			{
-				"name": "Create Review",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "raw",
-						"raw": "{\n  \"targetType\": \"COMPANY\",\n  \"targetId\": \"{{companyId}}\",\n  \"rating\": 5,\n  \"comment\": \"Excellent service! Highly recommended for anyone visiting Georgia.\"\n}",
-						"options": {
-							"raw": {
-								"language": "json"
-							}
-						}
-					},
-					"url": {
-						"raw": "{{baseUrl}}/reviews",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"reviews"
-						]
-					},
-					"description": "Create a review for a tour, guide, driver, or company. Requires email verification. One review per user per target."
 				},
-				"response": [],
-				"event": [
-					{
-						"listen": "test",
-						"script": {
-							"exec": [
-								"if (pm.response.code === 201) {",
-								"    var jsonData = pm.response.json();",
-								"    if (jsonData.data && jsonData.data.id) {",
-								"        pm.collectionVariables.set('reviewId', jsonData.data.id);",
-								"    }",
-								"}"
-							],
-							"type": "text/javascript"
-						}
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/notifications/unread-count",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "unread-count"]
+						},
+						"description": "Get unread notification count for badge. Rate limit: 100/1min."
 					}
-				]
-			},
-			{
-				"name": "Get Reviews for Target",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/reviews?targetType=COMPANY&targetId={{companyId}}&page=1&limit=20",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"reviews"
-						],
-						"query": [
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "PATCH",
+						"url": {
+							"raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "{{notificationId}}", "read"]
+						},
+						"description": "Mark single notification as read. Rate limit: 60/1min."
+					}
+				},
+				{
+					"name": "Mark All as Read",
+					"request": {
+						"method": "PATCH",
+						"header": [
 							{
-								"key": "targetType",
-								"value": "COMPANY",
-								"description": "TOUR, GUIDE, DRIVER, COMPANY"
-							},
-							{
-								"key": "targetId",
-								"value": "{{companyId}}"
-							},
-							{
-								"key": "rating",
-								"value": "5",
-								"description": "Filter by specific rating (1-5)",
-								"disabled": true
-							},
-							{
-								"key": "page",
-								"value": "1"
-							},
-							{
-								"key": "limit",
-								"value": "20"
+								"key": "Content-Type",
+								"value": "application/json"
 							}
-						]
-					},
-					"description": "Get reviews for any target (tour, guide, driver, company). Public endpoint - no auth required."
-				}
-			},
-			{
-				"name": "Get Review Statistics",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/reviews/stats?targetType=COMPANY&targetId={{companyId}}",
-						"host": [
-							"{{baseUrl}}"
 						],
-						"path": [
-							"reviews",
-							"stats"
-						],
-						"query": [
-							{
-								"key": "targetType",
-								"value": "COMPANY"
-							},
-							{
-								"key": "targetId",
-								"value": "{{companyId}}"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notificationIds\": []\n}",
+							"options": {
+								"raw": {"language": "json"}
 							}
-						]
-					},
-					"description": "Get review statistics: average rating, total count, and rating distribution (1-5 stars breakdown)."
+						},
+						"url": {
+							"raw": "{{baseUrl}}/notifications/read-all",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "read-all"]
+						},
+						"description": "Mark all or specific notifications as read. Empty array = mark all. Rate limit: 30/1min."
+					}
+				},
+				{
+					"name": "Delete Notification",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/notifications/{{notificationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "{{notificationId}}"]
+						},
+						"description": "Delete a notification. Rate limit: 30/1min."
+					}
 				}
-			},
-			{
-				"name": "Get My Reviews",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/reviews/my?page=1&limit=20",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"reviews",
-							"my"
-						],
-						"query": [
-							{
-								"key": "page",
-								"value": "1"
-							},
-							{
-								"key": "limit",
-								"value": "20"
-							}
-						]
-					},
-					"description": "Get authenticated user's reviews. Requires authentication."
-				}
-			},
-			{
-				"name": "Check My Review for Target",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/reviews/check?targetType=COMPANY&targetId={{companyId}}",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"reviews",
-							"check"
-						],
-						"query": [
-							{
-								"key": "targetType",
-								"value": "COMPANY"
-							},
-							{
-								"key": "targetId",
-								"value": "{{companyId}}"
-							}
-						]
-					},
-					"description": "Check if authenticated user has already reviewed this target. Returns hasReviewed boolean and existing review if any."
-				}
-			},
-			{
-				"name": "Update Review",
-				"request": {
-					"method": "PATCH",
-					"header": [],
-					"body": {
-						"mode": "raw",
-						"raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated my review - still great service but service was a bit slow.\"\n}",
-						"options": {
-							"raw": {
-								"language": "json"
+			]
+		},
+		{
+			"name": "Inquiries (5 endpoints)",
+			"description": "Tour/guide/driver inquiries with multi-recipient support.",
+			"item": [
+				{
+					"name": "Create Inquiry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('inquiryId', d.id);",
+									"  console.log('✅ Inquiry created: ' + d.id);",
+									"}"
+								],
+								"type": "text/javascript"
 							}
 						}
-					},
-					"url": {
-						"raw": "{{baseUrl}}/reviews/{{reviewId}}",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"reviews",
-							"{{reviewId}}"
-						]
-					},
-					"description": "Update your own review. Can update rating and/or comment."
-				}
-			},
-			{
-				"name": "Delete Review",
-				"request": {
-					"method": "DELETE",
-					"url": {
-						"raw": "{{baseUrl}}/reviews/{{reviewId}}",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"reviews",
-							"{{reviewId}}"
-						]
-					},
-					"description": "Delete your own review. Average rating will be recalculated."
-				}
-			}
-		]
-	},
-	{
-		"name": "Health & Monitoring (6 endpoints)",
-		"item": [
-			{
-				"name": "API Documentation",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							""
-						]
-					},
-					"description": "Get complete API documentation including all endpoints, features, and WebSocket events."
-				}
-			},
-			{
-				"name": "Basic Health Check",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/health",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"health"
-						]
-					},
-					"description": "Basic health check for load balancers. Returns 200 if server is running."
-				}
-			},
-			{
-				"name": "Detailed Health Check",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/health/detailed",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"health",
-							"detailed"
-						]
-					},
-					"description": "Comprehensive health check including database, Redis, and WebSocket status. Returns 503 if any dependency is unhealthy."
-				}
-			},
-			{
-				"name": "Server Metrics",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/health/metrics",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"health",
-							"metrics"
-						]
-					},
-					"description": "Get server metrics including uptime, memory usage, and WebSocket connection counts."
-				}
-			},
-			{
-				"name": "Readiness Probe",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/health/ready",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"health",
-							"ready"
-						]
-					},
-					"description": "Kubernetes-style readiness probe. Returns 200 if database and Redis are connected."
-				}
-			},
-			{
-				"name": "Liveness Probe",
-				"request": {
-					"auth": {
-						"type": "noauth"
-					},
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/health/live",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"health",
-							"live"
-						]
-					},
-					"description": "Kubernetes-style liveness probe. Always returns 200 if server is responding."
-				}
-			}
-		]
-	},
-	{
-		"name": "Media (9 endpoints)",
-		"item": [
-			{
-				"name": "Get Media for Entity",
-				"request": {
-					"method": "GET",
-					"url": {
-						"raw": "{{baseUrl}}/media/tour/{{tourId}}",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"media",
-							"tour",
-							"{{tourId}}"
-						]
-					},
-					"description": "Get all media files for a specific entity. Public endpoint."
-				}
-			},
-			{
-				"name": "Upload Media (Generic)",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "formdata",
-						"formdata": [
+					],
+					"request": {
+						"method": "POST",
+						"header": [
 							{
-								"key": "file",
-								"type": "file",
-								"src": []
+								"key": "Content-Type",
+								"value": "application/json"
 							}
-						]
-					},
-					"url": {
-						"raw": "{{baseUrl}}/media/tour/{{tourId}}",
-						"host": [
-							"{{baseUrl}}"
 						],
-						"path": [
-							"media",
-							"tour",
-							"{{tourId}}"
-						]
-					},
-					"description": "Upload a single file for any entity. entityType options: tour, company, guide, driver, user."
-				}
-			},
-			{
-				"name": "Upload Tour Image",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "formdata",
-						"formdata": [
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"targetType\": \"GUIDE\",\n  \"targetIds\": [\"{{guideId}}\"],\n  \"subject\": \"Tour inquiry for Tbilisi\",\n  \"message\": \"I'm interested in a guided tour of Tbilisi old town. Can you provide details about availability and pricing?\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/inquiries",
+							"host": ["{{baseUrl}}"],
+							"path": ["inquiries"]
+						},
+						"description": "Create inquiry. Target types: TOUR, GUIDE, DRIVER, COMPANY. Max 10 recipients. >2 recipients = requiresPayment. Rate limit: 20/1min."
+					}
+				},
+				{
+					"name": "Get Sent Inquiries",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/inquiries?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["inquiries"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"},
+								{"key": "status", "value": "PENDING", "disabled": true, "description": "PENDING, RESPONDED, ACCEPTED, DECLINED, EXPIRED"},
+								{"key": "targetType", "value": "GUIDE", "disabled": true}
+							]
+						},
+						"description": "Get inquiries sent by current user. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Get Received Inquiries",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/inquiries/received?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["inquiries", "received"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"},
+								{"key": "status", "value": "PENDING", "disabled": true}
+							]
+						},
+						"description": "Get inquiries received (as guide/driver/company). Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Get Inquiry by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/inquiries/{{inquiryId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["inquiries", "{{inquiryId}}"]
+						},
+						"description": "Get inquiry details. Only sender or recipient. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Respond to Inquiry",
+					"request": {
+						"method": "POST",
+						"header": [
 							{
-								"key": "file",
-								"type": "file",
-								"src": []
+								"key": "Content-Type",
+								"value": "application/json"
 							}
-						]
-					},
-					"url": {
-						"raw": "{{baseUrl}}/tours/{{tourId}}/images",
-						"host": [
-							"{{baseUrl}}"
 						],
-						"path": [
-							"tours",
-							"{{tourId}}",
-							"images"
-						]
-					},
-					"description": "Upload an image specifically for a tour."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"ACCEPTED\",\n  \"message\": \"I'd be happy to guide you! Let's discuss the details. I'm available next week.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/inquiries/{{inquiryId}}/respond",
+							"host": ["{{baseUrl}}"],
+							"path": ["inquiries", "{{inquiryId}}", "respond"]
+						},
+						"description": "Respond to inquiry. Status: RESPONDED, ACCEPTED, DECLINED. Only recipients can respond. Rate limit: 30/1min."
+					}
 				}
-			},
-			{
-				"name": "Upload Company Logo",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "formdata",
-						"formdata": [
-							{
-								"key": "file",
-								"type": "file",
-								"src": []
+			]
+		},
+		{
+			"name": "Search & Aggregator (6 endpoints)",
+			"description": "Main search with location filtering, autocomplete, and statistics.",
+			"item": [
+				{
+					"name": "Search All (Main Page)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/search?locationId={{locationId}}&category=all&page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["search"],
+							"query": [
+								{"key": "locationId", "value": "{{locationId}}", "description": "Filter by location UUID"},
+								{"key": "category", "value": "all", "description": "all, tours, guides, drivers, companies"},
+								{"key": "query", "value": "wine", "disabled": true, "description": "Text search"},
+								{"key": "minPrice", "value": "50", "disabled": true},
+								{"key": "maxPrice", "value": "500", "disabled": true},
+								{"key": "verified", "value": "true", "disabled": true},
+								{"key": "available", "value": "true", "disabled": true},
+								{"key": "sortBy", "value": "relevance", "disabled": true, "description": "relevance, price_asc, price_desc, rating, newest"},
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						},
+						"description": "Main search endpoint. Public. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Search Tours Only",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/search?locationId={{locationId}}&category=tours&minPrice=50&maxPrice=500&sortBy=price_asc",
+							"host": ["{{baseUrl}}"],
+							"path": ["search"],
+							"query": [
+								{"key": "locationId", "value": "{{locationId}}"},
+								{"key": "category", "value": "tours"},
+								{"key": "minPrice", "value": "50"},
+								{"key": "maxPrice", "value": "500"},
+								{"key": "sortBy", "value": "price_asc"}
+							]
+						},
+						"description": "Search only tours with price filter and sorting."
+					}
+				},
+				{
+					"name": "Search Guides Only",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/search?locationId={{locationId}}&category=guides&verified=true&available=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["search"],
+							"query": [
+								{"key": "locationId", "value": "{{locationId}}"},
+								{"key": "category", "value": "guides"},
+								{"key": "verified", "value": "true"},
+								{"key": "available", "value": "true"}
+							]
+						},
+						"description": "Search only verified and available guides."
+					}
+				},
+				{
+					"name": "Text Search",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/search?query=wine&category=all",
+							"host": ["{{baseUrl}}"],
+							"path": ["search"],
+							"query": [
+								{"key": "query", "value": "wine"},
+								{"key": "category", "value": "all"}
+							]
+						},
+						"description": "Text search across all categories."
+					}
+				},
+				{
+					"name": "Location Autocomplete",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/search/locations?query=Tbi&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["search", "locations"],
+							"query": [
+								{"key": "query", "value": "Tbi", "description": "Search query (min 1 char)"},
+								{"key": "limit", "value": "10", "description": "Max results (1-20)"}
+							]
+						},
+						"description": "Autocomplete for location search input. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Location Stats",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/search/locations/{{locationId}}/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["search", "locations", "{{locationId}}", "stats"]
+						},
+						"description": "Get aggregated counts for location (tours, guides, drivers). Rate limit: 100/1min."
+					}
+				}
+			]
+		},
+		{
+			"name": "Reviews & Ratings (7 endpoints)",
+			"description": "Review system for tours, guides, drivers, and companies.",
+			"item": [
+				{
+					"name": "Create Review",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('reviewId', d.id);",
+									"  console.log('✅ Review created');",
+									"}"
+								],
+								"type": "text/javascript"
 							}
-						]
-					},
-					"url": {
-						"raw": "{{baseUrl}}/companies/{{companyId}}/logo",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"companies",
-							"{{companyId}}",
-							"logo"
-						]
-					},
-					"description": "Upload a logo for a company."
-				}
-			},
-			{
-				"name": "Upload Guide Photo",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "formdata",
-						"formdata": [
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
 							{
-								"key": "file",
-								"type": "file",
-								"src": []
+								"key": "Content-Type",
+								"value": "application/json"
 							}
-						]
-					},
-					"url": {
-						"raw": "{{baseUrl}}/guides/{{guideId}}/photo",
-						"host": [
-							"{{baseUrl}}"
 						],
-						"path": [
-							"guides",
-							"{{guideId}}",
-							"photo"
-						]
-					},
-					"description": "Upload a profile photo for a guide."
-				}
-			},
-			{
-				"name": "Upload Driver Photo",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "formdata",
-						"formdata": [
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"targetType\": \"COMPANY\",\n  \"targetId\": \"{{companyId}}\",\n  \"rating\": 5,\n  \"comment\": \"Excellent service! Highly recommended for anyone visiting Georgia.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews"]
+						},
+						"description": "Create review. Requires email verification. One per user per target. Rate limit: 10/1min."
+					}
+				},
+				{
+					"name": "Get Reviews for Target",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/reviews?targetType=COMPANY&targetId={{companyId}}&page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews"],
+							"query": [
+								{"key": "targetType", "value": "COMPANY", "description": "TOUR, GUIDE, DRIVER, COMPANY"},
+								{"key": "targetId", "value": "{{companyId}}"},
+								{"key": "rating", "value": "5", "disabled": true, "description": "Filter by rating 1-5"},
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						},
+						"description": "Public. Get reviews for target. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Get Review Statistics",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/reviews/stats?targetType=COMPANY&targetId={{companyId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "stats"],
+							"query": [
+								{"key": "targetType", "value": "COMPANY"},
+								{"key": "targetId", "value": "{{companyId}}"}
+							]
+						},
+						"description": "Public. Get average rating, total count, and rating distribution. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Get My Reviews",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/reviews/my?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "my"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						},
+						"description": "Get authenticated user's reviews. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Check My Review for Target",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/reviews/check?targetType=COMPANY&targetId={{companyId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "check"],
+							"query": [
+								{"key": "targetType", "value": "COMPANY"},
+								{"key": "targetId", "value": "{{companyId}}"}
+							]
+						},
+						"description": "Check if user has reviewed target. Returns hasReviewed boolean and existing review. Rate limit: 100/1min."
+					}
+				},
+				{
+					"name": "Update Review",
+					"request": {
+						"method": "PATCH",
+						"header": [
 							{
-								"key": "file",
-								"type": "file",
-								"src": []
+								"key": "Content-Type",
+								"value": "application/json"
 							}
-						]
-					},
-					"url": {
-						"raw": "{{baseUrl}}/drivers/{{driverId}}/photo",
-						"host": [
-							"{{baseUrl}}"
 						],
-						"path": [
-							"drivers",
-							"{{driverId}}",
-							"photo"
-						]
-					},
-					"description": "Upload a profile photo for a driver."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated review - still great service but noticed some delays.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "{{reviewId}}"]
+						},
+						"description": "Update your own review. Rate limit: 20/1min."
+					}
+				},
+				{
+					"name": "Delete Review",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "{{reviewId}}"]
+						},
+						"description": "Delete your own review. Average rating recalculated. Rate limit: 20/1min."
+					}
 				}
-			},
-			{
-				"name": "Upload User Avatar",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "formdata",
-						"formdata": [
-							{
-								"key": "file",
-								"type": "file",
-								"src": []
+			]
+		},
+		{
+			"name": "Media (11 endpoints)",
+			"description": "Media upload and management for all entities.",
+			"item": [
+				{
+					"name": "Get Media for Entity",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/media/tour/{{tourId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["media", "tour", "{{tourId}}"]
+						},
+						"description": "Public. Get all media for entity. entityType: tour, company, guide, driver, user."
+					}
+				},
+				{
+					"name": "Upload Media (Generic)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('mediaId', d.id);",
+									"  console.log('✅ Media uploaded');",
+									"}"
+								],
+								"type": "text/javascript"
 							}
-						]
-					},
-					"url": {
-						"raw": "{{baseUrl}}/users/{{userId}}/avatar",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"users",
-							"{{userId}}",
-							"avatar"
-						]
-					},
-					"description": "Upload an avatar for a user."
+						}
+					],
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media/tour/{{tourId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["media", "tour", "{{tourId}}"]
+						},
+						"description": "Upload single file. entityType: tour, company, guide, driver, user. Requires verified email."
+					}
+				},
+				{
+					"name": "Batch Upload (Multiple)",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media/tour/{{tourId}}/batch",
+							"host": ["{{baseUrl}}"],
+							"path": ["media", "tour", "{{tourId}}", "batch"]
+						},
+						"description": "Upload multiple files. Use key 'files' for each file. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload Tour Image",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tours/{{tourId}}/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["tours", "{{tourId}}", "images"]
+						},
+						"description": "Upload tour image. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload Guide Photo",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/guides/{{guideId}}/photo",
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}", "photo"]
+						},
+						"description": "Upload guide profile photo. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload Guide Avatar",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/guides/{{guideId}}/avatar",
+							"host": ["{{baseUrl}}"],
+							"path": ["guides", "{{guideId}}", "avatar"]
+						},
+						"description": "Upload/replace guide avatar. Replaces existing. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload Driver Photo",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/drivers/{{driverId}}/photo",
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}", "photo"]
+						},
+						"description": "Upload driver profile photo. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload Driver Avatar",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/drivers/{{driverId}}/avatar",
+							"host": ["{{baseUrl}}"],
+							"path": ["drivers", "{{driverId}}", "avatar"]
+						},
+						"description": "Upload/replace driver avatar. Replaces existing. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload User Avatar",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/avatar",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}", "avatar"]
+						},
+						"description": "Upload user avatar. Self or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Upload Company Logo",
+					"request": {
+						"method": "POST",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/logo",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "logo"]
+						},
+						"description": "Upload company logo. Owner or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Delete Media",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/media/{{mediaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["media", "{{mediaId}}"]
+						},
+						"description": "Delete media by ID. Owner or ADMIN. Requires verified email."
+					}
 				}
-			},
-			{
-				"name": "Batch Upload (Multiple)",
-				"request": {
-					"method": "POST",
-					"header": [],
-					"body": {
-						"mode": "formdata",
-						"formdata": [
-							{
-								"key": "files",
-								"type": "file",
-								"src": []
-							},
-							{
-								"key": "files",
-								"type": "file",
-								"src": []
-							}
-						]
-					},
-					"url": {
-						"raw": "{{baseUrl}}/media/tour/{{tourId}}/batch",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"media",
-							"tour",
-							"{{tourId}}",
-							"batch"
-						]
-					},
-					"description": "Upload multiple files at once. Use key 'files' for each file."
+			]
+		},
+		{
+			"name": "Health & Monitoring (6 endpoints)",
+			"description": "Server health checks, metrics, and Kubernetes probes.",
+			"item": [
+				{
+					"name": "API Documentation",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": ["{{baseUrl}}"],
+							"path": [""]
+						},
+						"description": "Get complete API documentation."
+					}
+				},
+				{
+					"name": "Basic Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						},
+						"description": "Basic health check for load balancers. Returns 200 if server running."
+					}
+				},
+				{
+					"name": "Detailed Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/health/detailed",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "detailed"]
+						},
+						"description": "Comprehensive health check with database, Redis, WebSocket status. Returns 503 if unhealthy."
+					}
+				},
+				{
+					"name": "Server Metrics",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/health/metrics",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "metrics"]
+						},
+						"description": "Get server metrics: uptime, memory, WebSocket connections."
+					}
+				},
+				{
+					"name": "Readiness Probe",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/health/ready",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "ready"]
+						},
+						"description": "Kubernetes readiness probe. Returns 200 if database and Redis connected."
+					}
+				},
+				{
+					"name": "Liveness Probe",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/health/live",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "live"]
+						},
+						"description": "Kubernetes liveness probe. Always returns 200 if server responding."
+					}
 				}
-			},
-			{
-				"name": "Delete Media",
-				"request": {
-					"method": "DELETE",
-					"url": {
-						"raw": "{{baseUrl}}/media/{{mediaId}}",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"media",
-							"{{mediaId}}"
-						]
-					},
-					"description": "Delete a media file by ID."
-				}
-			}
-		]
-	}
-]
+			]
+		}
+	]
 }

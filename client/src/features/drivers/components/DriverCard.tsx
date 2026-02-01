@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Users,
   Car,
-  Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -26,8 +25,11 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
 
   if (!driver) return null;
 
-  // Use first photo from photos array, fallback to photoUrl, then placeholder
+  // Use avatarUrl first, then first photo from photos array, fallback to photoUrl, then placeholder
   const getPhotoUrl = () => {
+    if (driver.avatarUrl) {
+      return getMediaUrl(driver.avatarUrl);
+    }
     if (driver.photos && driver.photos.length > 0) {
       return getMediaUrl(driver.photos[0].url);
     }
@@ -41,8 +43,8 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
     ? `${driver.user.firstName} ${driver.user.lastName}`
     : 'Unknown Driver';
 
-  // Placeholder rating if not available in type yet
-  const rating = 5.0;
+  // Use real rating from server
+  const rating = driver.averageRating ? parseFloat(driver.averageRating) : null;
 
   const primaryLocation = driver.locations?.[0] || null;
   const otherLocationsCount = (driver.locations?.length || 0) - (primaryLocation ? 1 : 0);
@@ -85,42 +87,31 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
           </button>
         </div>
 
-        {driver.isVerified && (
-          <div className="absolute top-4 left-4 bg-emerald-500/90 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm z-10">
-            <Check className="h-3 w-3" />
-            Verified
-          </div>
-        )}
-
-        <div className={cn(
-          "absolute bottom-4 left-4 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm z-10",
-          driver.isAvailable ? "bg-emerald-500/90" : "bg-gray-500/90"
-        )}>
-          <div className={cn(
-            "h-1.5 w-1.5 rounded-full",
-            driver.isAvailable ? "bg-white animate-pulse" : "bg-gray-300"
-          )} />
-          {driver.isAvailable ? 'Available' : 'Unavailable'}
-        </div>
       </div>
 
       {/* Content Section */}
-      <div className="p-4 flex flex-col flex-1 gap-3">
+      <div className="p-4 max-[600px]:p-3 flex flex-col flex-1 gap-3 max-[600px]:gap-2">
 
         {/* Header: Name and Rating */}
         <div className="flex justify-between items-start gap-3">
-          <h3 className="text-lg font-bold leading-tight text-gray-900 dark:text-white group-hover:text-primary dark:group-hover:text-cyan-400 transition-colors line-clamp-1">
+          <h3 className="text-lg max-[600px]:text-base font-bold leading-tight text-gray-900 dark:text-white group-hover:text-primary dark:group-hover:text-cyan-400 transition-colors line-clamp-1">
             {fullName}
           </h3>
-          <div className="flex items-center gap-1 bg-yellow-500/10 px-2 py-1 rounded-lg border border-yellow-500/20 shrink-0">
+          <div className="flex items-center gap-1 bg-yellow-500/10 px-2 py-1 rounded-lg border border-yellow-500/20 shrink-0 max-[600px]:hidden">
             <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
-            <span className="text-yellow-600 dark:text-yellow-500 font-bold text-sm">{rating.toFixed(1)}</span>
+            <span className="text-yellow-600 dark:text-yellow-500 font-bold text-sm">{rating ? rating.toFixed(1) : 'New'}</span>
           </div>
         </div>
 
         {/* Location */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
+            {/* Mobile Only Rating */}
+            <div className="hidden max-[600px]:flex items-center gap-1 text-yellow-600 dark:text-yellow-500 font-bold text-xs pr-2 border-r border-gray-300 dark:border-gray-700">
+              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+              <span>{rating ? rating.toFixed(1) : 'New'}</span>
+            </div>
+
             <MapPin className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">
               {primaryLocation?.city || 'Georgia'}
@@ -150,17 +141,17 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
         </div>
 
         {/* Info Row */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-white/10 pt-3">
+        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-white/10 pt-3 max-[600px]:hidden">
           <span>Professional driver services</span>
         </div>
 
         {/* Footer: Price and Action */}
-        <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-100 dark:border-white/10">
+        <div className="mt-auto pt-3 max-[600px]:pt-2 flex items-center justify-between border-t border-gray-100 dark:border-white/10">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
               {driver.pricePerDay ? (
                 <>
-                  <span className="text-xl font-bold text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-gray-400">
+                  <span className="text-xl max-[600px]:text-lg font-bold text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-gray-400">
                     {new Intl.NumberFormat('en-US', { style: 'currency', currency: driver.currency || 'GEL' }).format(Number(driver.pricePerDay))}
                   </span>
                   <span className="text-gray-500 text-xs">/ day</span>

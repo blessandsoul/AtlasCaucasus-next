@@ -15,6 +15,7 @@ import {
     MapPin,
     MessageSquare,
     Users,
+    Star,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
@@ -25,11 +26,13 @@ interface SidebarItemProps {
     label: string;
     href: string;
     isActive: boolean;
+    onClick?: () => void;
 }
 
-const SidebarItem = ({ icon: Icon, label, href, isActive }: SidebarItemProps) => (
+const SidebarItem = ({ icon: Icon, label, href, isActive, onClick }: SidebarItemProps) => (
     <Link
         href={href}
+        onClick={onClick}
         className={cn(
             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:text-primary",
             isActive
@@ -58,13 +61,18 @@ const SidebarButton = ({ icon: Icon, label, onClick }: SidebarButtonProps) => (
     </button>
 );
 
-export const DashboardSidebar = () => {
+interface DashboardSidebarProps {
+    className?: string;
+    onItemClick?: () => void;
+}
+
+export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarProps) => {
     const pathname = usePathname();
     const { t } = useTranslation();
     const { logout, user } = useAuth();
 
     return (
-        <aside className="hidden lg:block w-64 shrink-0">
+        <aside className={cn("w-64 shrink-0", className)}>
             <div className="sticky top-24 space-y-4">
                 <div className="space-y-2">
                     {/* Overview Group */}
@@ -78,12 +86,21 @@ export const DashboardSidebar = () => {
                                 label={t('dashboard.menu.dashboard', 'Dashboard')}
                                 href={ROUTES.DASHBOARD}
                                 isActive={pathname === ROUTES.DASHBOARD}
+                                onClick={onItemClick}
                             />
                             <SidebarItem
                                 icon={MessageSquare}
                                 label={t('dashboard.menu.inquiries', 'Inquiries')}
                                 href={ROUTES.INQUIRIES.ROOT}
                                 isActive={pathname.startsWith(ROUTES.INQUIRIES.ROOT)}
+                                onClick={onItemClick}
+                            />
+                            <SidebarItem
+                                icon={Star}
+                                label={t('dashboard.menu.reviews', 'My Reviews')}
+                                href={ROUTES.REVIEWS}
+                                isActive={pathname === ROUTES.REVIEWS}
+                                onClick={onItemClick}
                             />
                         </div>
                     </div>
@@ -106,18 +123,21 @@ export const DashboardSidebar = () => {
                                                 label={t('company.operations.title', 'Operations')}
                                                 href={ROUTES.OPERATIONS.ROOT}
                                                 isActive={pathname.startsWith(ROUTES.OPERATIONS.ROOT)}
+                                                onClick={onItemClick}
                                             />
                                             <SidebarItem
                                                 icon={Building2}
                                                 label={t('company.management.title', 'My Company')}
                                                 href={ROUTES.COMPANY_MANAGEMENT}
                                                 isActive={pathname === ROUTES.COMPANY_MANAGEMENT}
+                                                onClick={onItemClick}
                                             />
                                             <SidebarItem
                                                 icon={UserPlus}
                                                 label={t('auth.create_agent', 'Create Agent')}
                                                 href={ROUTES.CREATE_AGENT}
                                                 isActive={pathname === ROUTES.CREATE_AGENT}
+                                                onClick={onItemClick}
                                             />
                                         </>
                                     )}
@@ -129,6 +149,7 @@ export const DashboardSidebar = () => {
                                             label={t('auth.create_tour', 'Create Tour')}
                                             href={ROUTES.TOURS.CREATE}
                                             isActive={pathname === ROUTES.TOURS.CREATE}
+                                            onClick={onItemClick}
                                         />
                                     )}
 
@@ -139,6 +160,7 @@ export const DashboardSidebar = () => {
                                             label={t('driver.dashboard.title', 'Driver Dashboard')}
                                             href="/dashboard/driver"
                                             isActive={pathname.startsWith('/dashboard/driver')}
+                                            onClick={onItemClick}
                                         />
                                     )}
 
@@ -149,6 +171,7 @@ export const DashboardSidebar = () => {
                                             label={t('guide.dashboard.title', 'Guide Dashboard')}
                                             href="/dashboard/guide"
                                             isActive={pathname.startsWith('/dashboard/guide')}
+                                            onClick={onItemClick}
                                         />
                                     )}
                                 </div>
@@ -167,12 +190,14 @@ export const DashboardSidebar = () => {
                                     label={t('admin.tabs.users', 'Users')}
                                     href={ROUTES.ADMIN.USERS}
                                     isActive={pathname === ROUTES.ADMIN.USERS || pathname === ROUTES.ADMIN.ROOT}
+                                    onClick={onItemClick}
                                 />
                                 <SidebarItem
                                     icon={MapPin}
                                     label={t('admin.tabs.locations', 'Locations')}
                                     href={ROUTES.ADMIN.LOCATIONS}
                                     isActive={pathname === ROUTES.ADMIN.LOCATIONS}
+                                    onClick={onItemClick}
                                 />
                             </div>
                         </div>
@@ -189,23 +214,29 @@ export const DashboardSidebar = () => {
                                 label={t('auth.profile', 'Profile')}
                                 href={ROUTES.PROFILE}
                                 isActive={pathname === ROUTES.PROFILE}
+                                onClick={onItemClick}
                             />
                             <SidebarItem
                                 icon={Briefcase}
                                 label={t('partner.become_partner', 'Become Partner')}
                                 href={ROUTES.BECOME_PARTNER}
                                 isActive={pathname === ROUTES.BECOME_PARTNER}
+                                onClick={onItemClick}
                             />
                             <SidebarItem
                                 icon={Settings}
                                 label={t('dashboard.menu.settings', 'Settings')}
                                 href={ROUTES.SETTINGS}
                                 isActive={pathname === ROUTES.SETTINGS}
+                                onClick={onItemClick}
                             />
                             <SidebarButton
                                 icon={LogOut}
                                 label={t('auth.logout', 'Logout')}
-                                onClick={() => logout()}
+                                onClick={() => {
+                                    if (onItemClick) onItemClick();
+                                    logout();
+                                }}
                             />
                         </div>
                     </div>

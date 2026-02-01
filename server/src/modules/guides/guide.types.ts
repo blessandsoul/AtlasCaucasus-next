@@ -12,7 +12,8 @@ export interface GuideResponse extends Guide {
         emailVerified: boolean;
     };
     locations: Location[];
-    photos?: SafeMedia[]; // Media photos associated with guide
+    photos?: SafeMedia[]; // Media photos associated with guide (gallery)
+    avatarUrl: string | null; // Primary profile photo
 }
 
 export interface UpdateGuideData {

@@ -40,6 +40,7 @@ import type { EntityType } from './EntityTypeTabs';
 
 interface ExploreFiltersProps {
     type: EntityType;
+    className?: string;
 }
 
 // Filter section wrapper component
@@ -67,7 +68,7 @@ const inputStyles = "h-10 w-full rounded-md border border-gray-200 dark:border-w
 // Debounce delay in milliseconds
 const DEBOUNCE_DELAY = 300;
 
-export const ExploreFilters = ({ type }: ExploreFiltersProps) => {
+export const ExploreFilters = ({ type, className }: ExploreFiltersProps) => {
     const { t } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
@@ -285,7 +286,10 @@ export const ExploreFilters = ({ type }: ExploreFiltersProps) => {
     ];
 
     return (
-        <div className="bg-white dark:bg-[#1f2937] text-gray-900 dark:text-white rounded-md p-6 shadow-sm border border-gray-200 dark:border-gray-800 sticky top-28 w-full">
+        <div className={cn(
+            "bg-white dark:bg-[#1f2937] text-gray-900 dark:text-white rounded-md p-6 shadow-sm border border-gray-200 dark:border-gray-800 sticky top-28 w-full",
+            className
+        )}>
             {/* Header with Clear button */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">

@@ -11,6 +11,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { StatusIndicator } from '@/components/common/StatusIndicator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@/features/users/hooks/useUsers';
@@ -103,9 +104,7 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-sm text-muted-foreground">{t('admin.users.status', 'Status')}</p>
-                                    <Badge variant={user.isActive ? 'default' : 'destructive'}>
-                                        {user.isActive ? t('admin.users.active', 'Active') : t('admin.users.inactive', 'Inactive')}
-                                    </Badge>
+                                    <StatusIndicator isActive={user.isActive} showLabel />
                                 </div>
                                 <div>
                                     <p className="text-sm text-muted-foreground">{t('admin.users.emailVerified', 'Email Verified')}</p>

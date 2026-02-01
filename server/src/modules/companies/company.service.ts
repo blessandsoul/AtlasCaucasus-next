@@ -1,10 +1,21 @@
-import { NotFoundError, ForbiddenError } from "../../libs/errors.js";
+import { NotFoundError, ForbiddenError, ValidationError } from "../../libs/errors.js";
 import { verifyCompanyOwnership } from "../../libs/authorization.js";
 import * as companyRepo from "./company.repo.js";
 import type { CompanyResponse, UpdateCompanyData, CompanyFilters } from "./company.types.js";
 import type { UserRole } from "../users/user.types.js";
 import type { User } from "@prisma/client";
+import type { UploadedFile } from "../media/media.types.js";
 import { deleteCompanyMedia } from "../media/media.helpers.js";
+import {
+    sanitizeFilename,
+    generateSeoFriendlyFilename,
+    validateFileType,
+    validateFileSize,
+    saveFile,
+    deleteFile,
+    slugify,
+} from "../../libs/file-upload.js";
+import { FILE_VALIDATION } from "../media/media.schemas.js";
 
 export async function getCompanies(
     filters: CompanyFilters,
@@ -111,4 +122,85 @@ export async function getTourAgents(
     }
 
     return companyRepo.getTourAgents(company.userId);
+}
+
+// ==========================================
+// LOGO MANAGEMENT
+// ==========================================
+
+export async function uploadCompanyLogo(
+    companyId: string,
+    userId: string,
+    userRoles: UserRole[],
+    file: UploadedFile
+): Promise<{ logoUrl: string }> {
+    // Verify company exists
+    const company = await getCompanyById(companyId);
+
+    // Verify ownership or admin
+    const hasPermission = await verifyCompanyOwnership(companyId, userId, userRoles);
+    if (!hasPermission) {
+        throw new ForbiddenError(
+            "You do not have permission to upload logo for this company",
+            "FORBIDDEN"
+        );
+    }
+
+    // Validate file type
+    if (!validateFileType(file.mimetype, FILE_VALIDATION.ALLOWED_MIME_TYPES)) {
+        throw new ValidationError(
+            `Invalid file type. Allowed types: ${FILE_VALIDATION.ALLOWED_MIME_TYPES.join(", ")}`
+        );
+    }
+
+    // Validate file size
+    if (!validateFileSize(file.size, FILE_VALIDATION.MAX_SIZE)) {
+        throw new ValidationError(
+            `File too large. Maximum size: ${FILE_VALIDATION.MAX_SIZE / (1024 * 1024)}MB`
+        );
+    }
+
+    // Delete old logo file if exists
+    if (company.logoUrl) {
+        await deleteFile(company.logoUrl);
+    }
+
+    // Generate SEO-friendly filename
+    const sanitizedName = sanitizeFilename(file.originalFilename);
+    const companySlug = slugify(company.companyName || "company", 40);
+    const uniqueFilename = generateSeoFriendlyFilename(sanitizedName, "company", `${companySlug}-logo`);
+
+    // Save file to disk
+    const logoUrl = await saveFile(file.buffer, "company", uniqueFilename);
+
+    // Update company with new logo URL
+    await companyRepo.update(companyId, { logoUrl });
+
+    return { logoUrl };
+}
+
+export async function deleteCompanyLogo(
+    companyId: string,
+    userId: string,
+    userRoles: UserRole[]
+): Promise<void> {
+    // Verify company exists
+    const company = await getCompanyById(companyId);
+
+    // Verify ownership or admin
+    const hasPermission = await verifyCompanyOwnership(companyId, userId, userRoles);
+    if (!hasPermission) {
+        throw new ForbiddenError(
+            "You do not have permission to delete logo for this company",
+            "FORBIDDEN"
+        );
+    }
+
+    // Delete logo file if exists
+    if (company.logoUrl) {
+        await deleteFile(company.logoUrl);
+    }
+
+    // Clear logo URL in database
+    await companyRepo.update(companyId, { logoUrl: null });
 }

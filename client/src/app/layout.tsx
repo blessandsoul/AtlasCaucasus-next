@@ -38,6 +38,7 @@ const notoSansGeorgian = Noto_Sans_Georgian({
 export const metadata = {
   title: "Atlas Caucasus",
   description: "Discover the beauty of Georgia",
+  icons: "/atlascaucasus.png",
 };
 
 export default function RootLayout({

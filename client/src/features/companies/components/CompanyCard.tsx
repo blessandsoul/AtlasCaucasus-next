@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation';
 import {
   Heart,
   ArrowRight,
-  Check,
   Globe,
   Phone,
-  Building2
+  Building2,
+  Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -36,6 +36,7 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
     return null;
   };
   const imageUrl = getImageUrl();
+  const rating = company.averageRating ? Number(company.averageRating) : null;
 
   const handleCardClick = () => {
     router.push(`/explore/companies/${company.id}`);
@@ -84,27 +85,30 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
           </button>
         </div>
 
-        {/* Verified Badge */}
-        {company.isVerified && (
-          <div className="absolute top-4 left-4 bg-blue-500/90 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm z-10">
-            <Check className="h-3 w-3" />
-            Verified
-          </div>
-        )}
       </div>
 
       {/* Content Section */}
-      <div className="p-4 flex flex-col flex-1 gap-3">
+      <div className="p-4 max-[600px]:p-3 flex flex-col flex-1 gap-3 max-[600px]:gap-2">
 
-        {/* Header: Name */}
+        {/* Header: Name and Rating */}
         <div className="flex justify-between items-start gap-3">
-          <h3 className="text-lg font-bold leading-tight text-gray-900 dark:text-white group-hover:text-primary dark:group-hover:text-cyan-400 transition-colors line-clamp-1">
+          <h3 className="text-lg max-[600px]:text-base font-bold leading-tight text-gray-900 dark:text-white group-hover:text-primary dark:group-hover:text-cyan-400 transition-colors line-clamp-1">
             {company.companyName}
           </h3>
+          <div className="flex items-center gap-1 bg-yellow-500/10 px-2 py-1 rounded-lg border border-yellow-500/20 shrink-0 max-[600px]:hidden">
+            <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
+            <span className="text-yellow-600 dark:text-yellow-500 font-bold text-sm">{rating ? rating.toFixed(1) : 'New'}</span>
+          </div>
         </div>
 
         {/* Details */}
         <div className="flex flex-col gap-1.5">
+          {/* Mobile Only Rating */}
+          <div className="hidden max-[600px]:flex items-center gap-1 text-yellow-600 dark:text-yellow-500 font-bold text-xs">
+            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+            <span>{rating ? rating.toFixed(1) : 'New'}</span>
+          </div>
+
           {company.websiteUrl && (
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
               <Globe className="h-3.5 w-3.5 shrink-0" />
@@ -127,15 +131,15 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
 
         {/* Description Excerpt */}
         {company.description && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-3 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-3 mt-1 max-[600px]:hidden">
             {company.description}
           </p>
         )}
 
         {/* Footer: Action */}
-        <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-100 dark:border-white/10">
+        <div className="mt-auto pt-3 max-[600px]:pt-2 flex items-center justify-between border-t border-gray-100 dark:border-white/10">
           <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground max-[600px]:hidden">
               Since {new Date(company.createdAt).getFullYear()}
             </span>
           </div>

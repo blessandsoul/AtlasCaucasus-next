@@ -82,6 +82,20 @@ class GuideService {
   async deletePhoto(id: string, photoId: string): Promise<void> {
     await apiClient.delete(API_ENDPOINTS.GUIDES.DELETE_PHOTO(id, photoId));
   }
+
+  // Avatar management (primary profile photo)
+  async uploadAvatar(guideId: string, file: File): Promise<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+      data: { avatarUrl: string };
+    }>(API_ENDPOINTS.GUIDES.UPLOAD_AVATAR(guideId), formData);
+
+    return response.data.data;
+  }
 }
 
 export const guideService = new GuideService();

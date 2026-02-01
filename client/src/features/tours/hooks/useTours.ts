@@ -115,7 +115,26 @@ export const useUploadTourImage = () => {
             tourService.uploadTourImage(id, files),
         onSuccess: (_, { id }) => {
             queryClient.invalidateQueries({ queryKey: ['tour', id] });
+            queryClient.invalidateQueries({ queryKey: ['tours', 'my'] });
             toast.success(t('tours.create.image_upload_success', 'Images uploaded successfully!'));
+        },
+        onError: (error) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+};
+
+export const useDeleteTourImage = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+
+    return useMutation({
+        mutationFn: ({ imageId }: { tourId: string; imageId: string }) =>
+            tourService.deleteTourImage(imageId),
+        onSuccess: (_, { tourId }) => {
+            queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
+            queryClient.invalidateQueries({ queryKey: ['tours', 'my'] });
+            toast.success(t('tours.image_deleted', 'Image deleted successfully'));
         },
         onError: (error) => {
             toast.error(getErrorMessage(error));

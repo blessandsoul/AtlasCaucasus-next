@@ -62,4 +62,22 @@ export async function companyRoutes(fastify: FastifyInstance): Promise<void> {
         { preHandler: [authGuard, requireVerifiedEmail] },
         companyController.deletePhoto
     );
+
+    // ==========================================
+    // LOGO MANAGEMENT
+    // ==========================================
+
+    // Auth required: Upload logo for company (ownership checked in service)
+    fastify.post(
+        "/companies/:id/logo",
+        { preHandler: [authGuard, requireVerifiedEmail] },
+        companyController.uploadLogo
+    );
+
+    // Auth required: Delete company logo (ownership checked in service)
+    fastify.delete(
+        "/companies/:id/logo",
+        { preHandler: [authGuard, requireVerifiedEmail] },
+        companyController.deleteLogo
+    );
 }

@@ -443,7 +443,7 @@
       "title": "My Company",
       "group_title": "Management",
       "subtitle": "Manage your company profile and settings",
-      "company_info": "Company Information",
+      "company_info": "Information",
       "company_info_desc": "Update your company details and contact information",
       "no_company": "You don't have a company profile yet"
     },
@@ -458,6 +458,17 @@
     "pending_verification": "Pending Verification",
     "update_success": "Company updated successfully!",
     "delete_success": "Company deleted successfully!",
+    "logo_uploaded": "Logo uploaded successfully",
+    "logo": {
+      "title": "Company Logo",
+      "alt": "Company logo",
+      "hint": "Recommended: 200x200px or larger, square aspect ratio",
+      "upload": "Upload Logo",
+      "change": "Change Logo",
+      "formats": "JPEG, PNG, or WebP (max 5MB)",
+      "invalid_type": "Only JPEG, PNG, and WebP images are allowed",
+      "file_too_large": "File size must be less than 5MB"
+    },
     "danger_zone": "Danger Zone",
     "danger_zone_desc": "Irreversible actions for your company",
     "delete_company": "Delete Company",
@@ -499,7 +510,7 @@
       }
     },
     "photos": {
-      "title": "Company Photos",
+      "title": "Photos",
       "description": "Upload photos to showcase your company",
       "supported_formats": "Supports JPG, PNG, WebP (max 5MB each)"
     }
@@ -616,7 +627,13 @@
     "menu": {
       "dashboard": "Dashboard",
       "account": "Account",
-      "settings": "Settings"
+      "settings": "Settings",
+      "inquiries": "Inquiries",
+      "reviews": "My Reviews"
+    },
+    "reviews": {
+      "title": "My Reviews",
+      "description": "Manage your reviews for tours, guides, drivers, and companies."
     }
   },
   "profile": {
@@ -629,6 +646,18 @@
     "verified": "Verified",
     "active": "Active",
     "save_changes": "Save Changes",
+    "update_success": "Profile updated successfully",
+    "avatar": {
+      "alt": "User avatar",
+      "upload": "Upload Photo",
+      "change": "Change Photo",
+      "remove": "Remove Photo",
+      "formats": "JPEG, PNG, or WebP (max 5MB)",
+      "invalid_type": "Only JPEG, PNG, and WebP images are allowed",
+      "file_too_large": "File size must be less than 5MB",
+      "upload_success": "Avatar uploaded successfully",
+      "delete_success": "Avatar removed successfully"
+    },
     "general": {
       "avatar_title": "Profile Picture",
       "avatar_desc": "Your profile picture helps people recognize you.",
@@ -803,5 +832,48 @@
     },
     "from": "From",
     "received_on": "Received On"
+  },
+  "reviews": {
+    "section_title": "Reviews",
+    "write_review": "Write a Review",
+    "edit_your_review": "Edit Your Review",
+    "already_reviewed": "You have already reviewed this item.",
+    "login_to_review": "Please log in to write a review.",
+    "edit_title": "Edit Your Review",
+    "edit_description": "Update your rating and comment below.",
+    "no_reviews": "No reviews yet",
+    "no_reviews_description": "Be the first to share your experience!",
+    "based_on": "Based on {{count}} reviews",
+    "rating_required": "Please select a rating",
+    "comment_placeholder": "Share your experience... (optional)",
+    "submit_review": "Submit Review",
+    "submitting": "Submitting...",
+    "update_review": "Update Review",
+    "updating": "Updating...",
+    "review_created": "Review submitted successfully!",
+    "review_updated": "Review updated successfully!",
+    "review_deleted": "Review deleted successfully!",
+    "delete_confirm_title": "Delete Review",
+    "delete_confirm_description": "Are you sure you want to delete this review? This action cannot be undone.",
+    "my_reviews": {
+      "title": "My Reviews",
+      "empty": "You haven't written any reviews yet.",
+      "empty_description": "Start exploring and share your experiences!",
+      "tour": "Tour",
+      "guide": "Guide",
+      "driver": "Driver",
+      "company": "Company"
+    },
+    "stats": {
+      "average": "Average Rating",
+      "total": "{{count}} reviews"
+    }
+  },
+  "media": {
+    "upload_success": "File uploaded successfully",
+    "delete_success": "File deleted successfully",
+    "batch_success": "{{count}} files uploaded successfully",
+    "batch_partial": "{{uploaded}} files uploaded, {{failed}} failed",
+    "max_files_exceeded": "Maximum {{max}} files allowed at once"
   }
 }

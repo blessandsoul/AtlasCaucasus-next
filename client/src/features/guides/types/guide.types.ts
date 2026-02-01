@@ -60,6 +60,7 @@ export interface Guide {
   pricePerDay?: number | string;
   currency?: string;
   photos?: GuideMedia[];
+  avatarUrl: string | null; // Primary profile photo
 }
 
 export interface GuideFilters {

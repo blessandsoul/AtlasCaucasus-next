@@ -232,6 +232,112 @@ export async function deleteDriverPhotos(driverId: string): Promise<void> {
 }
 
 // ==========================================
+// DRIVER AVATAR HELPERS
+// ==========================================
+
+/**
+ * Upload avatar for a driver
+ * @param currentUser - Authenticated user
+ * @param driverId - Driver ID
+ * @param file - Uploaded file
+ * @returns Created media record
+ */
+export async function uploadDriverAvatar(
+  currentUser: JwtUser,
+  driverId: string,
+  file: UploadedFile
+): Promise<SafeMedia> {
+  const driver = await getDriverById(driverId);
+  if (!driver) {
+    throw new NotFoundError("Driver profile not found", "DRIVER_NOT_FOUND");
+  }
+
+  // Check ownership
+  if ((driver as any).userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only upload avatar for your own driver profile", "NOT_DRIVER_OWNER");
+  }
+
+  // Delete existing avatar(s) before uploading new one
+  await deleteAllMediaForEntity("driver-avatar", driverId);
+
+  // Generate SEO-friendly slug from driver name
+  const driverName = `driver-${(driver as any).user?.firstName || ""}-${(driver as any).user?.lastName || ""}`.trim();
+  const entitySlug = slugify(driverName || "driver-avatar", 40);
+
+  return uploadMediaForEntity(currentUser, "driver-avatar", driverId, file, entitySlug);
+}
+
+/**
+ * Get driver avatar
+ * @param driverId - Driver ID
+ * @returns Array of media records (typically just one avatar)
+ */
+export async function getDriverAvatar(driverId: string): Promise<SafeMedia[]> {
+  return getMediaForEntity("driver-avatar", driverId);
+}
+
+/**
+ * Delete driver avatar
+ * @param driverId - Driver ID
+ */
+export async function deleteDriverAvatar(driverId: string): Promise<void> {
+  return deleteAllMediaForEntity("driver-avatar", driverId);
+}
+
+// ==========================================
+// GUIDE AVATAR HELPERS
+// ==========================================
+
+/**
+ * Upload avatar for a guide
+ * @param currentUser - Authenticated user
+ * @param guideId - Guide ID
+ * @param file - Uploaded file
+ * @returns Created media record
+ */
+export async function uploadGuideAvatar(
+  currentUser: JwtUser,
+  guideId: string,
+  file: UploadedFile
+): Promise<SafeMedia> {
+  const guide = await getGuideById(guideId);
+  if (!guide) {
+    throw new NotFoundError("Guide profile not found", "GUIDE_NOT_FOUND");
+  }
+
+  // Check ownership
+  if ((guide as any).userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only upload avatar for your own guide profile", "NOT_GUIDE_OWNER");
+  }
+
+  // Delete existing avatar(s) before uploading new one
+  await deleteAllMediaForEntity("guide-avatar", guideId);
+
+  // Generate SEO-friendly slug from guide name
+  const guideName = `guide-${(guide as any).user?.firstName || ""}-${(guide as any).user?.lastName || ""}`.trim();
+  const entitySlug = slugify(guideName || "guide-avatar", 40);
+
+  return uploadMediaForEntity(currentUser, "guide-avatar", guideId, file, entitySlug);
+}
+
+/**
+ * Get guide avatar
+ * @param guideId - Guide ID
+ * @returns Array of media records (typically just one avatar)
+ */
+export async function getGuideAvatar(guideId: string): Promise<SafeMedia[]> {
+  return getMediaForEntity("guide-avatar", guideId);
+}
+
+/**
+ * Delete guide avatar
+ * @param guideId - Guide ID
+ */
+export async function deleteGuideAvatar(guideId: string): Promise<void> {
+  return deleteAllMediaForEntity("guide-avatar", guideId);
+}
+
+// ==========================================
 // USER MEDIA HELPERS (Avatars)
 // ==========================================
 
@@ -251,6 +357,9 @@ export async function uploadUserAvatar(
   if (userId !== currentUser.id && !currentUser.roles.includes("ADMIN")) {
     throw new ForbiddenError("You can only upload your own avatar", "NOT_USER_OWNER");
   }
+
+  // Delete existing avatar(s) before uploading new one
+  await deleteAllMediaForEntity("user", userId);
 
   // Use generic slug for user avatars (JwtUser doesn't have name fields)
   const entitySlug = "user-avatar";

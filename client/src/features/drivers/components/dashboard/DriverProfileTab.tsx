@@ -41,6 +41,9 @@ import {
   useUploadDriverPhotos,
   useDeleteDriverPhoto,
 } from '../../hooks/useDrivers';
+import { useUploadDriverAvatar } from '../../hooks/useUploadDriverAvatar';
+import { useDeleteDriverAvatar } from '../../hooks/useDeleteDriverAvatar';
+import { ProfileAvatarUpload } from '@/components/common/ProfileAvatarUpload';
 import { getErrorMessage } from '@/lib/utils/error';
 import { getMediaUrl } from '@/lib/utils/media';
 
@@ -74,6 +77,8 @@ export const DriverProfileTab = () => {
   const deleteMutation = useDeleteDriver();
   const uploadPhotosMutation = useUploadDriverPhotos();
   const deletePhotoMutation = useDeleteDriverPhoto();
+  const uploadAvatarMutation = useUploadDriverAvatar(driver?.id || '');
+  const deleteAvatarMutation = useDeleteDriverAvatar(driver?.id || '');
 
   const {
     register,
@@ -164,6 +169,27 @@ export const DriverProfileTab = () => {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      {/* Avatar Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('driver.profile.avatar', 'Profile Photo')}</CardTitle>
+          <CardDescription>
+            {t('driver.profile.avatar_desc', 'Your primary profile photo shown to customers')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProfileAvatarUpload
+            currentAvatarUrl={driver.avatarUrl}
+            firstName={driver.user?.firstName || ''}
+            lastName={driver.user?.lastName || ''}
+            onUpload={(file) => uploadAvatarMutation.mutate(file)}
+            onDelete={() => deleteAvatarMutation.mutate()}
+            isUploading={uploadAvatarMutation.isPending}
+            isDeleting={deleteAvatarMutation.isPending}
+          />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>

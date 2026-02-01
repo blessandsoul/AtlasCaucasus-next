@@ -4,11 +4,17 @@ import type { UpdateGuideData, GuideFilters, GuideResponse } from "./guide.types
 import { getMediaByEntity } from "../media/media.repo.js";
 
 async function toGuideResponseWithMedia(guide: any): Promise<GuideResponse> {
+    // Fetch gallery photos (entityType: "guide")
     const media = await getMediaByEntity("guide", guide.id);
+    // Fetch avatar (entityType: "guide-avatar")
+    const avatarMedia = await getMediaByEntity("guide-avatar", guide.id);
+    const avatar = avatarMedia.length > 0 ? avatarMedia[0] : null;
+
     return {
         ...guide,
         locations: guide.locations.map((gl: any) => gl.location),
         photos: media,
+        avatarUrl: avatar?.url ?? null,
     };
 }
 
