@@ -41,12 +41,12 @@ class AuthService {
 
     async getMe(): Promise<IUser> {
         const response = await apiClient.get(API_ENDPOINTS.AUTH.ME);
-        return response.data.data.user;
+        return response.data.data;
     }
 
     async claimRole(data: IClaimRoleRequest): Promise<IUser> {
         const response = await apiClient.post(API_ENDPOINTS.AUTH.CLAIM_ROLE, data);
-        return response.data.data.user;
+        return response.data.data;
     }
 
     async requestPasswordReset(email: string): Promise<void> {

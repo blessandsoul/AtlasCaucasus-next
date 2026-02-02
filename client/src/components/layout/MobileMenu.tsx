@@ -48,7 +48,7 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
     const { data: chatsData } = useChats({}, { enabled: isAuthenticated && mounted });
     const totalUnreadChats = chatsData?.items.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
 
-    const { data: notificationData } = useUnreadCount();
+    const { data: notificationData } = useUnreadCount({ enabled: isAuthenticated && mounted });
     const notificationCount = notificationData?.count || 0;
 
     useEffect(() => {

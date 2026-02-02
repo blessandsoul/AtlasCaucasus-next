@@ -45,9 +45,8 @@ export interface IUpdateCompanyRequest {
   phoneNumber?: string;
 }
 
-export interface IGetMyCompanyResponse {
-  company: Company;
-}
+// API returns company directly, not wrapped
+export type IGetMyCompanyResponse = Company;
 
 export interface CreateAgentFormData {
   email: string;
@@ -100,6 +99,5 @@ export interface TourAgent {
   createdAt: string;
 }
 
-export interface IGetTourAgentsResponse {
-  tourAgents: TourAgent[];
-}
+// API returns tour agents array directly, not wrapped
+export type IGetTourAgentsResponse = TourAgent[];

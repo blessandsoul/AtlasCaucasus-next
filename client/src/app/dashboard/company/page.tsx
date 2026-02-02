@@ -70,14 +70,12 @@ export default function CompanyManagementPage() {
   const { user, isAuthenticated } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
-  const { data: response, isLoading, error, refetch } = useMyCompany();
+  const { data: company, isLoading, error, refetch } = useMyCompany();
   const updateMutation = useUpdateCompany();
   const deleteMutation = useDeleteCompany();
   const uploadPhotosMutation = useUploadCompanyPhotos();
   const deletePhotoMutation = useDeleteCompanyPhoto();
   const photoInputRef = useRef<HTMLInputElement>(null);
-
-  const company = response?.company;
 
   const {
     register,

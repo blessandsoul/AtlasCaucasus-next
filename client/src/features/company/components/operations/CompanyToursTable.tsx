@@ -83,7 +83,7 @@ export const CompanyToursTable = () => {
             header: t('company.operations.tours.table.title', 'Title'),
             cell: (tour) => (
                 <div className="font-medium">
-                    <Link href={ROUTES.TOURS.DETAILS(tour.id)} className="hover:underline flex items-center gap-2">
+                    <Link href={ROUTES.TOURS.DETAILS(tour.id)} target="_blank" className="hover:underline flex items-center gap-2">
                         <span>{tour.title}</span>
                     </Link>
                 </div>

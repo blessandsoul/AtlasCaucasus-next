@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ export const NewChatDialog = ({
   onOpenChange,
   onChatCreated,
 }: NewChatDialogProps) => {
+  const { t } = useTranslation();
   const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
   const createChat = useCreateDirectChat();
@@ -35,7 +37,7 @@ export const NewChatDialog = ({
 
     const trimmedUserId = userId.trim();
     if (!trimmedUserId) {
-      setError('Please enter a user ID');
+      setError(t('chat.user_id_required', 'Please enter a user ID'));
       return;
     }
 
@@ -47,7 +49,7 @@ export const NewChatDialog = ({
     } catch (err: unknown) {
       const errorMessage = err instanceof Error
         ? err.message
-        : (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message || 'Failed to create chat';
+        : (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message || t('chat.create_error', 'Failed to create chat');
       setError(errorMessage);
     }
   };
@@ -56,16 +58,16 @@ export const NewChatDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="z-[200]">
         <DialogHeader>
-          <DialogTitle>Start New Chat</DialogTitle>
+          <DialogTitle>{t('chat.new_chat_title', 'Start New Chat')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="userId">User ID</Label>
+            <Label htmlFor="userId">{t('chat.user_id', 'User ID')}</Label>
             <Input
               id="userId"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              placeholder="Enter user ID to chat with"
+              placeholder={t('chat.user_id_placeholder', 'Enter user ID to chat with')}
               disabled={createChat.isPending}
             />
             {error && <p className="text-sm text-destructive">{error}</p>}
@@ -77,16 +79,16 @@ export const NewChatDialog = ({
               onClick={() => onOpenChange(false)}
               disabled={createChat.isPending}
             >
-              Cancel
+              {t('chat.cancel', 'Cancel')}
             </Button>
             <Button type="submit" disabled={createChat.isPending}>
               {createChat.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  {t('chat.creating', 'Creating...')}
                 </>
               ) : (
-                'Start Chat'
+                t('chat.start_chat', 'Start Chat')
               )}
             </Button>
           </div>

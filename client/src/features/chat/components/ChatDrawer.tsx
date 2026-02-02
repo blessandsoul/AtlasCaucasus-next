@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, MessageSquarePlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ChatList } from './ChatList';
 import { ChatWindow } from './ChatWindow';
@@ -15,6 +16,7 @@ import { closeDrawer, selectChat, clearSelectedChat } from '../store/chatSlice';
 import { useChat } from '../hooks/useChats';
 
 export const ChatDrawer = () => {
+    const { t } = useTranslation();
     const { isAuthenticated } = useAuth();
     const dispatch = useAppDispatch();
     const { isDrawerOpen, selectedChatId } = useAppSelector((state) => state.chat);
@@ -82,11 +84,11 @@ export const ChatDrawer = () => {
                                     <Button variant="ghost" size="icon" onClick={handleBackToList}>
                                         <ArrowLeft className="h-5 w-5" />
                                     </Button>
-                                    <h2 className="font-semibold">Chat</h2>
+                                    <h2 className="font-semibold">{t('chat.detail_title', 'Chat')}</h2>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    <h2 className="font-semibold text-lg">Messages</h2>
+                                    <h2 className="font-semibold text-lg">{t('chat.drawer_title', 'Messages')}</h2>
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -109,7 +111,7 @@ export const ChatDrawer = () => {
                                     <ChatWindow chat={chatData} />
                                 ) : (
                                     <div className="flex items-center justify-center h-full">
-                                        Loading...
+                                        {t('chat.loading', 'Loading...')}
                                     </div>
                                 )
                             ) : (

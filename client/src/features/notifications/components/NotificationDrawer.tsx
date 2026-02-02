@@ -4,6 +4,7 @@ import { useEffect, useCallback, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bell, CheckCheck, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NotificationItem } from './NotificationItem';
@@ -24,6 +25,7 @@ interface NotificationDrawerProps {
 }
 
 export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps) => {
+    const { t } = useTranslation();
     const { isAuthenticated } = useAuth();
     const dispatch = useAppDispatch();
     const [page, setPage] = useState(1);
@@ -36,6 +38,7 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
 
     const { data, isLoading, isFetching } = useNotifications(
         { page, limit: 20 },
+        { enabled: isAuthenticated && isOpen && mounted }
     );
 
     const groupedNotifications = useMemo(() => {
@@ -114,7 +117,7 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
                         <div className="flex items-center justify-between p-4 border-b border-border">
                             <div className="flex items-center gap-2">
                                 <Bell className="h-5 w-5 text-muted-foreground" />
-                                <h2 className="font-semibold text-lg">Notifications</h2>
+                                <h2 className="font-semibold text-lg">{t('notifications.title', 'Notifications')}</h2>
                             </div>
                             <div className="flex items-center gap-2">
                                 {hasUnread && (
@@ -123,14 +126,14 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
                                         size="sm"
                                         onClick={handleMarkAllAsRead}
                                         disabled={markAllAsRead.isPending}
-                                        className="text-xs"
+                                        className="text-xs gap-1"
                                     >
                                         {markAllAsRead.isPending ? (
-                                            <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                                            <Loader2 className="h-4 w-4 animate-spin" />
                                         ) : (
-                                            <CheckCheck className="h-4 w-4 mr-1" />
+                                            <CheckCheck className="h-4 w-4" />
                                         )}
-                                        Mark all as read
+                                        {t('notifications.mark_all_read', 'Mark all as read')}
                                     </Button>
                                 )}
                                 <Button variant="ghost" size="icon" onClick={onClose}>
@@ -161,9 +164,9 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
                                     <div className="flex items-center justify-center h-16 w-16 rounded-full bg-muted mb-4">
                                         <Bell className="h-8 w-8 text-muted-foreground" />
                                     </div>
-                                    <h3 className="text-lg font-medium mb-1">No notifications</h3>
+                                    <h3 className="text-lg font-medium mb-1">{t('notifications.empty_title', 'No notifications')}</h3>
                                     <p className="text-sm text-muted-foreground">
-                                        You&apos;re all caught up! Check back later for updates.
+                                        {t('notifications.empty_desc', "You're all caught up! Check back later for updates.")}
                                     </p>
                                 </div>
                             ) : (
@@ -198,7 +201,7 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
                                                 {isFetching ? (
                                                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                                                 ) : null}
-                                                Load more
+                                                {t('notifications.load_more', 'Load more')}
                                             </Button>
                                         </div>
                                     )}
@@ -207,8 +210,9 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
                         </div>
                     </motion.div>
                 </>
-            )}
-        </AnimatePresence>,
+            )
+            }
+        </AnimatePresence >,
         document.body
     );
 };

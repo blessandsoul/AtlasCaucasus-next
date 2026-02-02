@@ -52,8 +52,8 @@ export const Header = () => {
     const { data: chatsData } = useChats({}, { enabled: isAuthenticated && hasMounted });
     const totalUnread = chatsData?.items.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
 
-    // Get notification unread count
-    const { data: unreadCountData } = useUnreadCount();
+    // Get notification unread count (only when authenticated)
+    const { data: unreadCountData } = useUnreadCount({ enabled: isAuthenticated && hasMounted });
     const notificationCount = unreadCountData?.count || 0;
 
     // Subscribe to real-time notifications

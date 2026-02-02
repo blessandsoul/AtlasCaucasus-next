@@ -6,6 +6,7 @@ import { DashboardSidebar } from './DashboardSidebar';
 import { Loader2, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { useRoleCheck } from '@/hooks/useRoleCheck';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -14,6 +15,9 @@ interface DashboardLayoutProps {
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     const [hasMounted, setHasMounted] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Ensure user roles are up to date when accessing dashboard
+    useRoleCheck();
 
     useEffect(() => {
         setHasMounted(true);

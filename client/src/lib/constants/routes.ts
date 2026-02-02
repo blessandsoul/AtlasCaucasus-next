@@ -36,11 +36,11 @@ export const ROUTES = {
     DRIVERS: '/explore/drivers',
   },
   TOURS: {
-    LIST: '/tours',
-    DETAILS: (id: string) => `/tours/${id}`,
+    LIST: '/explore/tours',
+    DETAILS: (id: string) => `/explore/tours/${id}`,
     MY_TOURS: '/my-tours',
     CREATE: '/dashboard/tours/create',
-    EDIT: (id: string) => `/tours/${id}/edit`,
+    EDIT: (id: string) => `/explore/tours/${id}/edit`,
   },
   COMPANIES: {
     LIST: '/companies',

@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "tourism-server-complete-api",
-		"name": "Tourism Server API - Complete (108 Endpoints)",
-		"description": "Complete API collection for Tourism Server - Production-ready Georgian tourism platform with multi-role authentication, real-time chat, notifications, inquiries, search/aggregator, reviews/ratings, media management, and comprehensive health monitoring.\n\nUpdated: 2026-02-01\n\n## Authentication\n- Bearer token authentication via `Authorization: Bearer {{accessToken}}`\n- Tokens auto-captured from login/register responses\n- Use `noauth` endpoints for public access\n\n## User Roles\n- USER: Regular travelers\n- COMPANY: Tour operators\n- GUIDE: Tour guides\n- DRIVER: Drivers\n- ADMIN: Administrators\n- TOUR_AGENT: Company sub-accounts\n\n## WebSocket\n- Connect: `ws://localhost:3000/ws?token={{accessToken}}`\n- Events: connected, heartbeat, user:online, user:offline, chat:message, notification:new",
+		"name": "Tourism Server API - Complete (115+ Endpoints)",
+		"description": "Complete API collection for Tourism Server - Production-ready Georgian tourism platform with multi-role authentication, real-time chat, notifications, inquiries, search/aggregator, reviews/ratings, media management, and comprehensive health monitoring.\n\nUpdated: 2026-02-01\n\n## Authentication\n- Bearer token authentication via `Authorization: Bearer {{accessToken}}`\n- Tokens auto-captured from login/register responses\n- Use `noauth` endpoints for public access\n- CSRF protection: Include X-CSRF-Token header for state-changing requests\n\n## User Roles\n- USER: Regular travelers\n- COMPANY: Tour operators\n- GUIDE: Tour guides\n- DRIVER: Drivers\n- ADMIN: Administrators\n- TOUR_AGENT: Company sub-accounts\n\n## WebSocket\n- Connect: `ws://localhost:8000/ws?token={{accessToken}}`\n- Events: connected, heartbeat, user:online, user:offline, chat:message, notification:new",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -18,7 +18,7 @@
 	"variable": [
 		{
 			"key": "baseUrl",
-			"value": "http://localhost:3000/api/v1",
+			"value": "http://localhost:8000/api/v1",
 			"type": "string"
 		},
 		{
@@ -28,6 +28,11 @@
 		},
 		{
 			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "csrfToken",
 			"value": "",
 			"type": "string"
 		},
@@ -90,13 +95,48 @@
 			"key": "photoId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "messageId",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
 		{
-			"name": "Authentication (15 endpoints)",
-			"description": "User registration, login, token management, role claiming, and password reset flows.",
+			"name": "Authentication (17 endpoints)",
+			"description": "User registration, login, token management, CSRF, role claiming, tour agents, and password reset flows.",
 			"item": [
+				{
+					"name": "Get CSRF Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.csrfToken) pm.collectionVariables.set('csrfToken', d.csrfToken);",
+									"  console.log('✅ CSRF token captured');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/auth/csrf-token",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "csrf-token"]
+						},
+						"description": "Get CSRF token for state-changing requests. Include token in X-CSRF-Token header for POST/PUT/PATCH/DELETE."
+					}
+				},
 				{
 					"name": "Register User",
 					"event": [
@@ -125,6 +165,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -168,6 +212,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -210,6 +258,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -251,6 +303,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -303,6 +359,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -336,6 +396,12 @@
 					],
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/auth/logout-all",
 							"host": ["{{baseUrl}}"],
@@ -367,6 +433,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -404,6 +474,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -426,6 +500,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -453,6 +531,35 @@
 					}
 				},
 				{
+					"name": "Accept Tour Agent Invitation",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"paste-64-char-invitation-token-from-email-here\",\n  \"password\": \"SecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/accept-invitation",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "accept-invitation"]
+						},
+						"description": "Accept tour agent invitation and set password. Public endpoint - no auth required. Rate limit: 3/1hr."
+					}
+				},
+				{
 					"name": "Verify Email",
 					"request": {
 						"auth": {
@@ -463,6 +570,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -488,6 +599,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -513,6 +628,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -553,6 +672,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -570,7 +693,7 @@
 			]
 		},
 		{
-			"name": "Users (7 endpoints)",
+			"name": "Users (9 endpoints)",
 			"description": "User management. Most endpoints require ADMIN role or self-access.",
 			"item": [
 				{
@@ -596,6 +719,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -649,6 +776,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -671,6 +802,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -689,6 +824,12 @@
 					"name": "Remove User Role (Admin)",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}/roles/GUIDE",
 							"host": ["{{baseUrl}}"],
@@ -701,12 +842,54 @@
 					"name": "Delete User",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}",
 							"host": ["{{baseUrl}}"],
 							"path": ["users", "{{userId}}"]
 						},
-						"description": "Delete user. Self or ADMIN. Requires verified email."
+						"description": "Delete user (soft delete). Self or ADMIN. Requires verified email."
+					}
+				},
+				{
+					"name": "Unlock User Account (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/unlock",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}", "unlock"]
+						},
+						"description": "Unlock locked user account. Removes lockout and resets failed login attempts. ADMIN only."
+					}
+				},
+				{
+					"name": "Restore Deleted User (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/restore",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}", "restore"]
+						},
+						"description": "Restore soft-deleted user account. ADMIN only."
 					}
 				}
 			]
@@ -775,6 +958,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -797,6 +984,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -815,6 +1006,12 @@
 					"name": "Delete Location (Admin)",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/locations/{{locationId}}",
 							"host": ["{{baseUrl}}"],
@@ -826,7 +1023,7 @@
 			]
 		},
 		{
-			"name": "Companies (11 endpoints)",
+			"name": "Companies (12 endpoints)",
 			"description": "Tour company profiles with logo/photos. Public read, owner/admin write.",
 			"item": [
 				{
@@ -900,6 +1097,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -918,6 +1119,12 @@
 					"name": "Delete Company",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/companies/{{companyId}}",
 							"host": ["{{baseUrl}}"],
@@ -936,6 +1143,25 @@
 							"path": ["companies", "{{companyId}}", "tour-agents"]
 						},
 						"description": "List tour agents for company. Owner or ADMIN."
+					}
+				},
+				{
+					"name": "Get Company Tours",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/companies/{{companyId}}/tours?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["companies", "{{companyId}}", "tours"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						},
+						"description": "Public. List active tours for a company."
 					}
 				},
 				{
@@ -972,6 +1198,12 @@
 					],
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -994,6 +1226,12 @@
 					"name": "Delete Company Photo",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/companies/{{companyId}}/photos/{{photoId}}",
 							"host": ["{{baseUrl}}"],
@@ -1006,6 +1244,12 @@
 					"name": "Upload Company Logo",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -1028,6 +1272,12 @@
 					"name": "Delete Company Logo",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/companies/{{companyId}}/logo",
 							"host": ["{{baseUrl}}"],
@@ -1115,6 +1365,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1133,6 +1387,12 @@
 					"name": "Delete Guide",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/guides/{{guideId}}",
 							"host": ["{{baseUrl}}"],
@@ -1175,6 +1435,12 @@
 					],
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -1197,6 +1463,12 @@
 					"name": "Delete Guide Photo",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/guides/{{guideId}}/photos/{{photoId}}",
 							"host": ["{{baseUrl}}"],
@@ -1284,6 +1556,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1302,6 +1578,12 @@
 					"name": "Delete Driver",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/drivers/{{driverId}}",
 							"host": ["{{baseUrl}}"],
@@ -1344,6 +1626,12 @@
 					],
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -1366,6 +1654,12 @@
 					"name": "Delete Driver Photo",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/drivers/{{driverId}}/photos/{{photoId}}",
 							"host": ["{{baseUrl}}"],
@@ -1398,7 +1692,10 @@
 								{"key": "category", "value": "City Tour", "disabled": true},
 								{"key": "city", "value": "Tbilisi", "disabled": true},
 								{"key": "minPrice", "value": "50", "disabled": true},
-								{"key": "maxPrice", "value": "500", "disabled": true}
+								{"key": "maxPrice", "value": "500", "disabled": true},
+								{"key": "difficulty", "value": "easy", "disabled": true},
+								{"key": "sortBy", "value": "price", "disabled": true},
+								{"key": "order", "value": "asc", "disabled": true}
 							]
 						},
 						"description": "Public. List all active tours with filters."
@@ -1442,11 +1739,15 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Tbilisi City Tour\",\n  \"price\": 50,\n  \"summary\": \"Explore the beautiful capital of Georgia\",\n  \"description\": \"Full day tour covering Old Town, Holy Trinity Cathedral, Narikala Fortress, and more\",\n  \"currency\": \"USD\",\n  \"durationMinutes\": 480,\n  \"maxPeople\": 15,\n  \"difficulty\": \"easy\",\n  \"category\": \"City Tour\"\n}"
+							"raw": "{\n  \"title\": \"Tbilisi City Tour\",\n  \"price\": 50,\n  \"summary\": \"Explore the beautiful capital of Georgia\",\n  \"description\": \"Full day tour covering Old Town, Holy Trinity Cathedral, Narikala Fortress, and more\",\n  \"currency\": \"USD\",\n  \"durationMinutes\": 480,\n  \"maxPeople\": 15,\n  \"difficulty\": \"easy\",\n  \"category\": \"City Tour\",\n  \"instantBooking\": true,\n  \"freeCancellation\": true\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/tours",
@@ -1474,25 +1775,6 @@
 					}
 				},
 				{
-					"name": "List Company Tours",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"url": {
-							"raw": "{{baseUrl}}/companies/{{companyId}}/tours?page=1&limit=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["companies", "{{companyId}}", "tours"],
-							"query": [
-								{"key": "page", "value": "1"},
-								{"key": "limit", "value": "10"}
-							]
-						},
-						"description": "Public. List active tours for a specific company."
-					}
-				},
-				{
 					"name": "Update Tour",
 					"request": {
 						"method": "PATCH",
@@ -1500,6 +1782,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1518,6 +1804,12 @@
 					"name": "Delete Tour",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/tours/{{tourId}}",
 							"host": ["{{baseUrl}}"],
@@ -1545,6 +1837,12 @@
 					],
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -1562,12 +1860,27 @@
 						},
 						"description": "Upload image for tour. Owner or ADMIN. Requires verified email."
 					}
+				},
+				{
+					"name": "Get Tour Images",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/media/tour/{{tourId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["media", "tour", "{{tourId}}"]
+						},
+						"description": "Public. Get all images for a tour."
+					}
 				}
 			]
 		},
 		{
 			"name": "Presence & WebSocket (6 endpoints)",
-			"description": "Real-time presence tracking. WebSocket: ws://localhost:3000/ws?token={{accessToken}}",
+			"description": "Real-time presence tracking. WebSocket: ws://localhost:8000/ws?token={{accessToken}}",
 			"item": [
 				{
 					"name": "Get My Presence",
@@ -1601,6 +1914,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1644,10 +1961,10 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "ws://localhost:3000/ws?token={{accessToken}}",
+							"raw": "ws://localhost:8000/ws?token={{accessToken}}",
 							"protocol": "ws",
 							"host": ["localhost"],
-							"port": "3000",
+							"port": "8000",
 							"path": ["ws"],
 							"query": [
 								{"key": "token", "value": "{{accessToken}}"}
@@ -1685,6 +2002,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1722,6 +2043,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1766,12 +2091,31 @@
 				},
 				{
 					"name": "Send Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"  const d = pm.response.json().data;",
+									"  if (d.id) pm.collectionVariables.set('messageId', d.id);",
+									"  console.log('✅ Message sent');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1797,7 +2141,7 @@
 							"query": [
 								{"key": "page", "value": "1"},
 								{"key": "limit", "value": "50"},
-								{"key": "before", "value": "message-id", "disabled": true, "description": "Cursor for infinite scroll"}
+								{"key": "before", "value": "{{messageId}}", "disabled": true, "description": "Cursor for infinite scroll"}
 							]
 						},
 						"description": "Get messages with pagination. Use 'before' cursor for infinite scroll. Rate limit: 100/1min."
@@ -1811,6 +2155,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1833,6 +2181,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -1851,6 +2203,12 @@
 					"name": "Leave Chat",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/chats/{{chatId}}/leave",
 							"host": ["{{baseUrl}}"],
@@ -1899,6 +2257,12 @@
 					"name": "Mark Notification as Read",
 					"request": {
 						"method": "PATCH",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
 							"host": ["{{baseUrl}}"],
@@ -1915,14 +2279,15 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"notificationIds\": []\n}",
-							"options": {
-								"raw": {"language": "json"}
-							}
+							"raw": "{\n  \"notificationIds\": []\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/notifications/read-all",
@@ -1936,6 +2301,12 @@
 					"name": "Delete Notification",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/notifications/{{notificationId}}",
 							"host": ["{{baseUrl}}"],
@@ -1973,6 +2344,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -2042,6 +2417,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -2214,6 +2593,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -2309,6 +2692,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
 							}
 						],
 						"body": {
@@ -2327,6 +2714,12 @@
 					"name": "Delete Review",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
 							"host": ["{{baseUrl}}"],
@@ -2375,6 +2768,12 @@
 					],
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2397,6 +2796,12 @@
 					"name": "Batch Upload (Multiple)",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2424,6 +2829,12 @@
 					"name": "Upload Tour Image",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2446,6 +2857,12 @@
 					"name": "Upload Guide Photo",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2468,6 +2885,12 @@
 					"name": "Upload Guide Avatar",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2490,6 +2913,12 @@
 					"name": "Upload Driver Photo",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2512,6 +2941,12 @@
 					"name": "Upload Driver Avatar",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2534,6 +2969,12 @@
 					"name": "Upload User Avatar",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2556,6 +2997,12 @@
 					"name": "Upload Company Logo",
 					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -2578,6 +3025,12 @@
 					"name": "Delete Media",
 					"request": {
 						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-CSRF-Token",
+								"value": "{{csrfToken}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/media/{{mediaId}}",
 							"host": ["{{baseUrl}}"],

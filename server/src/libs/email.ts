@@ -75,7 +75,7 @@ export async function sendVerificationEmail(
   firstName: string,
   token: string
 ): Promise<boolean> {
-  const verifyUrl = `${env.FRONTEND_URL || "http://localhost:3000"}/verify-email?token=${token}`;
+  const verifyUrl = `${env.FRONTEND_URL}/verify-email?token=${token}`;
 
   const html = `
     <!DOCTYPE html>
@@ -124,7 +124,7 @@ export async function sendPasswordResetEmail(
   firstName: string,
   token: string
 ): Promise<boolean> {
-  const resetUrl = `${env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${token}`;
+  const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${token}`;
 
   const html = `
     <!DOCTYPE html>
@@ -222,7 +222,7 @@ export async function sendTourAgentInvitationLink(
   firstName: string,
   invitationToken: string
 ): Promise<boolean> {
-  const acceptUrl = `${env.FRONTEND_URL || "http://localhost:3000"}/accept-invitation?token=${invitationToken}`;
+  const acceptUrl = `${env.FRONTEND_URL}/accept-invitation?token=${invitationToken}`;
 
   const html = `
     <!DOCTYPE html>

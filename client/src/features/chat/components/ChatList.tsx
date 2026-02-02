@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useChats } from '../hooks/useChats';
 import { ChatListItem } from './ChatListItem';
 import type { Chat } from '../types/chat.types';
@@ -11,6 +12,7 @@ interface ChatListProps {
 }
 
 export const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useChats({ limit: 50 });
 
   if (isLoading) {
@@ -24,7 +26,7 @@ export const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
   if (error) {
     return (
       <div className="p-4 text-sm text-destructive">
-        Failed to load chats
+        {t('chat.load_error', 'Failed to load chats')}
       </div>
     );
   }
@@ -34,7 +36,7 @@ export const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
   if (chats.length === 0) {
     return (
       <div className="p-4 text-sm text-muted-foreground text-center">
-        No conversations yet
+        {t('chat.empty_list', 'No conversations yet')}
       </div>
     );
   }

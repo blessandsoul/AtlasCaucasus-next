@@ -3,6 +3,7 @@
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import {
     MessageSquare,
     AtSign,
@@ -61,25 +62,25 @@ const getNotificationIconColor = (type: NotificationType): string => {
     }
 };
 
-const formatTimeAgo = (dateString: string): string => {
+const formatTimeAgo = (dateString: string, t: (key: string, options?: any) => string): string => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
     if (diffInSeconds < 60) {
-        return 'Just now';
+        return t('notifications.time_ago.just_now', 'Just now');
     }
     if (diffInSeconds < 3600) {
         const minutes = Math.floor(diffInSeconds / 60);
-        return `${minutes}m ago`;
+        return t('notifications.time_ago.m_ago', { count: minutes, defaultValue: `${minutes}m ago` });
     }
     if (diffInSeconds < 86400) {
         const hours = Math.floor(diffInSeconds / 3600);
-        return `${hours}h ago`;
+        return t('notifications.time_ago.h_ago', { count: hours, defaultValue: `${hours}h ago` });
     }
     if (diffInSeconds < 604800) {
         const days = Math.floor(diffInSeconds / 86400);
-        return `${days}d ago`;
+        return t('notifications.time_ago.d_ago', { count: days, defaultValue: `${days}d ago` });
     }
     return date.toLocaleDateString();
 };
@@ -91,9 +92,10 @@ export const NotificationItem = ({
     isMarkingRead = false,
     isDeleting = false,
 }: NotificationItemProps) => {
+    const { t } = useTranslation();
     const timeAgo = useMemo(
-        () => formatTimeAgo(notification.createdAt),
-        [notification.createdAt]
+        () => formatTimeAgo(notification.createdAt, t),
+        [notification.createdAt, t]
     );
 
     const handleClick = useCallback(() => {

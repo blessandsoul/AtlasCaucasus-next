@@ -26,8 +26,8 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default("Tourism Georgia <noreply@tourism-georgia.com>"),
 
-  // Frontend URL for email links
-  FRONTEND_URL: z.string().url().optional(),
+  // Frontend URL for email links (used for verification, password reset, etc.)
+  FRONTEND_URL: z.string().url().default("http://localhost:5173"),
 
   // CORS configuration (comma-separated list of allowed origins for production)
   CORS_ORIGINS: z

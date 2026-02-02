@@ -18,21 +18,30 @@ export const notificationKeys = {
   unreadCount: () => [...notificationKeys.all, 'unread-count'] as const,
 };
 
-export const useNotifications = (params: INotificationFilters = {}) => {
+export const useNotifications = (
+  params: INotificationFilters = {},
+  options?: { enabled?: boolean }
+) => {
+  const isEnabled = options?.enabled ?? false;
+
   return useQuery({
     queryKey: notificationKeys.list(params),
     queryFn: () => notificationService.getNotifications(params),
     staleTime: 1 * 60 * 1000, // 1 minute - notifications should be fresher
     placeholderData: keepPreviousData,
+    enabled: isEnabled, // Disabled by default - requires auth check
   });
 };
 
-export const useUnreadCount = () => {
+export const useUnreadCount = (options?: { enabled?: boolean }) => {
+  const isEnabled = options?.enabled ?? false;
+
   return useQuery({
     queryKey: notificationKeys.unreadCount(),
     queryFn: () => notificationService.getUnreadCount(),
     staleTime: 30 * 1000, // 30 seconds - check frequently
-    refetchInterval: 60 * 1000, // Refetch every minute
+    refetchInterval: isEnabled ? 60 * 1000 : false, // Only refetch when enabled
+    enabled: isEnabled, // Disabled by default - requires auth check
   });
 };
 

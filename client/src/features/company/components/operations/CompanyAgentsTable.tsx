@@ -13,9 +13,7 @@ import type { TourAgent } from '@/features/companies/types/company.types';
 export const CompanyAgentsTable = () => {
     const { t } = useTranslation();
 
-    const { data: response, isLoading, error } = useTourAgents();
-
-    const agents = response?.tourAgents || [];
+    const { data: agents = [], isLoading, error } = useTourAgents();
 
     const columns: ColumnDef<TourAgent>[] = [
         {

@@ -104,6 +104,13 @@ const handleRefreshFailure = (reason: string): void => {
     clearCsrfToken();
 
     if (typeof window !== 'undefined') {
+        // Explicitly clear localStorage to prevent rehydration loop
+        try {
+            localStorage.removeItem('auth');
+        } catch {
+            // Ignore localStorage errors
+        }
+
         // Add reason to URL for user feedback
         const encodedReason = encodeURIComponent(reason);
         window.location.href = `/login?reason=${encodedReason}`;
@@ -176,16 +183,25 @@ export const refreshAccessToken = async (): Promise<boolean> => {
         } catch (error: unknown) {
             console.error('Failed to refresh token:', error);
 
-            // Check if this is a rate limit error from server
-            const axiosError = error as { response?: { data?: { error?: { code?: string } } } };
+            // Check error details from server
+            const axiosError = error as { response?: { status?: number; data?: { error?: { code?: string } } } };
             const errorCode = axiosError?.response?.data?.error?.code;
+            const statusCode = axiosError?.response?.status;
 
+            // Handle specific error cases that require immediate logout
             if (errorCode === 'RATE_LIMIT_EXCEEDED') {
                 handleRefreshFailure('rate_limited');
+                return false;
             }
 
-            // Don't logout on first failure - let the component handle retry
-            // But if we've exhausted our attempts, logout
+            // 401/403 from refresh endpoint means token is invalid or user doesn't exist
+            // These are unrecoverable - logout immediately
+            if (statusCode === 401 || statusCode === 403) {
+                handleRefreshFailure('session_expired');
+                return false;
+            }
+
+            // For other errors (network issues, etc.), check if we've exhausted attempts
             if (!canAttemptRefresh()) {
                 handleRefreshFailure('session_expired');
             }
