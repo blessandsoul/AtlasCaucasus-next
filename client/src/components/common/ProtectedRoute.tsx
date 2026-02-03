@@ -38,8 +38,8 @@ export const ProtectedRoute = ({ children, requireVerified = false, allowedRoles
     }
 
     if (requireVerified && !user?.emailVerified) {
-        // router.push('/verify-email'); // Uncomment when route exists
-        // return null;
+        router.push('/verify-email-pending');
+        return null;
     }
 
     if (allowedRoles && user) {

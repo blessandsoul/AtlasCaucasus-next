@@ -51,7 +51,9 @@
       "explore": "Explore",
       "traveler": "Traveler",
       "business": "Business",
-      "support": "Support"
+      "support": "Support",
+      "notifications": "Notifications",
+      "messages": "Messages"
     },
     "footer": {
       "desc": "Discover the hidden gems of Georgia with us. We connect you with the best tours, guides, and local experiences for unforgettable memories.",
@@ -189,7 +191,13 @@
     "check_spam_folder": "If you don't see it, check your spam or junk folder.",
     "verification_link_expires": "The verification link expires in 24 hours.",
     "logout_all_success": "All sessions have been logged out successfully.",
-    "change_password": "Change Password"
+    "change_password": "Change Password",
+    "invalid_credentials": "Invalid email or password.",
+    "invalid_credentials_with_attempts": "Invalid email or password. {{count}} attempts remaining.",
+    "account_locked": "Account is locked. Please try again later.",
+    "too_many_attempts": "Too many attempts. Please try again later.",
+    "verify_email_required": "Please verify your email to continue",
+    "rate_limited": "Too many requests. Please try again later."
   },
   "validation": {
     "password_required": "Password is required",

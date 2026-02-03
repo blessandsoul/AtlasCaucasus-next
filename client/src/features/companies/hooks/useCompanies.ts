@@ -171,3 +171,20 @@ export const useCreateTourAgent = () => {
     },
   });
 };
+
+export const useDeleteTourAgent = () => {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: ({ companyId, agentId }: { companyId: string; agentId: string }) =>
+      companyService.deleteTourAgent(companyId, agentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company', 'agents'] });
+      toast.success(t('company.tour_agent_removed', 'Tour agent removed successfully!'));
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+};

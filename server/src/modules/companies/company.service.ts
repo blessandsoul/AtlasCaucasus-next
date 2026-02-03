@@ -124,6 +124,40 @@ export async function getTourAgents(
     return companyRepo.getTourAgents(company.userId);
 }
 
+export async function deleteTourAgent(
+    companyId: string,
+    agentId: string,
+    requesterId: string,
+    requesterRoles: UserRole[]
+): Promise<void> {
+    // Verify company exists
+    const company = await getCompanyById(companyId);
+
+    // Verify ownership or admin
+    const hasPermission = await verifyCompanyOwnership(companyId, requesterId, requesterRoles);
+    if (!hasPermission) {
+        throw new ForbiddenError(
+            "You do not have permission to remove tour agents from this company",
+            "FORBIDDEN"
+        );
+    }
+
+    // Verify agent exists and belongs to this company
+    const agent = await companyRepo.findTourAgentById(agentId);
+    if (!agent) {
+        throw new NotFoundError("Tour agent not found", "AGENT_NOT_FOUND");
+    }
+
+    if (agent.parentCompanyId !== company.userId) {
+        throw new ForbiddenError(
+            "This agent does not belong to your company",
+            "FORBIDDEN"
+        );
+    }
+
+    await companyRepo.deleteTourAgent(agentId);
+}
+
 // ==========================================
 // LOGO MANAGEMENT
 // ==========================================

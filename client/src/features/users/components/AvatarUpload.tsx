@@ -54,11 +54,13 @@ export const AvatarUpload = ({
 
       const validation = validateImageFile(file);
       if (!validation.valid) {
+        // Check for size error (contains 'size' or '5MB'), otherwise it's a type error
+        const isSizeError = validation.error?.includes('size') || validation.error?.includes('5MB');
         setError(
           t(
-            validation.error?.includes('type')
-              ? 'profile.avatar.invalid_type'
-              : 'profile.avatar.file_too_large',
+            isSizeError
+              ? 'profile.avatar.file_too_large'
+              : 'profile.avatar.invalid_type',
             validation.error || ''
           )
         );

@@ -33,7 +33,7 @@ export const ProfileSecurity = ({ user }: ProfileSecurityProps) => {
         if (!user?.email) return;
         forgotPassword.mutate({ email: user.email }, {
             onSuccess: () => {
-                toast.success(t('auth.recovery_instructions_sent', `Password reset instructions sent to ${user.email}`));
+                toast.success(t('auth.recovery_instructions_sent', { email: user.email }));
             }
         });
     };

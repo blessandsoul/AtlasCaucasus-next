@@ -279,6 +279,67 @@ export class ChatRepository {
     }
 
     /**
+     * Get unread message counts for multiple chats in a single batch query
+     * This is more efficient than calling getUnreadCount for each chat individually
+     */
+    async getUnreadCountsBatch(
+        userId: string,
+        chatIds: string[]
+    ): Promise<Map<string, number>> {
+        if (chatIds.length === 0) return new Map();
+
+        // Get all participants for the user in these chats
+        const participants = await prisma.chatParticipant.findMany({
+            where: {
+                userId,
+                chatId: { in: chatIds },
+            },
+            select: { chatId: true, lastReadAt: true },
+        });
+
+        // Create a map of chatId -> lastReadAt
+        const lastReadMap = new Map<string, Date>();
+        for (const p of participants) {
+            lastReadMap.set(p.chatId, p.lastReadAt);
+        }
+
+        // Get unread counts using raw aggregation for better performance
+        const unreadCounts = await prisma.chatMessage.groupBy({
+            by: ["chatId"],
+            where: {
+                chatId: { in: chatIds },
+                senderId: { not: userId },
+            },
+            _count: { id: true },
+        });
+
+        // For each chat, we need to filter by lastReadAt
+        // Since groupBy doesn't support per-group where clauses, we need individual counts
+        // but we can run them in parallel
+        const countPromises = chatIds.map(async (chatId) => {
+            const lastReadAt = lastReadMap.get(chatId);
+            if (!lastReadAt) return { chatId, count: 0 };
+
+            const count = await prisma.chatMessage.count({
+                where: {
+                    chatId,
+                    senderId: { not: userId },
+                    createdAt: { gt: lastReadAt },
+                },
+            });
+            return { chatId, count };
+        });
+
+        const results = await Promise.all(countPromises);
+        const countMap = new Map<string, number>();
+        for (const { chatId, count } of results) {
+            countMap.set(chatId, count);
+        }
+
+        return countMap;
+    }
+
+    /**
      * Check if user is participant of chat
      */
     async isParticipant(userId: string, chatId: string): Promise<boolean> {

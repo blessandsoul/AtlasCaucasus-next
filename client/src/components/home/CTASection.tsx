@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 export const CTASection = () => {
@@ -18,10 +19,14 @@ export const CTASection = () => {
                 style={{ y: ctaY }}
                 className="absolute inset-0 w-full h-[120%]"
             >
-                <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Chaukhi_Mountain_%26_Tina_Lake%2C_Juta_Valley%2C_Mtskheta-Mtianeti%2C_Georgia.jpg/2560px-Chaukhi_Mountain_%26_Tina_Lake%2C_Juta_Valley%2C_Mtskheta-Mtianeti%2C_Georgia.jpg"
+                <Image
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Chaukhi_Mountain_%26_Tina_Lake%2C_Juta_Valley%2C_Mtskheta-Mtianeti%2C_Georgia.jpg/1280px-Chaukhi_Mountain_%26_Tina_Lake%2C_Juta_Valley%2C_Mtskheta-Mtianeti%2C_Georgia.jpg"
                     alt="Chaukhi Mountain & Tina Lake"
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
+                    loading="lazy"
+                    quality={75}
                 />
                 <div className="absolute inset-0 bg-black/40" />
             </motion.div>

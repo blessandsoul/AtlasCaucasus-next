@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: glob: server/**
 ---
 
 > **SCOPE**: These rules apply specifically to the **server** directory.

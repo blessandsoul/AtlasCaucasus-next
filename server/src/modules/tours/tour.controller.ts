@@ -119,7 +119,22 @@ export async function listAllToursHandler(
     throw new ValidationError(parsed.error.errors[0].message);
   }
 
-  const { page, limit, search, category, difficulty, minPrice, maxPrice, locationId } = parsed.data;
+  const {
+    page,
+    limit,
+    search,
+    category,
+    difficulty,
+    minPrice,
+    maxPrice,
+    locationId,
+    minRating,
+    minDuration,
+    maxDuration,
+    maxPeople,
+    isFeatured,
+    sortBy,
+  } = parsed.data;
 
   // Build filters object
   const filters = {
@@ -129,6 +144,12 @@ export async function listAllToursHandler(
     minPrice,
     maxPrice,
     locationId,
+    minRating,
+    minDuration,
+    maxDuration,
+    maxPeople,
+    isFeatured,
+    sortBy,
   };
 
   const { items, totalItems } = await listAllToursPublic(page, limit, filters);

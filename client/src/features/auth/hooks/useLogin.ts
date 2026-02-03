@@ -20,6 +20,7 @@ export const useLogin = () => {
             console.log('🔐 Login successful, response:', {
                 hasUser: !!response.user,
                 hasTokens: !!response.tokens,
+                emailVerified: response.user?.emailVerified,
             });
 
             // Store user and tokens in Redux
@@ -31,6 +32,14 @@ export const useLogin = () => {
             // Reset refresh attempt counter and start token refresh monitoring
             resetRefreshAttempts();
             startTokenRefreshMonitoring();
+
+            // Check if email is verified
+            if (!response.user?.emailVerified) {
+                // Redirect to verification pending page
+                toast.info(t('auth.verify_email_required') || 'Please verify your email to continue');
+                router.push(ROUTES.VERIFY_EMAIL_PENDING);
+                return;
+            }
 
             // Show success message
             toast.success(t('auth.login_success') || 'Logged in successfully');

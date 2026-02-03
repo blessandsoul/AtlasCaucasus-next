@@ -11,7 +11,6 @@ export const PromotionalBanner = () => {
         <section className="w-full relative overflow-hidden">
             {/* Background with overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 opacity-90" />
-            <div className="absolute inset-0 bg-[url('/patterns/noise.png')] opacity-10 mix-blend-overlay" />
 
             {/* Decorative blurs */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />

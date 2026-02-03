@@ -114,42 +114,45 @@ export class ChatService {
     /**
      * Get user's chats (inbox)
      * Returns chats with last message and unread count
+     * Optimized to batch unread count queries for better performance
      */
     async getUserChats(userId: string, page: number, limit: number) {
         const { chats, total } = await chatRepo.findUserChats(userId, page, limit);
 
-        // Add unread count for each chat
-        const chatsWithMetadata = await Promise.all(
-            chats.map(async (chat) => {
-                const unreadCount = await chatRepo.getUnreadCount(userId, chat.id);
+        // Batch fetch unread counts for all chats at once (performance optimization)
+        const chatIds = chats.map((chat) => chat.id);
+        const unreadCountsMap = await chatRepo.getUnreadCountsBatch(userId, chatIds);
 
-                // Get the last message if exists
-                const lastMessage = chat.messages[0] || null;
+        // Map chats with metadata
+        const chatsWithMetadata = chats.map((chat) => {
+            const unreadCount = unreadCountsMap.get(chat.id) || 0;
 
-                return {
-                    id: chat.id,
-                    type: chat.type,
-                    name: chat.name,
-                    creatorId: chat.creatorId,
-                    createdAt: chat.createdAt,
-                    updatedAt: chat.updatedAt,
-                    participants: chat.participants,
-                    unreadCount,
-                    lastMessage: lastMessage
-                        ? {
-                            id: lastMessage.id,
-                            chatId: lastMessage.chatId,
-                            senderId: lastMessage.senderId,
-                            sender: lastMessage.sender,
-                            content: lastMessage.content,
-                            mentionedUsers: lastMessage.mentionedUsers as string[],
-                            createdAt: lastMessage.createdAt,
-                            readBy: [], // Not included in list view for performance
-                        }
-                        : null,
-                };
-            })
-        );
+            // Get the last message if exists
+            const lastMessage = chat.messages[0] || null;
+
+            return {
+                id: chat.id,
+                type: chat.type,
+                name: chat.name,
+                creatorId: chat.creatorId,
+                createdAt: chat.createdAt,
+                updatedAt: chat.updatedAt,
+                participants: chat.participants,
+                unreadCount,
+                lastMessage: lastMessage
+                    ? {
+                        id: lastMessage.id,
+                        chatId: lastMessage.chatId,
+                        senderId: lastMessage.senderId,
+                        sender: lastMessage.sender,
+                        content: lastMessage.content,
+                        mentionedUsers: lastMessage.mentionedUsers as string[],
+                        createdAt: lastMessage.createdAt,
+                        readBy: [], // Not included in list view for performance
+                    }
+                    : null,
+            };
+        });
 
         return { chats: chatsWithMetadata, total };
     }

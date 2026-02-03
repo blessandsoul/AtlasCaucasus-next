@@ -55,6 +55,8 @@ export const API_ENDPOINTS = {
     PHOTOS: (id: string) => `/companies/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/companies/${id}/photos/${photoId}`,
     UPLOAD_LOGO: (id: string) => `/companies/${id}/logo`,
+    TOUR_AGENTS: (id: string) => `/companies/${id}/tour-agents`,
+    DELETE_TOUR_AGENT: (companyId: string, agentId: string) => `/companies/${companyId}/tour-agents/${agentId}`,
   },
   GUIDES: {
     LIST: '/guides',

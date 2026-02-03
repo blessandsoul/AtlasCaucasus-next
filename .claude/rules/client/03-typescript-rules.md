@@ -1,3 +1,7 @@
+---
+trigger: glob: client/**
+---
+
 > **SCOPE**: These rules apply specifically to the **client** directory (Next.js App Router).
 
 # TypeScript Rules & Types

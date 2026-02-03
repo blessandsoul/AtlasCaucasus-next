@@ -110,6 +110,26 @@ export async function getTourAgents(
     );
 }
 
+export async function deleteTourAgent(
+    request: FastifyRequest,
+    reply: FastifyReply
+): Promise<void> {
+    const params = request.params as { id: string; agentId: string };
+    const companyId = validateUuidParam(params.id);
+    const agentId = validateUuidParam(params.agentId);
+
+    await companyService.deleteTourAgent(
+        companyId,
+        agentId,
+        request.user.id,
+        request.user.roles
+    );
+
+    return reply.send(
+        successResponse("Tour agent removed successfully", null)
+    );
+}
+
 // ==========================================
 // PHOTO MANAGEMENT
 // ==========================================

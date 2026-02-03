@@ -77,6 +77,10 @@ class CompanyService {
     return response.data.data;
   }
 
+  async deleteTourAgent(companyId: string, agentId: string): Promise<void> {
+    await apiClient.delete(API_ENDPOINTS.COMPANIES.DELETE_TOUR_AGENT(companyId, agentId));
+  }
+
   // Photo management
   async getPhotos(id: string): Promise<CompanyMedia[]> {
     const response = await apiClient.get<{

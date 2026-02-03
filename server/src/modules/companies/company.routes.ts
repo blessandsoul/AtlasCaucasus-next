@@ -39,6 +39,13 @@ export async function companyRoutes(fastify: FastifyInstance): Promise<void> {
         companyController.getTourAgents
     );
 
+    // Auth required: Delete a tour agent (ownership checked in service)
+    fastify.delete(
+        "/companies/:id/tour-agents/:agentId",
+        { preHandler: [authGuard, requireVerifiedEmail] },
+        companyController.deleteTourAgent
+    );
+
     // Public: List active tours for a company
     fastify.get("/companies/:id/tours", listCompanyToursHandler);
 

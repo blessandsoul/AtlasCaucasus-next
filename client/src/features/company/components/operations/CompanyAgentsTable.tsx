@@ -1,19 +1,39 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Mail, Calendar } from 'lucide-react';
-import { useTourAgents } from '@/features/companies/hooks/useCompanies';
+import { Users, Mail, Calendar, Trash2 } from 'lucide-react';
+import { useTourAgents, useDeleteTourAgent, useMyCompany } from '@/features/companies/hooks/useCompanies';
 import { formatDate } from '@/lib/utils/format';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import type { ColumnDef } from '@/components/common/DataTable';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import type { TourAgent } from '@/features/companies/types/company.types';
 
 export const CompanyAgentsTable = () => {
     const { t } = useTranslation();
+    const [agentToDelete, setAgentToDelete] = useState<TourAgent | null>(null);
 
     const { data: agents = [], isLoading, error } = useTourAgents();
+    const { data: myCompany } = useMyCompany();
+    const deleteAgent = useDeleteTourAgent();
+
+    const handleDeleteClick = (agent: TourAgent) => {
+        setAgentToDelete(agent);
+    };
+
+    const handleConfirmDelete = () => {
+        if (agentToDelete && myCompany?.id) {
+            deleteAgent.mutate({
+                companyId: myCompany.id,
+                agentId: agentToDelete.id,
+            });
+            setAgentToDelete(null);
+        }
+    };
 
     const columns: ColumnDef<TourAgent>[] = [
         {
@@ -58,6 +78,23 @@ export const CompanyAgentsTable = () => {
                     {formatDate(agent.createdAt)}
                 </div>
             )
+        },
+        {
+            header: t('common.actions', 'Actions'),
+            cell: (agent) => (
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(agent);
+                    }}
+                >
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            ),
+            className: "w-[80px]"
         }
     ];
 
@@ -76,6 +113,19 @@ export const CompanyAgentsTable = () => {
                     title: t('company.agents.empty_state', 'No agents found'),
                     description: t('company.agents.empty_state_description', 'No agents found for your company.')
                 }}
+            />
+
+            <ConfirmDialog
+                open={!!agentToDelete}
+                onOpenChange={(open) => !open && setAgentToDelete(null)}
+                onConfirm={handleConfirmDelete}
+                title={t('company.agents.delete_title', 'Remove Agent')}
+                description={t(
+                    'company.agents.delete_description',
+                    `Are you sure you want to remove ${agentToDelete?.firstName} ${agentToDelete?.lastName} from your company? This action cannot be undone.`
+                )}
+                confirmLabel={t('common.remove', 'Remove')}
+                isDestructive
             />
         </div>
     );

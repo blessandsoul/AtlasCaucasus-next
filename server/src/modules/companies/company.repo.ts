@@ -173,3 +173,20 @@ export async function getTourAgents(companyUserId: string): Promise<User[]> {
         },
     });
 }
+
+export async function findTourAgentById(agentId: string): Promise<User | null> {
+    return prisma.user.findUnique({
+        where: { id: agentId },
+    });
+}
+
+export async function deleteTourAgent(agentId: string): Promise<void> {
+    // Remove the agent's connection to the parent company and soft delete
+    await prisma.user.update({
+        where: { id: agentId },
+        data: {
+            parentCompanyId: null,
+            deletedAt: new Date(),
+        },
+    });
+}
