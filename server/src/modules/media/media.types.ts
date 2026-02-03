@@ -10,7 +10,7 @@ export interface SafeMedia {
   url: string;
   entityType: string;
   entityId: string;
-  uploadedBy: string;
+  uploadedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
