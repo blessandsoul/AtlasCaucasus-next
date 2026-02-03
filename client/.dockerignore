@@ -1,10 +1,8 @@
 node_modules
-dist
+.next
 .env
 .env.*
 *.log
-logs/
-uploads/
 .git
 .gitignore
 README.md
@@ -12,5 +10,3 @@ README.md
 .vscode
 .idea
 coverage
-.nyc_output
-docker-compose.yml
