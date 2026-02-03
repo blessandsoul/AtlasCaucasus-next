@@ -16,7 +16,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:reset": "prisma migrate reset --force",
-    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:seed": "tsx src/scripts/db/seed.ts",
     "cleanup:media": "tsx src/scripts/cleanup-media.ts",
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:stop": "pm2 stop tourism-server",
@@ -27,14 +27,17 @@
     "pm2:monit": "pm2 monit",
     "setup:test-accounts": "tsx scripts/setup-test-accounts.ts",
     "pre-production:check": "tsx scripts/pre-production-check.ts",
-    "db:clear": "tsx scripts/db/clear-data.ts",
-    "db:clear:all": "tsx scripts/db/clear-data.ts --include-locations",
-    "db:clear:dry": "tsx scripts/db/clear-data.ts --dry-run",
-    "db:seed:realistic": "tsx scripts/db/seed-realistic.ts",
-    "db:reset:realistic": "npm run db:clear && npm run db:seed:realistic"
+    "db:clear": "tsx src/scripts/db/clear-data.ts",
+    "db:clear:all": "tsx src/scripts/db/clear-data.ts --include-locations",
+    "db:clear:dry": "tsx src/scripts/db/clear-data.ts --dry-run",
+    "db:seed:realistic": "tsx src/scripts/db/seed-realistic.ts",
+    "db:reset:realistic": "npm run db:clear && npm run db:seed:realistic",
+    "db:seed:prod": "node dist/scripts/db/seed.js",
+    "db:clear:prod": "node dist/scripts/db/clear-data.js",
+    "db:seed:realistic:prod": "node dist/scripts/db/seed-realistic.js"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx src/scripts/db/seed.ts"
   },
   "keywords": [],
   "author": "",
