@@ -98,9 +98,10 @@ export const HeroSection = () => {
                 >
                     {/* Using simple img for parity, next/image generally preferred but needs width/height or fill */}
                     <img
-                        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2000&q=80"
+                        src="/hero-backgrounds/hero-main.png"
                         alt="Hero Background"
                         className="h-full w-full object-cover"
+                        style={{ objectPosition: 'center 30%' }}
                     />
                     <div className="absolute inset-0 bg-black/40" />
                 </motion.div>

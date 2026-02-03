@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { Star, Wallet, Users, Eye } from 'lucide-react';
 import { colors } from '@/lib/colors';
 import type { EntityType } from './EntityTypeTabs';
@@ -18,15 +19,25 @@ export const ExploreHero = () => {
     const titleKey = currentType === 'tours' ? 'title' : `${currentType}_title`;
     const subtitleKey = currentType === 'tours' ? 'subtitle' : `${currentType}_subtitle`;
 
+    const [randomImage, setRandomImage] = useState<string>('');
+
+    useEffect(() => {
+        const randomIndex = Math.floor(Math.random() * 10) + 1;
+        setRandomImage(`/hero-backgrounds/${currentType}/${randomIndex}.png`);
+    }, [currentType]);
+
     return (
         <section className="relative w-full pt-28 pb-16 text-white overflow-hidden">
             {/* Background Image */}
-            <div className="absolute inset-0 z-0">
-                <img
-                    src="https://community.thriveglobal.com/wp-content/uploads/2022/09/photo-1534685785745-60a2cea0ec34.jpeg"
-                    alt="Explore Background"
-                    className="h-full w-full object-cover"
-                />
+            <div className="absolute inset-0 z-0 bg-gray-900">
+                {randomImage && (
+                    <img
+                        src={randomImage}
+                        alt="Explore Background"
+                        className="h-full w-full object-cover opacity-80 animate-in fade-in duration-700"
+                        style={{ objectPosition: 'center 30%' }}
+                    />
+                )}
                 <div className="absolute inset-0 bg-black/60" />
             </div>
 
