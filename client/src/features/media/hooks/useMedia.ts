@@ -85,8 +85,6 @@ export const useDeleteMedia = () => {
   return useMutation({
     mutationFn: ({
       id,
-      entityType,
-      entityId,
     }: {
       id: string;
       entityType: MediaEntityType;
