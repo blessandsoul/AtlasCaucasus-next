@@ -1,13 +1,13 @@
 'use client';
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, Suspense } from 'react';
 import { CompanyCard } from '@/features/companies/components/CompanyCard';
 import { Pagination } from '@/components/common/Pagination';
 import { useCompanies } from '@/features/companies/hooks/useCompanies';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
-export default function ExploreCompaniesPage() {
+function ExploreCompaniesContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -85,5 +85,21 @@ export default function ExploreCompaniesPage() {
         </>
       )}
     </div>
+  );
+}
+
+function ExploreCompaniesLoading() {
+  return (
+    <div className="lg:col-span-3 w-full flex items-center justify-center min-h-[400px]">
+      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+    </div>
+  );
+}
+
+export default function ExploreCompaniesPage() {
+  return (
+    <Suspense fallback={<ExploreCompaniesLoading />}>
+      <ExploreCompaniesContent />
+    </Suspense>
   );
 }

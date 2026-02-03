@@ -1,18 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import { ExploreHero } from '@/features/explore/components/ExploreHero';
 import { EntityTypeTabs, type EntityType } from '@/features/explore/components/EntityTypeTabs';
 import { ExploreFilters } from '@/features/explore/components/ExploreFilters';
 import { ExploreMobileFilters } from '@/features/explore/components/ExploreMobileFilters';
 
 /**
- * ExploreLayout - Shared layout for /explore/* routes
+ * ExploreLayoutContent - Inner component that uses useSearchParams
  * Contains the hero section, tabs, and persistent sidebar filters
  * Detail pages (with IDs) bypass the filter layout
  */
-export default function ExploreLayout({
+function ExploreLayoutContent({
     children,
 }: {
     children: React.ReactNode;
@@ -64,5 +65,30 @@ export default function ExploreLayout({
                 </div>
             </div>
         </div>
+    );
+}
+
+// Loading fallback for Suspense
+function ExploreLayoutLoading({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="flex flex-col bg-gray-50 dark:bg-gray-950">
+            <div className="h-64 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+            {children}
+        </div>
+    );
+}
+
+// Main layout component wrapped in Suspense for useSearchParams
+export default function ExploreLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <Suspense fallback={<ExploreLayoutLoading>{children}</ExploreLayoutLoading>}>
+            <ExploreLayoutContent>{children}</ExploreLayoutContent>
+        </Suspense>
     );
 }

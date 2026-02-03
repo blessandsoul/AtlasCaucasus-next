@@ -19,15 +19,16 @@ import {
   Calendar,
   Building2,
   Share2,
+  Loader2,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils/format';
 import { getMediaUrl } from '@/lib/utils/media';
-import { useCallback } from 'react';
+import { useCallback, Suspense } from 'react';
 import { ChatButton } from '@/features/chat/components/ChatButton';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { isValidUuid } from '@/lib/utils/validation';
 
-export default function CompanyDetailsPage() {
+function CompanyDetailsContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -418,5 +419,21 @@ export default function CompanyDetailsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CompanyDetailsLoading() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+    </div>
+  );
+}
+
+export default function CompanyDetailsPage() {
+  return (
+    <Suspense fallback={<CompanyDetailsLoading />}>
+      <CompanyDetailsContent />
+    </Suspense>
   );
 }
