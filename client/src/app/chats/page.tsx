@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { MessageSquarePlus } from 'lucide-react';
+import { MessageSquarePlus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ChatList } from '@/features/chat/components/ChatList';
 import { ChatWindow } from '@/features/chat/components/ChatWindow';
@@ -10,7 +10,8 @@ import { NewChatDialog } from '@/features/chat/components/NewChatDialog';
 import { useChat } from '@/features/chat/hooks/useChats';
 import type { Chat } from '@/features/chat/types/chat.types';
 
-export default function ChatsPage() {
+// Inner component that uses useSearchParams
+function ChatsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const chatId = searchParams.get('chatId');
@@ -82,5 +83,25 @@ export default function ChatsPage() {
         />
       </div>
     </div>
+  );
+}
+
+// Loading fallback for Suspense
+function ChatsLoading() {
+  return (
+    <div className="container mx-auto px-4 pt-28 pb-6">
+      <div className="h-[calc(100vh-10rem)] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    </div>
+  );
+}
+
+// Main page component wrapped in Suspense for useSearchParams
+export default function ChatsPage() {
+  return (
+    <Suspense fallback={<ChatsLoading />}>
+      <ChatsContent />
+    </Suspense>
   );
 }
