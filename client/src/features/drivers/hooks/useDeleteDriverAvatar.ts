@@ -15,8 +15,8 @@ export const useDeleteDriverAvatar = (driverId: string) => {
             if (!driverId) {
                 throw new Error('Driver ID is required');
             }
-            // Get avatar media for driver (using driver-avatar entityType)
-            const media = await mediaService.getMedia('driver-avatar', driverId);
+            // Get avatar media for driver (using driver entityType)
+            const media = await mediaService.getMedia('driver', driverId);
             // Delete all avatar media (should be only one)
             for (const item of media) {
                 await mediaService.deleteMedia(item.id);
