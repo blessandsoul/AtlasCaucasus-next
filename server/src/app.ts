@@ -56,12 +56,9 @@ function buildApp() {
     origin: (origin, callback) => {
       // Handle requests with no origin header
       if (!origin) {
-        // In production: reject null origins (security risk - can be exploited via sandboxed iframes)
-        // In development: allow for Postman, curl, mobile apps testing
-        if (env.NODE_ENV === "production") {
-          logger.warn("CORS: Rejected request with null origin in production");
-          return callback(new Error("CORS: Origin header required"), false);
-        }
+        // Allow requests without origin header in all environments
+        // This includes: direct browser navigation, curl, Postman, health checks
+        // Safe because we protect state-changing operations with CSRF tokens
         return callback(null, true);
       }
 
