@@ -245,7 +245,7 @@ class WebSocketManager {
         }
     }
 
-    private handleError(event: Event): void {
+    private handleError(_event: Event): void {
         // Browser doesn't expose error details for security reasons
         // The actual error reason will come in the close event
         console.error('WebSocket error - connection failed. Check if server is running at',
