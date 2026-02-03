@@ -57,7 +57,12 @@
       "Bash(__NEW_LINE_88c0703f37db7c41__ echo \"1. Search with SQL injection payload - full response:\")",
       "Bash(__NEW_LINE_88c0703f37db7c41__ echo \"\")",
       "mcp__plugin_playwright_playwright__browser_resize",
-      "Bash(npm run pre-production:check:*)"
+      "Bash(npm run pre-production:check:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(dir:*)",
+      "Bash(git push:*)"
     ]
   }
 }
