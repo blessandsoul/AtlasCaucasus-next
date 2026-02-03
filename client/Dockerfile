@@ -7,6 +7,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# CRITICAL: Unset NODE_ENV to ensure devDependencies are installed
+# Coolify may set NODE_ENV=production which breaks the build
+ENV NODE_ENV=
+
 # Copy package files
 COPY package*.json ./
 
