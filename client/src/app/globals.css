@@ -145,6 +145,54 @@
     scrollbar-width: none;
   }
 
+  /* Custom Scrollbar Styling */
+  /* Webkit Browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(220 14% 96%);
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(220 9% 46%);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 200ms ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+    background-clip: padding-box;
+  }
+
+  /* Dark Mode - Webkit */
+  .dark ::-webkit-scrollbar-track {
+    background: hsl(220 13% 18%);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(220 9% 46%);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(217.2 91.2% 59.8%);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(220 9% 46%) hsl(220 14% 96%);
+  }
+
+  .dark * {
+    scrollbar-color: hsl(220 9% 46%) hsl(220 13% 18%);
+  }
+
   /* Gradient Text */
   .text-gradient {
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, #22d3ee 50%, hsl(var(--primary)) 100%);
@@ -153,6 +201,8 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: gradient-shift 3s ease infinite;
+    display: inline-block;
+    padding-bottom: 0.1em;
   }
 
   @keyframes gradient-shift {
@@ -264,11 +314,11 @@
 
   /* Marquee Animation */
   .animate-marquee {
-    animation: marquee 25s linear infinite;
+    animation: marquee 45s ease-in-out infinite;
   }
 
   .animate-marquee2 {
-    animation: marquee2 25s linear infinite;
+    animation: marquee2 45s ease-in-out infinite;
   }
 
   @keyframes marquee {

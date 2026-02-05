@@ -1,6 +1,6 @@
-# Tourism Server - Claude Assistant Rules
+# AtlasCaucasus - Claude Assistant Rules
 
-This directory contains project-specific rules and guidelines for Claude working on the Tourism Server project.
+This directory contains project-specific rules and guidelines for Claude working on the AtlasCaucasus tourism marketplace platform.
 
 ## 📁 Directory Structure
 
@@ -22,10 +22,11 @@ If you are using Claude via an extension or CLI that supports context loading:
 
 ## 🎯 Key Principles (TL;DR)
 
-- **Stack**: Node.js, Fastify, TypeScript, MySQL, Prisma, Redis
+- **Stack**: Node.js, Fastify, TypeScript, MySQL, Prisma, Redis, React, TanStack Query
 - **Architecture**: Routes → Controllers → Services → Repositories → DB
+- **Domain**: Tourism marketplace for Georgia (Caucasus region) connecting travelers with tours, guides, and drivers
 - **API**: All routes prefixed with `/api/v1`
-- **Response Format**: 
+- **Response Format**:
   - Success: `{ success: true, message: "...", data: {...} }`
   - Error: `{ success: false, error: { code: "...", message: "..." } }`
 - **Safety**: Keep changes minimal, preserve existing behavior

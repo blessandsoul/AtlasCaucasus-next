@@ -1,4 +1,4 @@
-# Tourism Server - Quick Reference for AI Assistants
+# AtlasCaucasus Tourism Platform - Quick Reference for AI Assistants
 
 **Read this first, then dive into specific rule files as needed.**
 
@@ -6,7 +6,7 @@
 
 ## 🎯 Project Overview
 
-**Tourism API server for Georgia** - High-traffic, production-ready backend for tour operators, hotels, and restaurants.
+**AtlasCaucasus Tourism Platform** - Tourism marketplace for Georgia (Caucasus region) connecting travelers with tour companies, guides, and drivers. Features include inquiry system, real-time chat, ratings/reviews, and location-based search.
 
 ---
 
@@ -160,12 +160,17 @@ updated_at: timestamp (auto-update)
 /api/v1/health          # Health check
 /api/v1/auth/*          # Authentication
 /api/v1/users/*         # User management
-/api/v1/companies/*     # Companies
-/api/v1/tours/*         # Tours
-/api/v1/hotels/*        # Hotels
-/api/v1/restaurants/*   # Restaurants
-/api/v1/bookings/*      # Bookings
-/api/v1/payments/*      # Payments
+/api/v1/companies/*     # Tour company profiles
+/api/v1/tours/*         # Tour listings and availability
+/api/v1/guides/*        # Tour guide profiles
+/api/v1/drivers/*       # Driver profiles
+/api/v1/inquiries/*     # Inquiry system (tours/guides/drivers)
+/api/v1/reviews/*       # Rating and review system
+/api/v1/chat/*          # Real-time messaging
+/api/v1/locations/*     # Geographic locations
+/api/v1/search/*        # Location-based search
+/api/v1/notifications/* # User notifications
+/api/v1/media/*         # File uploads
 ```
 
 ---
@@ -181,7 +186,7 @@ updated_at: timestamp (auto-update)
 
 ### DON'T
 - ❌ Delete or restructure large parts of codebase
-- ❌ Break existing behavior (auth, bookings, payments)
+- ❌ Break existing behavior (auth, inquiries, chat, reviews)
 - ❌ Change function signatures without explicit request
 - ❌ Leave half-implemented features
 - ❌ Add noisy debug logs
@@ -213,7 +218,7 @@ updated_at: timestamp (auto-update)
 ## 🧪 Testing
 
 - Use Jest or Vitest
-- Test core logic: pricing, availability, bookings, payments
+- Test core logic: tour availability, inquiries, reviews, chat notifications
 - Mock external APIs
 - Deterministic tests only
 

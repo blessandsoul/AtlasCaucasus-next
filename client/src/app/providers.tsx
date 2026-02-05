@@ -10,6 +10,7 @@ import { queryClient } from '@/lib/api/query-client';
 import { LoadingProvider } from '@/context/LoadingContext';
 import { WebSocketProvider } from '@/context/WebSocketContext';
 import { NotificationInitializer } from '@/features/notifications/components/NotificationInitializer';
+import { AgentationProvider } from '@/components/dev/AgentationProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <NotificationInitializer />
             {children}
             <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
+            <AgentationProvider />
           </WebSocketProvider>
         </LoadingProvider>
       </QueryClientProvider>
