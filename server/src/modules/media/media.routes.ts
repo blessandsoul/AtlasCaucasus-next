@@ -12,6 +12,12 @@ import {
   uploadUserAvatarHandler,
   uploadDriverAvatarHandler,
   uploadGuideAvatarHandler,
+  uploadCompanyCoverHandler,
+  uploadGuideCoverHandler,
+  uploadDriverCoverHandler,
+  deleteCompanyCoverHandler,
+  deleteGuideCoverHandler,
+  deleteDriverCoverHandler,
 } from "./media.controller.js";
 
 interface MediaParams {
@@ -109,5 +115,51 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
     "/guides/:guideId/avatar",
     { preHandler: [authGuard, requireVerifiedEmail] },
     uploadGuideAvatarHandler
+  );
+
+  // ==========================================
+  // COVER IMAGE ENDPOINTS
+  // ==========================================
+
+  // Companies: Upload company cover image (replaces existing)
+  fastify.post<{ Params: { companyId: string } }>(
+    "/companies/:companyId/cover",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    uploadCompanyCoverHandler
+  );
+
+  // Guides: Upload guide cover image (replaces existing)
+  fastify.post<{ Params: { guideId: string } }>(
+    "/guides/:guideId/cover",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    uploadGuideCoverHandler
+  );
+
+  // Drivers: Upload driver cover image (replaces existing)
+  fastify.post<{ Params: { driverId: string } }>(
+    "/drivers/:driverId/cover",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    uploadDriverCoverHandler
+  );
+
+  // Companies: Delete company cover image
+  fastify.delete<{ Params: { companyId: string } }>(
+    "/companies/:companyId/cover",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    deleteCompanyCoverHandler
+  );
+
+  // Guides: Delete guide cover image
+  fastify.delete<{ Params: { guideId: string } }>(
+    "/guides/:guideId/cover",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    deleteGuideCoverHandler
+  );
+
+  // Drivers: Delete driver cover image
+  fastify.delete<{ Params: { driverId: string } }>(
+    "/drivers/:driverId/cover",
+    { preHandler: [authGuard, requireVerifiedEmail] },
+    deleteDriverCoverHandler
   );
 }

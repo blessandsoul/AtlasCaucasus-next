@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useCompany } from '@/features/companies/hooks/useCompanies';
 import { useCompanyTours } from '@/features/tours/hooks/useTours';
 import { TourCard } from '@/features/tours/components/TourCard';
@@ -29,6 +30,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { isValidUuid } from '@/lib/utils/validation';
 
 function CompanyDetailsContent() {
+  const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -84,23 +86,24 @@ function CompanyDetailsContent() {
   if (!isValidId || error || !company) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
-        <h2 className="text-2xl font-bold">Company not found</h2>
+        <h2 className="text-2xl font-bold">{t('company_details.not_found_title')}</h2>
         <p className="text-muted-foreground">
-          The company you are looking for does not exist or has been removed.
+          {t('company_details.not_found_desc')}
         </p>
         <Button
           variant="outline"
           onClick={() => router.push('/explore/companies')}
         >
-          Back to Companies
+          {t('company_details.back_to_companies')}
         </Button>
       </div>
     );
   }
 
   const logoUrl = company.logoUrl ? getMediaUrl(company.logoUrl) : null;
-  const coverImage =
-    'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=1920&q=80';
+  const coverImage = company.coverUrl
+    ? getMediaUrl(company.coverUrl)
+    : '/default-covers/company-cover.jpg';
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -125,12 +128,12 @@ function CompanyDetailsContent() {
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          {t('common.back')}
         </Button>
 
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+        <div className="flex flex-col items-center md:items-stretch md:flex-row gap-6 md:gap-8">
           {/* Logo Card */}
-          <div className="w-32 h-32 md:w-48 md:h-48 rounded-2xl bg-background p-1.5 shadow-2xl shadow-black/20 flex-shrink-0">
+          <div className="w-44 h-44 md:w-48 md:h-48 rounded-2xl bg-background p-1.5 shadow-2xl shadow-black/20 flex-shrink-0">
             <div className="w-full h-full rounded-xl overflow-hidden bg-muted border border-border flex items-center justify-center relative">
               {logoUrl ? (
                 <img
@@ -145,39 +148,37 @@ function CompanyDetailsContent() {
           </div>
 
           {/* Header Info */}
-          <div className="flex-1 pt-2 md:pt-12 text-foreground">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
+          <div className="flex-1 min-w-0 w-full flex flex-col items-center md:items-stretch pt-2 md:pt-12 text-foreground">
+            <div className="flex flex-col items-center md:items-start md:flex-row md:justify-between gap-4 w-full flex-1">
+              <div className="flex flex-col items-center md:items-start justify-between h-full flex-1">
+                <div className="flex items-center gap-3">
                   <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
                     {company.companyName}
                   </h1>
                   {company.isVerified && (
-                    <div className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg shadow-blue-500/20">
-                      <CheckCircle className="w-3 h-3" />
-                      VERIFIED
-                    </div>
+                    <CheckCircle className="h-6 w-6 text-cyan-500 shrink-0" />
                   )}
                 </div>
 
-                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground font-medium">
+                <div className="flex flex-col items-center md:items-start gap-1 text-sm text-muted-foreground font-medium">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4" />
-                    <span>Joined {formatDate(company.createdAt)}</span>
+                    <span>{formatDate(company.createdAt)}</span>
                   </div>
                   {company.registrationNumber && (
                     <div className="flex items-center gap-1.5">
-                      <span>Reg: {company.registrationNumber}</span>
+                      <Building2 className="w-4 h-4" />
+                      <span>{company.registrationNumber}</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2 mt-4 md:mt-0">
+              <div className="flex gap-2 shrink-0">
                 <ChatButton
                   otherUserId={company.userId}
-                  label="Contact"
+                  label={t('company_details.contact')}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
                 />
                 <Button variant="secondary" size="icon" className="shadow-md">
@@ -202,26 +203,26 @@ function CompanyDetailsContent() {
                   value="about"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 text-base"
                 >
-                  About
+                  {t('guide_details.tabs.about')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="tours"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 text-base"
                 >
-                  Tours
+                  {t('guide_details.tabs.tours')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="reviews"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-3 text-base"
                 >
-                  Reviews
+                  {t('guide_details.tabs.reviews')}
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="about" className="mt-8 space-y-8">
                 <div className="prose prose-stone dark:prose-invert max-w-none">
                   <h3 className="text-xl font-semibold mb-4">
-                    About {company.companyName}
+                    {t('company_details.about_company', { name: company.companyName })}
                   </h3>
                   {company.description ? (
                     <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
@@ -230,7 +231,7 @@ function CompanyDetailsContent() {
                   ) : (
                     <div className="p-8 border border-dashed rounded-lg text-center text-muted-foreground bg-muted/30">
                       <Building2 className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                      <p>This company hasn&apos;t added a description yet.</p>
+                      <p>{t('company_details.no_description')}</p>
                     </div>
                   )}
                 </div>
@@ -239,21 +240,21 @@ function CompanyDetailsContent() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {[
                     {
-                      label: 'Tours',
+                      label: t('company_details.stats.tours'),
                       value:
                         toursData?.pagination.totalItems?.toString() || '0',
                     },
                     {
-                      label: 'Reviews',
+                      label: t('company_details.stats.reviews'),
                       value: reviewStats?.reviewCount?.toString() || '0',
                     },
                     {
-                      label: 'Rating',
+                      label: t('company_details.stats.rating'),
                       value: reviewStats?.averageRating
                         ? reviewStats.averageRating.toFixed(1)
                         : 'N/A',
                     },
-                    { label: 'Response', value: '100%' },
+                    { label: t('company_details.stats.response'), value: '100%' },
                   ].map((stat, i) => (
                     <div
                       key={i}
@@ -306,7 +307,7 @@ function CompanyDetailsContent() {
                   </div>
                 ) : (
                   <div className="p-12 border border-dashed rounded-lg text-center text-muted-foreground bg-muted/30">
-                    <p>No active tours listed.</p>
+                    <p>{t('company_details.no_active_tours')}</p>
                   </div>
                 )}
               </TabsContent>
@@ -324,7 +325,7 @@ function CompanyDetailsContent() {
           <div className="lg:col-span-1 space-y-6">
             <Card className="border-none shadow-lg shadow-black/5 dark:shadow-black/20 overflow-hidden">
               <CardHeader className="bg-muted/30 border-b pb-4">
-                <CardTitle className="text-lg">Contact Information</CardTitle>
+                <CardTitle className="text-lg">{t('company_details.contact_info.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-5 pt-6">
                 {company.websiteUrl && (
@@ -334,7 +335,7 @@ function CompanyDetailsContent() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-muted-foreground mb-0.5">
-                        Website
+                        {t('company_details.contact_info.website')}
                       </p>
                       <a
                         href={company.websiteUrl}
@@ -357,7 +358,7 @@ function CompanyDetailsContent() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-muted-foreground mb-0.5">
-                        Phone
+                        {t('company_details.contact_info.phone')}
                       </p>
                       <a
                         href={`tel:${company.phoneNumber}`}
@@ -376,7 +377,7 @@ function CompanyDetailsContent() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-muted-foreground mb-0.5">
-                        Email
+                        {t('company_details.contact_info.email')}
                       </p>
                       <a
                         href={`mailto:${company.user.email}`}
@@ -388,11 +389,6 @@ function CompanyDetailsContent() {
                   </div>
                 )}
 
-                <div className="pt-4 mt-2 border-t">
-                  <Button variant="outline" className="w-full">
-                    View All Listings
-                  </Button>
-                </div>
               </CardContent>
             </Card>
 
@@ -405,11 +401,10 @@ function CompanyDetailsContent() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground">
-                      Verified Partner
+                      {t('company_details.verified_partner.title')}
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
-                      This company has been verified by Atlas Caucasus for
-                      quality and reliability.
+                      {t('company_details.verified_partner.desc')}
                     </p>
                   </div>
                 </div>

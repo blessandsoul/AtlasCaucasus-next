@@ -27,7 +27,10 @@ interface DriverHeaderProps {
   className?: string;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
@@ -36,13 +39,27 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
 
   const fullName = driver.user
     ? `${driver.user.firstName} ${driver.user.lastName}`
-    : 'Unknown Driver';
+    : t('driver_details.unknown_driver', 'Unknown Driver');
 
   // Use avatarUrl first, fallback to photoUrl
   const photoUrl = getMediaUrl(driver.avatarUrl || driver.photoUrl);
   const rating = driver.averageRating ? parseFloat(driver.averageRating) : null;
 
-  const primaryLocation = driver.locations?.[0];
+  const getLocations = (): Location[] => {
+    if (!driver.locations || driver.locations.length === 0) return [];
+
+    const firstItem = driver.locations[0];
+    if ('location' in firstItem && (firstItem as any).location) {
+      return (driver.locations as any[])
+        .filter((dl) => dl.location)
+        .map((dl) => dl.location as Location);
+    }
+
+    return driver.locations as Location[];
+  };
+
+  const locations = getLocations();
+  const primaryLocation = locations[0];
 
   const handleSendMessage = useCallback(async () => {
     if (!isAuthenticated) {
@@ -82,9 +99,9 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
       )}
     >
       <div className="p-6 md:p-8">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+        <div className="flex flex-col items-center md:items-stretch md:flex-row gap-6 md:gap-8">
           <div className="relative shrink-0">
-            <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-background shadow-lg">
+            <div className="w-44 h-44 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-background shadow-lg">
               <img
                 src={photoUrl}
                 alt={fullName}
@@ -93,10 +110,10 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
             </div>
           </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
+          <div className="flex-1 min-w-0 w-full flex flex-col items-center md:items-stretch">
+            <div className="flex flex-col items-center md:items-start md:flex-row md:justify-between gap-4 w-full flex-1">
+              <div className="flex flex-col items-center md:items-start justify-between h-full flex-1">
+                <div className="flex items-center gap-2">
                   <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">
                     {fullName}
                   </h1>
@@ -105,27 +122,25 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
                   )}
                 </div>
 
-                {driver.bio && (
-                  <p className="text-muted-foreground text-sm md:text-base mb-3 line-clamp-2 md:line-clamp-3">
-                    {driver.bio}
-                  </p>
-                )}
-
-                {primaryLocation && (
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm mb-4">
-                    <MapPin className="h-4 w-4 text-cyan-500" />
-                    <span>{primaryLocation.city}</span>
-                  </div>
-                )}
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
-                    <Car className="h-3.5 w-3.5 text-cyan-500" />
-                    <span>{driver.vehicleType}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
-                    <Users className="h-3.5 w-3.5 text-cyan-500" />
-                    <span>{driver.vehicleCapacity} Seats</span>
+                <div className="flex flex-col items-center md:items-start gap-2">
+                  {primaryLocation && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <MapPin className="h-3.5 w-3.5 text-cyan-500" />
+                      <span>
+                        {primaryLocation.name || primaryLocation.city}
+                        {primaryLocation.country && `, ${primaryLocation.country}`}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+                      <Car className="h-3.5 w-3.5 text-cyan-500" />
+                      <span>{driver.vehicleType}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+                      <Users className="h-3.5 w-3.5 text-cyan-500" />
+                      <span>{driver.vehicleCapacity} {t('driver_details.seats', 'Seats')}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -134,11 +149,13 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
                 <div className="flex items-center gap-1">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                   <span className="text-xl font-bold text-foreground">
-                    {rating ? rating.toFixed(1) : 'New'}
+                    {rating ? rating.toFixed(1) : t('driver_details.new', 'New')}
                   </span>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {driver.reviewCount > 0 ? `${driver.reviewCount} review${driver.reviewCount !== 1 ? 's' : ''}` : 'No reviews yet'}
+                  {driver.reviewCount > 0
+                    ? t('driver_details.review_count', '{{count}} reviews', { count: driver.reviewCount })
+                    : t('driver_details.no_reviews', 'No reviews yet')}
                 </span>
               </div>
             </div>
@@ -157,7 +174,7 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
             ) : (
               <MessageCircle className="h-5 w-5 mr-2" />
             )}
-            Send Message
+            {t('driver_details.send_message', 'Send Message')}
           </Button>
           {driver.phoneNumber && (
             <Button
@@ -167,7 +184,7 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
               onClick={handleCall}
             >
               <Phone className="h-5 w-5 mr-2" />
-              Call
+              {t('driver_details.call', 'Call')}
             </Button>
           )}
         </div>

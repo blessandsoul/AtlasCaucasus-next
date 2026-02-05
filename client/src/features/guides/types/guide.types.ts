@@ -61,6 +61,7 @@ export interface Guide {
   currency?: string;
   photos?: GuideMedia[];
   avatarUrl: string | null; // Primary profile photo
+  coverUrl: string | null; // Cover/hero image
 }
 
 export interface GuideFilters {

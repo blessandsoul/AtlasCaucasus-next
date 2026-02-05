@@ -375,6 +375,227 @@ export async function deleteGuideAvatar(guideId: string): Promise<void> {
 }
 
 // ==========================================
+// COMPANY COVER HELPERS
+// ==========================================
+
+/**
+ * Upload cover image for a company
+ * @param currentUser - Authenticated user
+ * @param companyId - Company ID
+ * @param file - Uploaded file
+ * @returns Created media record
+ */
+export async function uploadCompanyCover(
+  currentUser: JwtUser,
+  companyId: string,
+  file: UploadedFile
+): Promise<SafeMedia> {
+  const company = await getCompanyById(companyId);
+  if (!company) {
+    throw new NotFoundError("Company not found", "COMPANY_NOT_FOUND");
+  }
+
+  // Check ownership (type-safe)
+  if (!isCompanyOwner(company, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only upload cover for your own company", "NOT_COMPANY_OWNER");
+  }
+
+  // Delete existing cover before uploading new one
+  await deleteAllMediaForEntity("company-cover", companyId);
+
+  // Generate SEO-friendly slug from company name
+  const entitySlug = generateEntitySlug(company.companyName || "company-cover", "cover");
+
+  return uploadMediaForEntity(currentUser, "company-cover", companyId, file, entitySlug);
+}
+
+/**
+ * Get company cover image
+ * @param companyId - Company ID
+ * @returns Array of media records (typically just one cover)
+ */
+export async function getCompanyCover(companyId: string): Promise<SafeMedia[]> {
+  return getMediaForEntity("company-cover", companyId);
+}
+
+/**
+ * Delete company cover image (no ownership check - internal use)
+ * @param companyId - Company ID
+ */
+export async function deleteCompanyCover(companyId: string): Promise<void> {
+  return deleteAllMediaForEntity("company-cover", companyId);
+}
+
+/**
+ * Delete company cover image with ownership verification
+ * @param currentUser - Authenticated user
+ * @param companyId - Company ID
+ */
+export async function deleteCompanyCoverAuthed(
+  currentUser: JwtUser,
+  companyId: string
+): Promise<void> {
+  const company = await getCompanyById(companyId);
+  if (!company) {
+    throw new NotFoundError("Company not found", "COMPANY_NOT_FOUND");
+  }
+
+  if (!isCompanyOwner(company, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only delete cover for your own company", "NOT_COMPANY_OWNER");
+  }
+
+  return deleteAllMediaForEntity("company-cover", companyId);
+}
+
+// ==========================================
+// GUIDE COVER HELPERS
+// ==========================================
+
+/**
+ * Upload cover image for a guide
+ * @param currentUser - Authenticated user
+ * @param guideId - Guide ID
+ * @param file - Uploaded file
+ * @returns Created media record
+ */
+export async function uploadGuideCover(
+  currentUser: JwtUser,
+  guideId: string,
+  file: UploadedFile
+): Promise<SafeMedia> {
+  const guide = await getGuideById(guideId);
+  if (!guide) {
+    throw new NotFoundError("Guide profile not found", "GUIDE_NOT_FOUND");
+  }
+
+  // Check ownership (type-safe)
+  if (!isGuideOwner(guide, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only upload cover for your own guide profile", "NOT_GUIDE_OWNER");
+  }
+
+  // Delete existing cover before uploading new one
+  await deleteAllMediaForEntity("guide-cover", guideId);
+
+  // Generate SEO-friendly slug from guide name (type-safe)
+  const guideName = getGuideDisplayName(guide);
+  const entitySlug = slugify(guideName || "guide-cover", 40);
+
+  return uploadMediaForEntity(currentUser, "guide-cover", guideId, file, entitySlug);
+}
+
+/**
+ * Get guide cover image
+ * @param guideId - Guide ID
+ * @returns Array of media records (typically just one cover)
+ */
+export async function getGuideCover(guideId: string): Promise<SafeMedia[]> {
+  return getMediaForEntity("guide-cover", guideId);
+}
+
+/**
+ * Delete guide cover image (no ownership check - internal use)
+ * @param guideId - Guide ID
+ */
+export async function deleteGuideCover(guideId: string): Promise<void> {
+  return deleteAllMediaForEntity("guide-cover", guideId);
+}
+
+/**
+ * Delete guide cover image with ownership verification
+ * @param currentUser - Authenticated user
+ * @param guideId - Guide ID
+ */
+export async function deleteGuideCoverAuthed(
+  currentUser: JwtUser,
+  guideId: string
+): Promise<void> {
+  const guide = await getGuideById(guideId);
+  if (!guide) {
+    throw new NotFoundError("Guide profile not found", "GUIDE_NOT_FOUND");
+  }
+
+  if (!isGuideOwner(guide, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only delete cover for your own guide profile", "NOT_GUIDE_OWNER");
+  }
+
+  return deleteAllMediaForEntity("guide-cover", guideId);
+}
+
+// ==========================================
+// DRIVER COVER HELPERS
+// ==========================================
+
+/**
+ * Upload cover image for a driver
+ * @param currentUser - Authenticated user
+ * @param driverId - Driver ID
+ * @param file - Uploaded file
+ * @returns Created media record
+ */
+export async function uploadDriverCover(
+  currentUser: JwtUser,
+  driverId: string,
+  file: UploadedFile
+): Promise<SafeMedia> {
+  const driver = await getDriverById(driverId);
+  if (!driver) {
+    throw new NotFoundError("Driver profile not found", "DRIVER_NOT_FOUND");
+  }
+
+  // Check ownership (type-safe)
+  if (!isDriverOwner(driver, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only upload cover for your own driver profile", "NOT_DRIVER_OWNER");
+  }
+
+  // Delete existing cover before uploading new one
+  await deleteAllMediaForEntity("driver-cover", driverId);
+
+  // Generate SEO-friendly slug from driver name (type-safe)
+  const driverName = getDriverDisplayName(driver);
+  const entitySlug = slugify(driverName || "driver-cover", 40);
+
+  return uploadMediaForEntity(currentUser, "driver-cover", driverId, file, entitySlug);
+}
+
+/**
+ * Get driver cover image
+ * @param driverId - Driver ID
+ * @returns Array of media records (typically just one cover)
+ */
+export async function getDriverCover(driverId: string): Promise<SafeMedia[]> {
+  return getMediaForEntity("driver-cover", driverId);
+}
+
+/**
+ * Delete driver cover image (no ownership check - internal use)
+ * @param driverId - Driver ID
+ */
+export async function deleteDriverCover(driverId: string): Promise<void> {
+  return deleteAllMediaForEntity("driver-cover", driverId);
+}
+
+/**
+ * Delete driver cover image with ownership verification
+ * @param currentUser - Authenticated user
+ * @param driverId - Driver ID
+ */
+export async function deleteDriverCoverAuthed(
+  currentUser: JwtUser,
+  driverId: string
+): Promise<void> {
+  const driver = await getDriverById(driverId);
+  if (!driver) {
+    throw new NotFoundError("Driver profile not found", "DRIVER_NOT_FOUND");
+  }
+
+  if (!isDriverOwner(driver, currentUser.id) && !currentUser.roles.includes("ADMIN")) {
+    throw new ForbiddenError("You can only delete cover for your own driver profile", "NOT_DRIVER_OWNER");
+  }
+
+  return deleteAllMediaForEntity("driver-cover", driverId);
+}
+
+// ==========================================
 // USER MEDIA HELPERS (Avatars)
 // ==========================================
 

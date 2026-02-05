@@ -49,6 +49,9 @@ import {
   useDeleteCompanyPhoto,
 } from '@/features/companies/hooks/useCompanies';
 import { CompanyLogoUpload } from '@/features/companies/components/CompanyLogoUpload';
+import { CoverImageUpload } from '@/components/common/CoverImageUpload';
+import { useUploadCompanyCover } from '@/features/companies/hooks/useUploadCompanyCover';
+import { useDeleteCompanyCover } from '@/features/companies/hooks/useDeleteCompanyCover';
 import { ROUTES } from '@/lib/constants/routes';
 import { formatDate } from '@/lib/utils/format';
 import { getErrorMessage } from '@/lib/utils/error';
@@ -75,6 +78,8 @@ export default function CompanyManagementPage() {
   const deleteMutation = useDeleteCompany();
   const uploadPhotosMutation = useUploadCompanyPhotos();
   const deletePhotoMutation = useDeleteCompanyPhoto();
+  const uploadCoverMutation = useUploadCompanyCover(company?.id || '');
+  const deleteCoverMutation = useDeleteCompanyCover(company?.id || '');
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -433,6 +438,26 @@ export default function CompanyManagementPage() {
               </div>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Cover Image Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('company.management.cover', 'Cover Image')}</CardTitle>
+          <CardDescription>
+            {t('company.management.cover_desc', 'The banner image displayed on your public company page')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CoverImageUpload
+            currentCoverUrl={company.coverUrl}
+            onUpload={(file) => uploadCoverMutation.mutate(file)}
+            onDelete={() => deleteCoverMutation.mutate()}
+            isUploading={uploadCoverMutation.isPending}
+            isDeleting={deleteCoverMutation.isPending}
+            defaultCoverUrl="/default-covers/company-cover.jpg"
+          />
         </CardContent>
       </Card>
 

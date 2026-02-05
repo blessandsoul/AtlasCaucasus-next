@@ -43,7 +43,10 @@ import {
 } from '../../hooks/useDrivers';
 import { useUploadDriverAvatar } from '../../hooks/useUploadDriverAvatar';
 import { useDeleteDriverAvatar } from '../../hooks/useDeleteDriverAvatar';
+import { useUploadDriverCover } from '../../hooks/useUploadDriverCover';
+import { useDeleteDriverCover } from '../../hooks/useDeleteDriverCover';
 import { ProfileAvatarUpload } from '@/components/common/ProfileAvatarUpload';
+import { CoverImageUpload } from '@/components/common/CoverImageUpload';
 import { getErrorMessage } from '@/lib/utils/error';
 import { getMediaUrl } from '@/lib/utils/media';
 
@@ -79,6 +82,8 @@ export const DriverProfileTab = () => {
   const deletePhotoMutation = useDeleteDriverPhoto();
   const uploadAvatarMutation = useUploadDriverAvatar(driver?.id || '');
   const deleteAvatarMutation = useDeleteDriverAvatar(driver?.id || '');
+  const uploadCoverMutation = useUploadDriverCover(driver?.id || '');
+  const deleteCoverMutation = useDeleteDriverCover(driver?.id || '');
 
   const {
     register,
@@ -186,6 +191,26 @@ export const DriverProfileTab = () => {
             onDelete={() => deleteAvatarMutation.mutate()}
             isUploading={uploadAvatarMutation.isPending}
             isDeleting={deleteAvatarMutation.isPending}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Cover Image Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('driver.profile.cover', 'Cover Image')}</CardTitle>
+          <CardDescription>
+            {t('driver.profile.cover_desc', 'The banner image displayed on your public profile page')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CoverImageUpload
+            currentCoverUrl={driver.coverUrl}
+            onUpload={(file) => uploadCoverMutation.mutate(file)}
+            onDelete={() => deleteCoverMutation.mutate()}
+            isUploading={uploadCoverMutation.isPending}
+            isDeleting={deleteCoverMutation.isPending}
+            defaultCoverUrl="/default-covers/driver-cover.jpg"
           />
         </CardContent>
       </Card>

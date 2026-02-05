@@ -9,8 +9,12 @@ import { GuideSidebar } from '@/features/guides/components/GuideSidebar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { isValidUuid } from '@/lib/utils/validation';
+import { getMediaUrl } from '@/lib/utils/media';
+
+import { useTranslation } from 'react-i18next'; // Added import
 
 export default function GuideDetailsPage() {
+  const { t } = useTranslation(); // Added hook
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -30,12 +34,12 @@ export default function GuideDetailsPage() {
   if (!isValidId || error || !guide) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center px-4">
-        <h2 className="text-2xl font-bold text-foreground">Guide not found</h2>
+        <h2 className="text-2xl font-bold text-foreground">{t('guide_details.not_found_title')}</h2>
         <p className="text-muted-foreground max-w-md">
-          The guide you are looking for does not exist or has been removed.
+          {t('guide_details.not_found_desc')}
         </p>
         <Button variant="outline" onClick={() => router.push('/explore/guides')}>
-          Back to Guides
+          {t('guide_details.back_to_guides')}
         </Button>
       </div>
     );
@@ -45,13 +49,17 @@ export default function GuideDetailsPage() {
     console.log('Book guide:', guide.id);
   };
 
+  const coverImage = guide.coverUrl
+    ? getMediaUrl(guide.coverUrl)
+    : '/default-covers/guide-cover.jpg';
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Hero Background */}
       <div className="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-gray-900">
           <img
-            src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=1920&q=80"
+            src={coverImage}
             alt="Background"
             className="w-full h-full object-cover opacity-60"
           />
@@ -69,7 +77,7 @@ export default function GuideDetailsPage() {
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          {t('common.back')}
         </Button>
 
         {/* Header Card */}

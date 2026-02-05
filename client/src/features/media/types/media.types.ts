@@ -1,5 +1,8 @@
 // Media entity types (matches server)
-export type MediaEntityType = 'tour' | 'company' | 'guide' | 'driver' | 'user';
+export type MediaEntityType =
+  | 'tour' | 'company' | 'guide' | 'driver' | 'user'
+  | 'guide-avatar' | 'driver-avatar'
+  | 'company-cover' | 'guide-cover' | 'driver-cover';
 
 // Media item returned from API
 export interface Media {

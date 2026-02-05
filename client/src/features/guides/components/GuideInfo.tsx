@@ -54,7 +54,10 @@ const AvailabilityDay = ({
   </div>
 );
 
+import { useTranslation } from 'react-i18next'; // Added import
+
 export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
+  const { t } = useTranslation(); // Added hook
   const [activeTab, setActiveTab] = useState('about');
   const photos = guide.photos || [];
 
@@ -82,29 +85,29 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
       bioLower.includes('hiking') ||
       bioLower.includes('trekking')
     ) {
-      specs.push('Mountain Tours');
+      specs.push(t('guide_details.specs.mountain_tours'));
     }
     if (
       bioLower.includes('wine') ||
       bioLower.includes('vineyard') ||
       bioLower.includes('kakheti')
     ) {
-      specs.push('Wine Tours');
+      specs.push(t('guide_details.specs.wine_tours'));
     }
     if (
       bioLower.includes('cultural') ||
       bioLower.includes('history') ||
       bioLower.includes('heritage')
     ) {
-      specs.push('Cultural Heritage');
+      specs.push(t('guide_details.specs.cultural_heritage'));
     }
     if (bioLower.includes('photo') || bioLower.includes('camera')) {
-      specs.push('Photography');
+      specs.push(t('guide_details.specs.photography'));
     }
 
     if (specs.length === 0) {
-      specs.push('Private Tours');
-      specs.push('City Tours');
+      specs.push(t('guide_details.specs.private_tours'));
+      specs.push(t('guide_details.specs.city_tours'));
     }
 
     return specs;
@@ -128,28 +131,28 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
     if (guide.isVerified) {
       achievements.push({
         icon: Shield,
-        label: 'Verified Identity',
+        label: t('guide_details.badges.verified_identity'),
       });
     }
 
     if (guide.yearsOfExperience && guide.yearsOfExperience >= 5) {
       achievements.push({
         icon: Award,
-        label: 'Top Rated 2024',
+        label: t('guide_details.badges.top_rated'),
       });
     }
 
     if (guide.reviewCount >= 100) {
       achievements.push({
         icon: Users,
-        label: `${Math.floor(guide.reviewCount * 5)}+ Tours`,
+        label: t('guide_details.badges.tours_count', { count: Math.floor(guide.reviewCount * 5) }),
       });
     }
 
     if (achievements.length < 3) {
       achievements.push({
         icon: Car,
-        label: 'Has Vehicle',
+        label: t('guide_details.badges.has_vehicle'),
       });
     }
 
@@ -172,7 +175,7 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
               value="about"
               className="flex-1 md:flex-none px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:text-cyan-500"
             >
-              About
+              {t('guide_details.tabs.about')}
             </TabsTrigger>
             {photos.length > 0 && (
               <TabsTrigger
@@ -181,7 +184,7 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
               >
                 <div className="flex items-center gap-2">
                   <ImageIcon className="w-4 h-4" />
-                  Photos
+                  {t('guide_details.guide_photos')}
                 </div>
               </TabsTrigger>
             )}
@@ -189,22 +192,22 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
               value="tours"
               className="flex-1 md:flex-none px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:text-cyan-500"
             >
-              Tours
+              {t('guide_details.tabs.tours')}
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
               className="flex-1 md:flex-none px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:text-cyan-500"
             >
-              Reviews
+              {t('guide_details.tabs.reviews')}
             </TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="about" className="p-6 md:p-8 mt-0">
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">About</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('guide_details.about_section')}</h3>
             <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-              {guide.bio || 'No bio available.'}
+              {guide.bio || t('guide_details.no_bio')}
             </p>
           </div>
 
@@ -225,7 +228,7 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
           {specializations.length > 0 && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-foreground mb-4">
-                Specializations
+                {t('guide_details.specializations')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {specializations.map((spec, index) => (
@@ -243,7 +246,7 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
           {locations.length > 0 && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-foreground mb-4">
-                Operating Areas
+                {t('guide_details.operating_areas')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {locations.map((loc, index) => (
@@ -261,11 +264,11 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
 
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Availability
+              {t('guide_details.availability')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(availability).map(([day, available]) => (
-                <AvailabilityDay key={day} day={day} available={available} />
+                <AvailabilityDay key={day} day={t(`guide_details.days.${day}`)} available={available} />
               ))}
             </div>
           </div>
@@ -275,7 +278,7 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
           <TabsContent value="photos" className="p-6 md:p-8 mt-0">
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">
-                Guide Photos
+                {t('guide_details.guide_photos')}
               </h3>
               <ImageGallery
                 images={photos.map((p) => ({
@@ -296,11 +299,10 @@ export const GuideInfo = ({ guide, className }: GuideInfoProps) => {
               <MapPin className="h-8 w-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              No Tours Yet
+              {t('guide_details.no_tours_title')}
             </h3>
             <p className="text-muted-foreground max-w-sm">
-              This guide hasn&apos;t listed any tours yet. Contact them directly
-              to arrange a custom tour.
+              {t('guide_details.no_tours_desc')}
             </p>
           </div>
         </TabsContent>

@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
     PHOTOS: (id: string) => `/companies/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/companies/${id}/photos/${photoId}`,
     UPLOAD_LOGO: (id: string) => `/companies/${id}/logo`,
+    UPLOAD_COVER: (id: string) => `/companies/${id}/cover`,
     TOUR_AGENTS: (id: string) => `/companies/${id}/tour-agents`,
     DELETE_TOUR_AGENT: (companyId: string, agentId: string) => `/companies/${companyId}/tour-agents/${agentId}`,
   },
@@ -67,6 +68,7 @@ export const API_ENDPOINTS = {
     PHOTOS: (id: string) => `/guides/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/guides/${id}/photos/${photoId}`,
     UPLOAD_AVATAR: (id: string) => `/guides/${id}/avatar`,
+    UPLOAD_COVER: (id: string) => `/guides/${id}/cover`,
   },
   DRIVERS: {
     LIST: '/drivers',
@@ -77,6 +79,7 @@ export const API_ENDPOINTS = {
     PHOTOS: (id: string) => `/drivers/${id}/photos`,
     DELETE_PHOTO: (id: string, photoId: string) => `/drivers/${id}/photos/${photoId}`,
     UPLOAD_AVATAR: (id: string) => `/drivers/${id}/avatar`,
+    UPLOAD_COVER: (id: string) => `/drivers/${id}/cover`,
   },
   LOCATIONS: {
     LIST: '/locations',

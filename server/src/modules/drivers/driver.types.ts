@@ -14,6 +14,7 @@ export interface DriverResponse extends Driver {
     locations: Location[];
     photos?: SafeMedia[]; // Media photos associated with driver (gallery)
     avatarUrl: string | null; // Primary profile photo
+    coverUrl: string | null; // Cover/hero image
 }
 
 export interface UpdateDriverData {

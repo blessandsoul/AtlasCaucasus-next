@@ -134,6 +134,20 @@ class CompanyService {
 
     return response.data.data;
   }
+
+  // Cover image management
+  async uploadCover(companyId: string, file: File): Promise<{ coverUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+      data: { coverUrl: string };
+    }>(API_ENDPOINTS.COMPANIES.UPLOAD_COVER(companyId), formData);
+
+    return response.data.data;
+  }
 }
 
 export const companyService = new CompanyService();

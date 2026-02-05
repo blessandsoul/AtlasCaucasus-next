@@ -53,7 +53,10 @@ const AvailabilityDay = ({
   </div>
 );
 
+import { useTranslation } from 'react-i18next';
+
 export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('about');
 
   const photos = driver.photos || [];
@@ -75,7 +78,7 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
     if (driver.isVerified) {
       achievements.push({
         icon: Shield,
-        label: 'Verified Driver',
+        label: t('driver_details.verified_driver', 'Verified Driver'),
       });
     }
 
@@ -86,7 +89,7 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
 
     achievements.push({
       icon: Users,
-      label: `Up to ${driver.vehicleCapacity} pax`,
+      label: t('driver_details.up_to_pax', 'Up to {{count}} pax', { count: driver.vehicleCapacity }),
     });
 
     return achievements;
@@ -108,13 +111,13 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
               value="about"
               className="flex-1 md:flex-none px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:text-cyan-500"
             >
-              About & Vehicle
+              {t('driver_details.tabs.about', 'About & Vehicle')}
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
               className="flex-1 md:flex-none px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:text-cyan-500"
             >
-              Reviews
+              {t('driver_details.tabs.reviews', 'Reviews')}
             </TabsTrigger>
             {photos.length > 0 && (
               <TabsTrigger
@@ -123,7 +126,7 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
               >
                 <div className="flex items-center gap-2">
                   <ImageIcon className="w-4 h-4" />
-                  Photos
+                  {t('driver_details.tabs.photos', 'Photos')}
                 </div>
               </TabsTrigger>
             )}
@@ -133,44 +136,44 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
         <TabsContent value="about" className="p-6 md:p-8 mt-0">
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              About Driver
+              {t('driver_details.about.title', 'About Driver')}
             </h3>
             <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-              {driver.bio || 'No bio available.'}
+              {driver.bio || t('driver_details.about.no_bio', 'No bio available.')}
             </p>
           </div>
 
           <div className="mb-8 p-6 bg-muted/30 rounded-xl border border-border/50">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Car className="h-5 w-5 text-cyan-500" />
-              Vehicle Details
+              {t('driver_details.about.vehicle_details', 'Vehicle Details')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col">
                 <span className="text-sm text-muted-foreground">
-                  Vehicle Make & Model
+                  {t('driver_details.about.make_model', 'Vehicle Make & Model')}
                 </span>
                 <span className="font-medium">
                   {driver.vehicleMake} {driver.vehicleModel}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">Year</span>
+                <span className="text-sm text-muted-foreground">{t('driver_details.about.year', 'Year')}</span>
                 <span className="font-medium">{driver.vehicleYear}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">Type</span>
+                <span className="text-sm text-muted-foreground">{t('driver_details.about.type', 'Type')}</span>
                 <span className="font-medium">{driver.vehicleType}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">Capacity</span>
+                <span className="text-sm text-muted-foreground">{t('driver_details.about.capacity', 'Capacity')}</span>
                 <span className="font-medium">
-                  {driver.vehicleCapacity} Passengers
+                  {driver.vehicleCapacity} {t('driver_details.about.passengers', 'Passengers')}
                 </span>
               </div>
               <div className="flex flex-col">
                 <span className="text-sm text-muted-foreground">
-                  License Plate
+                  {t('driver_details.about.license_plate', 'License Plate')}
                 </span>
                 <span className="font-medium">{driver.licenseNumber}</span>
               </div>
@@ -194,7 +197,7 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
           {locations.length > 0 && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-foreground mb-4">
-                Operating Areas
+                {t('driver_details.about.operating_areas', 'Operating Areas')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {locations.map((loc, index) => (
@@ -212,7 +215,7 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
 
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Availability
+              {t('driver_details.about.availability', 'Availability')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(availability).map(([day, available]) => (
@@ -234,7 +237,7 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
           <TabsContent value="photos" className="p-6 md:p-8 mt-0">
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">
-                Vehicle & Driver Photos
+                {t('driver_details.about.vehicle_driver_photos', 'Vehicle & Driver Photos')}
               </h3>
               <ImageGallery
                 images={photos.map((p) => ({

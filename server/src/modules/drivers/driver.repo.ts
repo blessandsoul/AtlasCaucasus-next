@@ -9,12 +9,16 @@ async function toDriverResponseWithMedia(driver: any): Promise<DriverResponse> {
     // Fetch avatar (entityType: "driver-avatar")
     const avatarMedia = await getMediaByEntity("driver-avatar", driver.id);
     const avatar = avatarMedia.length > 0 ? avatarMedia[0] : null;
+    // Fetch cover image (entityType: "driver-cover")
+    const coverMedia = await getMediaByEntity("driver-cover", driver.id);
+    const cover = coverMedia.length > 0 ? coverMedia[0] : null;
 
     return {
         ...driver,
         locations: driver.locations.map((dl: any) => dl.location),
         photos: media,
         avatarUrl: avatar?.url ?? null,
+        coverUrl: cover?.url ?? null,
     };
 }
 

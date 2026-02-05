@@ -9,12 +9,16 @@ async function toGuideResponseWithMedia(guide: any): Promise<GuideResponse> {
     // Fetch avatar (entityType: "guide-avatar")
     const avatarMedia = await getMediaByEntity("guide-avatar", guide.id);
     const avatar = avatarMedia.length > 0 ? avatarMedia[0] : null;
+    // Fetch cover image (entityType: "guide-cover")
+    const coverMedia = await getMediaByEntity("guide-cover", guide.id);
+    const cover = coverMedia.length > 0 ? coverMedia[0] : null;
 
     return {
         ...guide,
         locations: guide.locations.map((gl: any) => gl.location),
         photos: media,
         avatarUrl: avatar?.url ?? null,
+        coverUrl: cover?.url ?? null,
     };
 }
 

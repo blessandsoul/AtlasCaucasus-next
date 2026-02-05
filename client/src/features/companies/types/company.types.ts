@@ -34,6 +34,7 @@ export interface Company {
     emailVerified: boolean;
   };
   images?: CompanyMedia[];
+  coverUrl: string | null; // Cover/hero image
 }
 
 export interface IUpdateCompanyRequest {

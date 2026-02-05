@@ -42,7 +42,10 @@ import {
 } from '../../hooks/useGuides';
 import { useUploadGuideAvatar } from '../../hooks/useUploadGuideAvatar';
 import { useDeleteGuideAvatar } from '../../hooks/useDeleteGuideAvatar';
+import { useUploadGuideCover } from '../../hooks/useUploadGuideCover';
+import { useDeleteGuideCover } from '../../hooks/useDeleteGuideCover';
 import { ProfileAvatarUpload } from '@/components/common/ProfileAvatarUpload';
+import { CoverImageUpload } from '@/components/common/CoverImageUpload';
 import { getErrorMessage } from '@/lib/utils/error';
 import { getMediaUrl } from '@/lib/utils/media';
 
@@ -72,6 +75,8 @@ export const GuideProfileTab = () => {
   const deletePhotoMutation = useDeleteGuidePhoto();
   const uploadAvatarMutation = useUploadGuideAvatar(guide?.id || '');
   const deleteAvatarMutation = useDeleteGuideAvatar(guide?.id || '');
+  const uploadCoverMutation = useUploadGuideCover(guide?.id || '');
+  const deleteCoverMutation = useDeleteGuideCover(guide?.id || '');
 
   const {
     register,
@@ -186,6 +191,26 @@ export const GuideProfileTab = () => {
             onDelete={() => deleteAvatarMutation.mutate()}
             isUploading={uploadAvatarMutation.isPending}
             isDeleting={deleteAvatarMutation.isPending}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Cover Image Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('guide.profile.cover', 'Cover Image')}</CardTitle>
+          <CardDescription>
+            {t('guide.profile.cover_desc', 'The banner image displayed on your public profile page')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CoverImageUpload
+            currentCoverUrl={guide.coverUrl}
+            onUpload={(file) => uploadCoverMutation.mutate(file)}
+            onDelete={() => deleteCoverMutation.mutate()}
+            isUploading={uploadCoverMutation.isPending}
+            isDeleting={deleteCoverMutation.isPending}
+            defaultCoverUrl="/default-covers/guide-cover.jpg"
           />
         </CardContent>
       </Card>

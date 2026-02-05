@@ -10,6 +10,7 @@ export interface CompanyResponse extends Company {
         lastName: string;
         emailVerified: boolean;
     };
+    coverUrl: string | null; // Cover/hero image
 }
 
 export interface UpdateCompanyData {

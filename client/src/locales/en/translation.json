@@ -574,7 +574,49 @@
         "years_experience": "Years of Experience",
         "daily_rate": "Daily Rate (GEL)",
         "vehicle_details": "Vehicle Details",
-        "vehicle_type": "Vehicle Type",
+    "vehicle_type": "Vehicle Type",
+        "select_type": "Select type",
+        "types": {
+          "sedan": "Sedan",
+          "suv": "SUV",
+          "minivan": "Minivan",
+          "minibus": "Minibus"
+        },
+        "capacity": "Capacity",
+        "make": "Make",
+        "model": "Model",
+        "year": "Year",
+        "license": "License Plate"
+      }
+    }
+  },
+  "company_details": {
+    "not_found_title": "Company not found",
+    "not_found_desc": "The company you are looking for does not exist or has been removed.",
+    "back_to_companies": "Back to Companies",
+    "joined": "Joined {{date}}",
+    "reg_number": "Reg: {{number}}",
+    "contact": "Contact",
+    "about_company": "About {{name}}",
+    "no_description": "This company hasn't added a description yet.",
+    "stats": {
+      "tours": "Tours",
+      "reviews": "Reviews",
+      "rating": "Rating",
+      "response": "Response"
+    },
+    "no_active_tours": "No active tours listed.",
+    "contact_info": {
+      "title": "Contact Information",
+      "website": "Website",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "verified_partner": {
+      "title": "Verified Partner",
+      "desc": "This company has been verified by Atlas Caucasus for quality and reliability."
+    }
+  },
         "select_type": "Select type",
         "types": {
           "sedan": "Sedan",
@@ -598,6 +640,7 @@
     "call": "Call",
     "tabs": {
       "about": "About",
+      "photos": "Photos",
       "tours": "Tours",
       "reviews": "Reviews"
     },
@@ -620,6 +663,22 @@
       "tours_count": "{{count}}+ Tours",
       "has_vehicle": "Has Vehicle"
     },
+    "tour_card": {
+      "check_dates": "Check dates",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "new": "New",
+      "from": "from {{location}}",
+      "flexible": "Flexible",
+      "free_cancel": "Free Cancel",
+      "instant": "Instant",
+      "per_person": "per person"
+    },
+    "chat": {
+      "login_required": "Please log in to start a chat",
+      "self_chat_error": "You can't chat with yourself",
+      "start_error": "Failed to start chat. Please try again."
+    },
     "no_tours_title": "No Tours Yet",
     "no_tours_desc": "This guide hasn't listed any tours yet. Contact them directly to arrange a custom tour.",
     "no_reviews_title": "No Reviews Yet",
@@ -630,7 +689,22 @@
     "book_now": "Book Now",
     "not_found_title": "Guide not found",
     "not_found_desc": "The guide you are looking for does not exist or has been removed.",
-    "back_to_guides": "Back to Guides"
+    "back_to_guides": "Back to Guides",
+    "notifications": {
+      "chat_error": "Failed to start chat. Please try again.",
+      "login_required": "Please log in to send a message",
+      "self_message_error": "You can't message yourself"
+    },
+    "guide_photos": "Guide Photos",
+    "days": {
+      "Mon": "Mon",
+      "Tue": "Tue",
+      "Wed": "Wed",
+      "Thu": "Thu",
+      "Fri": "Fri",
+      "Sat": "Sat",
+      "Sun": "Sun"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import { useDriver } from '@/features/drivers/hooks/useDrivers';
 import { DriverHeader } from '@/features/drivers/components/DriverHeader';
@@ -9,8 +10,10 @@ import { DriverSidebar } from '@/features/drivers/components/DriverSidebar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { isValidUuid } from '@/lib/utils/validation';
+import { getMediaUrl } from '@/lib/utils/media';
 
 export default function DriverDetailsPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -30,12 +33,14 @@ export default function DriverDetailsPage() {
   if (!isValidId || error || !driver) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center px-4">
-        <h2 className="text-2xl font-bold text-foreground">Driver not found</h2>
+        <h2 className="text-2xl font-bold text-foreground">
+          {t('driver_details.not_found.title', 'Driver not found')}
+        </h2>
         <p className="text-muted-foreground max-w-md">
-          The driver you are looking for does not exist or has been removed.
+          {t('driver_details.not_found.description', 'The driver you are looking for does not exist or has been removed.')}
         </p>
         <Button variant="outline" onClick={() => router.push('/explore/drivers')}>
-          Back to Drivers
+          {t('driver_details.not_found.back_to_list', 'Back to Drivers')}
         </Button>
       </div>
     );
@@ -45,13 +50,17 @@ export default function DriverDetailsPage() {
     console.log('Book driver:', driver.id);
   };
 
+  const coverImage = driver.coverUrl
+    ? getMediaUrl(driver.coverUrl)
+    : '/default-covers/driver-cover.jpg';
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Hero Background */}
       <div className="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-gray-900">
           <img
-            src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1920&q=80"
+            src={coverImage}
             alt="Driving Background"
             className="w-full h-full object-cover opacity-60"
           />
@@ -69,7 +78,7 @@ export default function DriverDetailsPage() {
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          {t('driver_details.back', 'Back')}
         </Button>
 
         {/* Header Card */}

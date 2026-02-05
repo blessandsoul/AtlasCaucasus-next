@@ -10,6 +10,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface ChatButtonProps {
   otherUserId: string;
@@ -25,26 +26,30 @@ export const ChatButton = ({
   className,
   variant = 'default',
   size = 'default',
-  label = 'Chat',
+  label,
   showIcon = true,
 }: ChatButtonProps) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   const createChat = useCreateDirectChat();
   const [isLoading, setIsLoading] = useState(false);
 
+  // default label
+  const buttonLabel = label || t('chat.button_label', 'Chat');
+
   const handleClick = useCallback(async () => {
     // Check if user is authenticated
     if (!isAuthenticated) {
-      toast.error('Please log in to start a chat');
+      toast.error(t('chat.login_required'));
       router.push('/login');
       return;
     }
 
     // Check if trying to chat with themselves
     if (user?.id === otherUserId) {
-      toast.error("You can't chat with yourself");
+      toast.error(t('chat.self_chat_error'));
       return;
     }
 
@@ -55,11 +60,11 @@ export const ChatButton = ({
       dispatch(selectChat(chat.id));
     } catch (error) {
       console.error('Failed to create chat:', error);
-      toast.error('Failed to start chat. Please try again.');
+      toast.error(t('chat.start_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, user?.id, otherUserId, createChat, dispatch, router]);
+  }, [isAuthenticated, user?.id, otherUserId, createChat, dispatch, router, t]);
 
   const isDisabled = isLoading || createChat.isPending;
 
@@ -76,7 +81,7 @@ export const ChatButton = ({
       ) : showIcon ? (
         <MessageCircle className="w-4 h-4" />
       ) : null}
-      {label}
+      {buttonLabel}
     </Button>
   );
 };

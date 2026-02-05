@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -33,6 +34,7 @@ export const StarRating = ({
   onChange,
   className,
 }: StarRatingProps) => {
+  const { t } = useTranslation();
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
   const handleMouseEnter = useCallback(
@@ -84,7 +86,7 @@ export const StarRating = ({
             onClick={() => handleClick(starValue)}
             onMouseEnter={() => handleMouseEnter(starValue)}
             disabled={!interactive}
-            aria-label={interactive ? `Rate ${starValue} stars` : undefined}
+            aria-label={interactive ? t('reviews.rate_stars', 'Rate {{count}} stars', { count: starValue }) : undefined}
           >
             {/* Background star (empty) */}
             <Star

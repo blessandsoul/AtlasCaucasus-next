@@ -96,6 +96,20 @@ class GuideService {
 
     return response.data.data;
   }
+
+  // Cover image management
+  async uploadCover(guideId: string, file: File): Promise<{ coverUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+      data: { coverUrl: string };
+    }>(API_ENDPOINTS.GUIDES.UPLOAD_COVER(guideId), formData);
+
+    return response.data.data;
+  }
 }
 
 export const guideService = new GuideService();

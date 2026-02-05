@@ -1,6 +1,8 @@
 export interface Location {
   id: string;
-  city: string;
+  name: string;
+  region?: string;
+  country: string;
   latitude: number;
   longitude: number;
   createdAt: string;
@@ -47,6 +49,7 @@ export interface Driver {
   locations: Location[];
   photos?: DriverMedia[];
   avatarUrl: string | null; // Primary profile photo
+  coverUrl: string | null; // Cover/hero image
   pricePerDay?: number;
   currency?: string;
   yearsOfExperience?: number;

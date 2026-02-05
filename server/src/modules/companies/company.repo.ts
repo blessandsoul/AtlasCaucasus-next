@@ -5,9 +5,13 @@ import { getMediaByEntity } from "../media/media.repo.js";
 
 async function toCompanyResponseWithMedia(company: any): Promise<CompanyResponse> {
     const media = await getMediaByEntity("company", company.id);
+    // Fetch cover image (entityType: "company-cover")
+    const coverMedia = await getMediaByEntity("company-cover", company.id);
+    const cover = coverMedia.length > 0 ? coverMedia[0] : null;
     return {
         ...company,
         images: media,
+        coverUrl: cover?.url ?? null,
     };
 }
 

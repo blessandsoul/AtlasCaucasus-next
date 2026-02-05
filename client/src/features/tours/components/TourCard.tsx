@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import {
     Heart,
     Layers,
@@ -30,6 +31,7 @@ interface TourCardProps {
 }
 
 export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
+    const { t } = useTranslation();
     const router = useRouter();
     const containerRef = useRef<HTMLDivElement>(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -97,14 +99,14 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
 
     // Format next available date
     const formatDate = (dateStr: string | null) => {
-        if (!dateStr) return 'Check dates';
+        if (!dateStr) return t('tour_card.check_dates');
         const date = new Date(dateStr);
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        if (date.toDateString() === today.toDateString()) return 'Today';
-        if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+        if (date.toDateString() === today.toDateString()) return t('tour_card.today');
+        if (date.toDateString() === tomorrow.toDateString()) return t('tour_card.tomorrow');
 
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
@@ -197,7 +199,7 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
                     </h3>
                     <div className="flex items-center gap-1 bg-yellow-500/10 px-2 py-1 rounded-lg border border-yellow-500/20 shrink-0 max-[600px]:hidden">
                         <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
-                        <span className="text-yellow-600 dark:text-yellow-500 font-bold text-sm">{rating ? rating.toFixed(1) : 'New'}</span>
+                        <span className="text-yellow-600 dark:text-yellow-500 font-bold text-sm">{rating ? rating.toFixed(1) : t('tour_card.new')}</span>
                     </div>
                 </div>
 
@@ -207,16 +209,16 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
                         {/* Mobile Only Rating */}
                         <div className="hidden max-[600px]:flex items-center gap-1 text-yellow-600 dark:text-yellow-500 font-bold text-xs pr-2 border-r border-gray-300 dark:border-gray-700">
                             <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            <span>{rating ? rating.toFixed(1) : 'New'}</span>
+                            <span>{rating ? rating.toFixed(1) : t('tour_card.new')}</span>
                         </div>
 
                         <MapPin className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">{tour.category || 'Tour'} • {tour.city || 'Georgia'}</span>
+                        <span className="truncate">{tour.category || t('common.tour')} • {tour.city || 'Georgia'}</span>
                     </div>
                     {tour.startLocation && (
                         <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-xs">
                             <Route className="h-3 w-3 shrink-0" />
-                            <span className="truncate">from {tour.startLocation}</span>
+                            <span className="truncate">{t('tour_card.from', { location: tour.startLocation })}</span>
                         </div>
                     )}
                 </div>
@@ -242,7 +244,7 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
                         <span>
                             {tour.startDate
                                 ? new Date(tour.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                : 'Flexible'}
+                                : t('tour_card.flexible')}
                         </span>
                     </div>
                 </div>
@@ -252,13 +254,13 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
                     {tour.hasFreeCancellation && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20">
                             <Check className="h-2.5 w-2.5 mr-1" />
-                            Free Cancel
+                            {t('tour_card.free_cancel')}
                         </span>
                     )}
                     {tour.isInstantBooking && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-500 border border-blue-500/20">
                             <Zap className="h-2.5 w-2.5 mr-1" />
-                            Instant
+                            {t('tour_card.instant')}
                         </span>
                     )}
                 </div>
@@ -276,7 +278,7 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
                             <span className="text-xl max-[600px]:text-lg font-bold text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-gray-400">
                                 {formatCurrency(currentPrice, tour.currency)}
                             </span>
-                            <span className="text-gray-500 text-xs">per person</span>
+                            <span className="text-gray-500 text-xs">{t('tour_card.per_person')}</span>
                         </div>
                     </div>
 

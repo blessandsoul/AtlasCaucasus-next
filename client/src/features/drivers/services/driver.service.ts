@@ -93,6 +93,20 @@ class DriverService {
 
     return response.data.data;
   }
+
+  // Cover image management
+  async uploadCover(driverId: string, file: File): Promise<{ coverUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+      data: { coverUrl: string };
+    }>(API_ENDPOINTS.DRIVERS.UPLOAD_COVER(driverId), formData);
+
+    return response.data.data;
+  }
 }
 
 export const driverService = new DriverService();

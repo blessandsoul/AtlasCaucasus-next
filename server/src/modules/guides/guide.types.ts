@@ -14,6 +14,7 @@ export interface GuideResponse extends Guide {
     locations: Location[];
     photos?: SafeMedia[]; // Media photos associated with guide (gallery)
     avatarUrl: string | null; // Primary profile photo
+    coverUrl: string | null; // Cover/hero image
 }
 
 export interface UpdateGuideData {

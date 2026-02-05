@@ -10,7 +10,10 @@ interface GuideSidebarProps {
   className?: string;
 }
 
+import { useTranslation } from 'react-i18next'; // Added import
+
 export const GuideSidebar = ({ guide, onBook, className }: GuideSidebarProps) => {
+  const { t } = useTranslation(); // Added hook
   const price = guide.pricePerDay ? Number(guide.pricePerDay) : null;
   const currency = guide.currency || 'USD';
 
@@ -42,18 +45,18 @@ export const GuideSidebar = ({ guide, onBook, className }: GuideSidebarProps) =>
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
             <span className="text-xs text-muted-foreground mb-0.5">
-              Starting from
+              {t('guide_details.starting_from')}
             </span>
             {price ? (
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl md:text-3xl font-bold text-foreground">
                   {formatPrice(price, currency)}
                 </span>
-                <span className="text-muted-foreground text-sm">/day</span>
+                <span className="text-muted-foreground text-sm">/{t('guide_details.per_day')}</span>
               </div>
             ) : (
               <span className="text-lg font-semibold text-muted-foreground">
-                Contact for price
+                {t('guide_details.contact_for_price')}
               </span>
             )}
           </div>
@@ -63,7 +66,7 @@ export const GuideSidebar = ({ guide, onBook, className }: GuideSidebarProps) =>
             onClick={handleBook}
             className="bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full px-8 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
           >
-            Book Now
+            {t('guide_details.book_now')}
           </Button>
         </div>
       </div>

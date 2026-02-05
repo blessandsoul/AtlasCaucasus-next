@@ -24,6 +24,12 @@ import {
   uploadUserAvatar,
   uploadDriverAvatar,
   uploadGuideAvatar,
+  uploadCompanyCover,
+  uploadGuideCover,
+  uploadDriverCover,
+  deleteCompanyCoverAuthed,
+  deleteGuideCoverAuthed,
+  deleteDriverCoverAuthed,
 } from "./media.helpers.js";
 
 interface UploadMediaParams {
@@ -406,5 +412,137 @@ export async function uploadGuideAvatarHandler(
 
   return reply.status(201).send(
     successResponse("Guide avatar uploaded successfully", media)
+  );
+}
+
+// Specialized endpoint: Upload company cover image
+export async function uploadCompanyCoverHandler(
+  request: FastifyRequest<{ Params: { companyId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { companyId } = request.params;
+
+  const data = await request.file();
+  if (!data) {
+    throw new BadRequestError("No file provided", "NO_FILE_PROVIDED");
+  }
+
+  const buffer = await data.toBuffer();
+  const uploadedFile: UploadedFile = {
+    fieldname: data.fieldname,
+    filename: data.filename,
+    originalFilename: data.filename,
+    encoding: data.encoding,
+    mimetype: data.mimetype,
+    size: buffer.length,
+    buffer,
+  };
+
+  const media = await uploadCompanyCover(request.user, companyId, uploadedFile);
+
+  return reply.status(201).send(
+    successResponse("Company cover image uploaded successfully", media)
+  );
+}
+
+// Specialized endpoint: Upload guide cover image
+export async function uploadGuideCoverHandler(
+  request: FastifyRequest<{ Params: { guideId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { guideId } = request.params;
+
+  const data = await request.file();
+  if (!data) {
+    throw new BadRequestError("No file provided", "NO_FILE_PROVIDED");
+  }
+
+  const buffer = await data.toBuffer();
+  const uploadedFile: UploadedFile = {
+    fieldname: data.fieldname,
+    filename: data.filename,
+    originalFilename: data.filename,
+    encoding: data.encoding,
+    mimetype: data.mimetype,
+    size: buffer.length,
+    buffer,
+  };
+
+  const media = await uploadGuideCover(request.user, guideId, uploadedFile);
+
+  return reply.status(201).send(
+    successResponse("Guide cover image uploaded successfully", media)
+  );
+}
+
+// Specialized endpoint: Upload driver cover image
+export async function uploadDriverCoverHandler(
+  request: FastifyRequest<{ Params: { driverId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { driverId } = request.params;
+
+  const data = await request.file();
+  if (!data) {
+    throw new BadRequestError("No file provided", "NO_FILE_PROVIDED");
+  }
+
+  const buffer = await data.toBuffer();
+  const uploadedFile: UploadedFile = {
+    fieldname: data.fieldname,
+    filename: data.filename,
+    originalFilename: data.filename,
+    encoding: data.encoding,
+    mimetype: data.mimetype,
+    size: buffer.length,
+    buffer,
+  };
+
+  const media = await uploadDriverCover(request.user, driverId, uploadedFile);
+
+  return reply.status(201).send(
+    successResponse("Driver cover image uploaded successfully", media)
+  );
+}
+
+// Specialized endpoint: Delete company cover image
+export async function deleteCompanyCoverHandler(
+  request: FastifyRequest<{ Params: { companyId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { companyId } = request.params;
+
+  await deleteCompanyCoverAuthed(request.user, companyId);
+
+  return reply.send(
+    successResponse("Company cover image deleted successfully", null)
+  );
+}
+
+// Specialized endpoint: Delete guide cover image
+export async function deleteGuideCoverHandler(
+  request: FastifyRequest<{ Params: { guideId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { guideId } = request.params;
+
+  await deleteGuideCoverAuthed(request.user, guideId);
+
+  return reply.send(
+    successResponse("Guide cover image deleted successfully", null)
+  );
+}
+
+// Specialized endpoint: Delete driver cover image
+export async function deleteDriverCoverHandler(
+  request: FastifyRequest<{ Params: { driverId: string } }>,
+  reply: FastifyReply
+): Promise<void> {
+  const { driverId } = request.params;
+
+  await deleteDriverCoverAuthed(request.user, driverId);
+
+  return reply.send(
+    successResponse("Driver cover image deleted successfully", null)
   );
 }
