@@ -74,7 +74,7 @@ export const ReviewStats = ({
   if (reviewCount === 0) {
     return (
       <div className={cn('text-muted-foreground text-sm', className)}>
-        {t('reviews.no_reviews_yet', 'No reviews yet')}
+        {t('reviews.no_reviews_yet')}
       </div>
     );
   }
@@ -89,7 +89,7 @@ export const ReviewStats = ({
         <div className="flex flex-col">
           <StarRating rating={averageRating ?? 0} size="md" />
           <span className="text-sm text-muted-foreground">
-            {t('reviews.review_count', '{{count}} reviews', { count: reviewCount })}
+            {t('reviews.review_count', { count: reviewCount })}
           </span>
         </div>
       </div>

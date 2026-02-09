@@ -1,7 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import * as authController from "./auth.controller.js";
-import { authGuard, requireRole } from "../../middlewares/authGuard.js";
-import { requireVerifiedEmail } from "../../middlewares/requireVerifiedEmail.js";
+import { authGuard, authGuardNoEmailCheck, requireRole } from "../../middlewares/authGuard.js";
 import { createRateLimitConfig } from "../../config/rateLimit.js";
 
 export async function authRoutes(fastify: FastifyInstance): Promise<void> {
@@ -52,25 +51,25 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     authController.logout
   );
 
-  // Logout all - requires auth, light limit
+  // Logout all - requires auth (no email check — unverified users can still logout)
   fastify.post(
     "/auth/logout-all",
-    { preHandler: [authGuard], config: createRateLimitConfig("logout") },
+    { preHandler: [authGuardNoEmailCheck], config: createRateLimitConfig("logout") },
     authController.logoutAll
   );
 
-  // Get current user - no rate limit (protected by auth)
-  fastify.get("/auth/me", { preHandler: [authGuard] }, authController.me);
+  // Get current user - no email check (client needs user data to show verify-email page)
+  fastify.get("/auth/me", { preHandler: [authGuardNoEmailCheck] }, authController.me);
 
   // ==========================================
   // ROLE MANAGEMENT
   // ==========================================
 
-  // Claim GUIDE or DRIVER role (requires auth and verified email)
+  // Claim GUIDE or DRIVER role (authGuard enforces verified email)
   fastify.post(
     "/auth/claim-role",
     {
-      preHandler: [authGuard, requireVerifiedEmail],
+      preHandler: [authGuard],
       config: createRateLimitConfig("login") // Moderate limit
     },
     authController.claimRole
@@ -80,21 +79,21 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   // TOUR AGENT MANAGEMENT (Companies only)
   // ==========================================
 
-  // Create tour agent sub-account (requires COMPANY role and verified email)
+  // Create tour agent sub-account (authGuard enforces verified email)
   fastify.post(
     "/auth/tour-agents",
     {
-      preHandler: [authGuard, requireVerifiedEmail, requireRole("COMPANY")],
+      preHandler: [authGuard, requireRole("COMPANY")],
       config: createRateLimitConfig("login")
     },
     authController.createTourAgent
   );
 
-  // Get all tour agents for this company (requires COMPANY role and verified email)
+  // Get all tour agents for this company (authGuard enforces verified email)
   fastify.get(
     "/auth/tour-agents",
     {
-      preHandler: [authGuard, requireVerifiedEmail, requireRole("COMPANY")]
+      preHandler: [authGuard, requireRole("COMPANY")]
     },
     authController.getTourAgents
   );

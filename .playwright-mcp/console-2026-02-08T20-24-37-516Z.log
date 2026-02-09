@@ -1,0 +1,38 @@
+[     498ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     575ms] [ERROR] In HTML, %s cannot be a descendant of <%s>.
+This will cause a hydration error.%s <div> p 
+
+  ...
+    <LoadingBoundary name="blog/" loading={null}>
+      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{rsc:<Fragment>, ...}} ...>
+              <SegmentViewNode type="page" pagePath="dashboard/...">
+                <SegmentTrieNode>
+                <ClientPageRoot Component={function BlogDashboardPage} serverProvidedParams={{...}}>
+                  <BlogDashboardPage params={Promise} searchParams={Promise}>
+                    <div className="space-y-6">
+                      <div>
+                      <div className="grid grid-...">
+                        <div className="rounded-xl...">
+                          <div className="flex items...">
+                            <div>
+                            <div>
+>                             <p className="text-2xl font-bold tabular-nums">
+                                <Skeleton className="h-7 w-8">
+>                                 <div className="animate-pulse rounded-md bg-muted h-7 w-8">
+                              ...
+                        ...
+                      ...
+              ...
+            ...
+ @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     576ms] [ERROR] <%s> cannot contain a nested %s.
+See this log for the ancestor stack trace. p <div> @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   49174ms] [WARNING] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMGY5MTczNS1jMTI3LTRmMGEtYTg3OS0zZmI3NTRiZGViMzkiLCJyb2xlcyI6WyJBRE1JTiJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MDU4MjI1OSwiZXhwIjoxNzcwNTgzMTU5fQ.bXw2f5md9mYuzWgMnbf6ylmVw78wv17RUmLfkGLpGfw' failed: WebSocket is closed before the connection is established. @ http://localhost:3000/_next/static/chunks/src_72540e30._.js:502
+[   49258ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   49283ms] [WARNING] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMGY5MTczNS1jMTI3LTRmMGEtYTg3OS0zZmI3NTRiZGViMzkiLCJyb2xlcyI6WyJBRE1JTiJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MDU4MjI1OSwiZXhwIjoxNzcwNTgzMTU5fQ.bXw2f5md9mYuzWgMnbf6ylmVw78wv17RUmLfkGLpGfw' failed: WebSocket is closed before the connection is established. @ http://localhost:3000/_next/static/chunks/src_72540e30._.js:502
+[   49407ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   61451ms] [WARNING] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMGY5MTczNS1jMTI3LTRmMGEtYTg3OS0zZmI3NTRiZGViMzkiLCJyb2xlcyI6WyJBRE1JTiJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MDU4MjI1OSwiZXhwIjoxNzcwNTgzMTU5fQ.bXw2f5md9mYuzWgMnbf6ylmVw78wv17RUmLfkGLpGfw' failed: WebSocket is closed before the connection is established. @ http://localhost:3000/_next/static/chunks/src_72540e30._.js:502
+[   61519ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127

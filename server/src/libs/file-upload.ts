@@ -115,6 +115,10 @@ function getDefaultNameForEntity(entityType: MediaEntityType): string {
     user: "user-avatar",
     "guide-avatar": "guide-avatar",
     "driver-avatar": "driver-avatar",
+    blog: "blog-cover",
+    "company-cover": "company-cover",
+    "guide-cover": "guide-cover",
+    "driver-cover": "driver-cover",
   };
   return defaults[entityType] || "image";
 }

@@ -1,7 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import * as guideController from "./guide.controller.js";
 import { authGuard } from "../../middlewares/authGuard.js";
-import { requireVerifiedEmail } from "../../middlewares/requireVerifiedEmail.js";
 
 export async function guideRoutes(fastify: FastifyInstance): Promise<void> {
     // Public: List all guides (paginated, filterable)
@@ -20,14 +19,14 @@ export async function guideRoutes(fastify: FastifyInstance): Promise<void> {
     // Auth required: Update guide (ownership checked in service)
     fastify.patch(
         "/guides/:id",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         guideController.update
     );
 
     // Auth required: Delete guide (ownership checked in service)
     fastify.delete(
         "/guides/:id",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         guideController.deleteGuide
     );
 
@@ -41,14 +40,14 @@ export async function guideRoutes(fastify: FastifyInstance): Promise<void> {
     // Auth required: Upload photos for guide (ownership checked in helper)
     fastify.post(
         "/guides/:id/photos",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         guideController.uploadPhotos
     );
 
     // Auth required: Delete a specific photo (ownership checked in helper)
     fastify.delete(
         "/guides/:id/photos/:photoId",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         guideController.deletePhoto
     );
 }

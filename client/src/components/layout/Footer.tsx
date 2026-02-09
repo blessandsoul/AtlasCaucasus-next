@@ -130,7 +130,7 @@ export const Footer = () => {
 
                     {/* Quick Links */}
                     <div className="flex flex-col gap-4">
-                        <h4 className="font-bold text-lg">{t('header.nav.explore')}</h4>
+                        <h4 className="font-bold text-lg">{t('footer.quick_links')}</h4>
                         <nav className="flex flex-col gap-3 text-sm text-muted-foreground">
                             <Link href="/explore/tours" className="hover:text-primary hover:translate-x-1 transition-all inline-flex items-center gap-2 group">
                                 <span className="w-0 h-0.5 bg-primary group-hover:w-4 transition-all duration-300"></span>
@@ -148,6 +148,18 @@ export const Footer = () => {
                                 <span className="w-0 h-0.5 bg-primary group-hover:w-4 transition-all duration-300"></span>
                                 {t('header.nav_menu.items.drivers')}
                             </Link>
+                            <Link href="/blog" className="hover:text-primary hover:translate-x-1 transition-all inline-flex items-center gap-2 group">
+                                <span className="w-0 h-0.5 bg-primary group-hover:w-4 transition-all duration-300"></span>
+                                {t('header.nav.blog')}
+                            </Link>
+                            <Link href="/about" className="hover:text-primary hover:translate-x-1 transition-all inline-flex items-center gap-2 group">
+                                <span className="w-0 h-0.5 bg-primary group-hover:w-4 transition-all duration-300"></span>
+                                {t('header.nav.about')}
+                            </Link>
+                            <Link href="/contact" className="hover:text-primary hover:translate-x-1 transition-all inline-flex items-center gap-2 group">
+                                <span className="w-0 h-0.5 bg-primary group-hover:w-4 transition-all duration-300"></span>
+                                {t('header.nav.contact')}
+                            </Link>
                         </nav>
                     </div>
 
@@ -157,7 +169,7 @@ export const Footer = () => {
                         <div className="flex flex-col gap-3 text-sm text-muted-foreground">
                             <div className="flex items-start gap-3">
                                 <MapPin className="h-4 w-4 shrink-0 mt-0.5 text-primary" />
-                                <span>123 Rustaveli Avenue,<br />Tbilisi, Georgia</span>
+                                <span>{t('contact.info.address_value')}</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Phone className="h-4 w-4 shrink-0 text-primary" />
@@ -216,9 +228,9 @@ export const Footer = () => {
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
                     <p className="text-center md:text-left font-medium">© {currentYear} {t('header.brand.name')}. {t('header.footer.rights_reserved')}</p>
                     <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
-                        <Link href="#" className="hover:text-primary hover:underline underline-offset-4 transition-all">{t('header.footer.privacy_policy')}</Link>
-                        <Link href="#" className="hover:text-primary hover:underline underline-offset-4 transition-all">{t('header.footer.terms_of_service')}</Link>
-                        <Link href="#" className="hover:text-primary hover:underline underline-offset-4 transition-all">{t('header.footer.cookie_policy')}</Link>
+                        <Link href="/legal/privacy" className="hover:text-primary hover:underline underline-offset-4 transition-all">{t('header.footer.privacy_policy')}</Link>
+                        <Link href="/legal/terms" className="hover:text-primary hover:underline underline-offset-4 transition-all">{t('header.footer.terms_of_service')}</Link>
+                        <Link href="/legal/cookies" className="hover:text-primary hover:underline underline-offset-4 transition-all">{t('header.footer.cookie_policy')}</Link>
                     </div>
                 </div>
             </div>

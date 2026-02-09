@@ -1,6 +1,12 @@
 // Tour types matching backend API response
 
 export type TourDifficulty = 'easy' | 'moderate' | 'challenging';
+export type AvailabilityType = 'DAILY' | 'WEEKDAYS' | 'WEEKENDS' | 'SPECIFIC_DATES' | 'BY_REQUEST';
+
+export interface ItineraryStep {
+    title: string;
+    description: string;
+}
 
 export interface Tour {
     id: string;
@@ -26,6 +32,10 @@ export interface Tour {
     updatedAt: string;
     nextAvailableDate: string | null;
     startDate: string | null;
+    availabilityType: AvailabilityType;
+    availableDates: string[] | null;
+    startTime: string | null;
+    itinerary: ItineraryStep[] | null;
     images?: TourImage[];
     averageRating: string | null;
     reviewCount: number;
@@ -82,6 +92,10 @@ export interface CreateTourInput {
     hasFreeCancellation?: boolean;
     nextAvailableDate?: string;
     startDate?: string;
+    availabilityType?: AvailabilityType;
+    availableDates?: string[];
+    startTime?: string;
+    itinerary?: ItineraryStep[];
 }
 
 export interface UpdateTourInput {
@@ -103,6 +117,10 @@ export interface UpdateTourInput {
     isFeatured?: boolean;
     nextAvailableDate?: string | null;
     startDate?: string | null;
+    availabilityType?: AvailabilityType;
+    availableDates?: string[] | null;
+    startTime?: string | null;
+    itinerary?: ItineraryStep[] | null;
 }
 
 export interface MyToursParams {

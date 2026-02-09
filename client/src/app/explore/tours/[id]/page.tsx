@@ -1,90 +1,55 @@
-'use client';
+import type { Metadata } from 'next';
+import { TourDetailsClient } from './TourDetailsClient';
 
-import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { useTour } from '@/features/tours/hooks/useTours';
-import { TourHeader } from '@/features/tours/components/TourHeader';
-import { TourGallery } from '@/features/tours/components/TourGallery';
-import { TourSidebar } from '@/features/tours/components/TourSidebar';
-import { TourInfo } from '@/features/tours/components/TourInfo';
-import { ReviewsSection } from '@/features/reviews';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { Button } from '@/components/ui/button';
-import { isValidUuid } from '@/lib/utils/validation';
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+    const response = await fetch(`${apiUrl}/tours/${params.id}`, {
+      cache: 'no-store',
+    });
 
-export default function TourDetailsPage() {
-  const params = useParams();
-  const router = useRouter();
-  const id = params.id as string;
+    if (!response.ok) {
+      return {
+        title: 'Tour Not Found',
+      };
+    }
 
-  // Validate UUID format before making API call
-  const isValidId = isValidUuid(id);
-  const { data: tour, isLoading, error } = useTour(isValidId ? id : '');
+    const result = await response.json();
+    const tour = result.data;
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    const description = tour.summary || `Book ${tour.title} - starting from ${tour.price} ${tour.currency}`;
+    const imageUrl = tour.images?.[0]?.url || '/atlascaucasus.png';
+
+    return {
+      title: tour.title,
+      description,
+      openGraph: {
+        title: tour.title,
+        description,
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+            alt: tour.title,
+          },
+        ],
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: tour.title,
+        description,
+        images: [imageUrl],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Tour Details',
+    };
   }
+}
 
-  if (!isValidId || error || !tour) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
-        <h2 className="text-2xl font-bold">Tour not found</h2>
-        <p className="text-muted-foreground">
-          The tour you are looking for does not exist or has been removed.
-        </p>
-        <Button variant="outline" onClick={() => router.push('/explore/tours')}>
-          Back to Tours
-        </Button>
-      </div>
-    );
-  }
-
-  const handleBook = () => {
-    console.log('Book clicked', tour.id);
-  };
-
-  return (
-    <div className="container mx-auto pt-4 lg:pt-28 pb-8 px-4 md:px-6">
-      {/* Back Button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="mb-6 hover:bg-transparent hover:text-primary pl-0"
-        onClick={() => router.back()}
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back
-      </Button>
-
-      {/* Header */}
-      <TourHeader tour={tour} />
-
-      {/* Gallery */}
-      <TourGallery images={tour.images} className="mt-6 md:mt-8" />
-
-      {/* Main Content Grid */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-        {/* Left Column: Info, Desc, etc. */}
-        <div className="lg:col-span-2">
-          <TourInfo tour={tour} />
-        </div>
-
-        {/* Right Column: Sidebar */}
-        <div className="lg:col-span-1">
-          <TourSidebar tour={tour} onBook={handleBook} />
-        </div>
-      </div>
-
-      {/* Reviews Section */}
-      <ReviewsSection
-        targetType="TOUR"
-        targetId={id}
-        className="mt-8 md:mt-12"
-      />
-    </div>
-  );
+export default function TourDetailsPage(): React.ReactElement {
+  return <TourDetailsClient />;
 }

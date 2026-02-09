@@ -52,11 +52,10 @@ export const ForgotPasswordForm = () => {
                 </div>
                 <div className="space-y-2">
                     <h3 className="text-xl font-semibold text-foreground">
-                        {t('auth.check_email') || 'Check your email'}
+                        {t('auth.check_email')}
                     </h3>
                     <p className="text-muted-foreground">
-                        {t('auth.recovery_instructions_sent', { email: form.getValues().email }) ||
-                         `We've sent recovery instructions to ${form.getValues().email}`}
+                        {t('auth.recovery_instructions_sent', { email: form.getValues().email })}
                     </p>
                 </div>
                 <Button
@@ -64,7 +63,7 @@ export const ForgotPasswordForm = () => {
                     className="w-full"
                     onClick={() => setIsSubmitted(false)}
                 >
-                    {t('auth.try_another_email') || 'Try another email'}
+                    {t('auth.try_another_email')}
                 </Button>
                 <div className="pt-4 border-t border-border">
                     <Link
@@ -72,7 +71,7 @@ export const ForgotPasswordForm = () => {
                         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        {t('auth.back_to_login') || 'Back to login'}
+                        {t('auth.back_to_login')}
                     </Link>
                 </div>
             </div>
@@ -84,8 +83,7 @@ export const ForgotPasswordForm = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <Alert className="bg-blue-50 border-blue-200 text-blue-800">
                     <AlertDescription>
-                        {t('auth.forgot_password_desc') ||
-                         "Enter your email address and we'll send you instructions to reset your password."}
+                        {t('auth.forgot_password_desc')}
                     </AlertDescription>
                 </Alert>
 
@@ -114,7 +112,7 @@ export const ForgotPasswordForm = () => {
                     disabled={forgotPasswordMutation.isPending}
                 >
                     {forgotPasswordMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t('auth.send_reset_link') || 'Send reset link'}
+                    {t('auth.send_reset_link')}
                 </Button>
 
                 <div className="text-center">
@@ -123,7 +121,7 @@ export const ForgotPasswordForm = () => {
                         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        {t('auth.back_to_login') || 'Back to login'}
+                        {t('auth.back_to_login')}
                     </Link>
                 </div>
             </form>

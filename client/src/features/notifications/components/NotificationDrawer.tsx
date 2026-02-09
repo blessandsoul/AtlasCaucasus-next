@@ -16,8 +16,10 @@ import {
     useDeleteNotification,
 } from '../hooks/useNotifications';
 import { groupNotifications } from '../utils/notification.utils';
+import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
 import { selectChat } from '@/features/chat/store/chatSlice';
+import { ROUTES } from '@/lib/constants/routes';
 
 interface NotificationDrawerProps {
     isOpen: boolean;
@@ -27,6 +29,7 @@ interface NotificationDrawerProps {
 export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps) => {
     const { t } = useTranslation();
     const { isAuthenticated } = useAuth();
+    const router = useRouter();
     const dispatch = useAppDispatch();
     const [page, setPage] = useState(1);
     const [mounted, setMounted] = useState(false);
@@ -81,11 +84,16 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
 
         // Handle redirection for CHAT_MESSAGE
         if (notification.type === 'CHAT_MESSAGE' && notification.data?.chatId) {
-            onClose(); // Close notification drawer
-            // Dispatch actions to open chat drawer and select the chat
+            onClose();
             dispatch(selectChat(notification.data.chatId as string));
         }
-    }, [handleMarkAsRead, onClose, dispatch]);
+
+        // Handle redirection for INQUIRY notifications
+        if ((notification.type === 'INQUIRY_RECEIVED' || notification.type === 'INQUIRY_RESPONSE') && notification.data?.inquiryId) {
+            onClose();
+            router.push(ROUTES.INQUIRIES.DETAILS(notification.data.inquiryId as string));
+        }
+    }, [handleMarkAsRead, onClose, dispatch, router]);
 
     const hasNotifications = groupedNotifications.length > 0;
     const hasUnread = groupedNotifications.some((n) => !n.isRead);

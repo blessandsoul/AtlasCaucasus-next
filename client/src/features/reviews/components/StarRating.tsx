@@ -86,7 +86,7 @@ export const StarRating = ({
             onClick={() => handleClick(starValue)}
             onMouseEnter={() => handleMouseEnter(starValue)}
             disabled={!interactive}
-            aria-label={interactive ? t('reviews.rate_stars', 'Rate {{count}} stars', { count: starValue }) : undefined}
+            aria-label={interactive ? t('reviews.rate_stars', { count: starValue }) : undefined}
           >
             {/* Background star (empty) */}
             <Star

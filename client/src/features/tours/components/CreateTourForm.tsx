@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { format } from "date-fns";
-import { CalendarIcon, Loader2, Upload, X, Check } from "lucide-react";
+import { CalendarIcon, Loader2, Upload, X, Check, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -55,8 +54,6 @@ export const CreateTourForm = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [datePopoverOpen, setDatePopoverOpen] = useState(false);
-    const [focusTimePicker, setFocusTimePicker] = useState(false);
 
     // Create and cleanup preview URLs when files change
     useEffect(() => {
@@ -100,7 +97,17 @@ export const CreateTourForm = () => {
             .optional(),
         isInstantBooking: z.boolean().default(false),
         hasFreeCancellation: z.boolean().default(false),
-        startDate: z.date().optional(),
+        availabilityType: z.enum(['DAILY', 'WEEKDAYS', 'WEEKENDS', 'SPECIFIC_DATES', 'BY_REQUEST']).default('BY_REQUEST'),
+        availableDates: z.array(z.string()).optional(),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/, t('tours.create.validation.start_time_format', 'Must be in HH:MM format')).optional().or(z.literal('')),
+        itinerary: z.array(z.object({
+            title: z.string()
+                .min(1, t('tours.create.validation.itinerary_title_required', 'Step title is required'))
+                .max(200, t('tours.create.validation.itinerary_title_max', 'Step title must be at most 200 characters')),
+            description: z.string()
+                .min(1, t('tours.create.validation.itinerary_desc_required', 'Step description is required'))
+                .max(2000, t('tours.create.validation.itinerary_desc_max', 'Step description must be at most 2000 characters')),
+        })).max(30).optional(),
     }), [t]);
 
     type TourFormValues = z.infer<typeof createTourSchema>;
@@ -116,8 +123,30 @@ export const CreateTourForm = () => {
             startLocation: "",
             isInstantBooking: false,
             hasFreeCancellation: false,
+            availabilityType: 'BY_REQUEST' as const,
+            availableDates: [],
+            startTime: '',
+            itinerary: [],
         },
     });
+
+    const { fields: itineraryFields, append: appendStep, remove: removeStep, swap: swapSteps } = useFieldArray({
+        control: form.control,
+        name: 'itinerary',
+    });
+
+    const handleAddStep = useCallback((): void => {
+        if (itineraryFields.length >= 30) return;
+        appendStep({ title: '', description: '' });
+    }, [itineraryFields.length, appendStep]);
+
+    const handleMoveUp = useCallback((index: number): void => {
+        if (index > 0) swapSteps(index, index - 1);
+    }, [swapSteps]);
+
+    const handleMoveDown = useCallback((index: number): void => {
+        if (index < itineraryFields.length - 1) swapSteps(index, index + 1);
+    }, [swapSteps, itineraryFields.length]);
 
     const onSubmit = async (data: TourFormValues) => {
         setIsSubmitting(true);
@@ -125,7 +154,11 @@ export const CreateTourForm = () => {
             // Convert TourFormValues to CreateTourInput (handling date -> string conversion)
             const tourData: CreateTourInput = {
                 ...data,
-                startDate: data.startDate ? data.startDate.toISOString() : undefined,
+                startTime: data.startTime || undefined,
+                availableDates: data.availabilityType === 'SPECIFIC_DATES' && data.availableDates?.length
+                    ? data.availableDates
+                    : undefined,
+                itinerary: data.itinerary?.length ? data.itinerary : undefined,
             };
 
             // 1. Create Tour
@@ -284,7 +317,7 @@ export const CreateTourForm = () => {
                                                 <FormItem>
                                                     <FormLabel>{t('tours.create.duration', 'Duration (minutes)')}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="180" {...field} />
+                                                        <Input type="number" placeholder="180" {...field} value={field.value ?? ''} />
                                                     </FormControl>
                                                     <FormDescription>
                                                         {t('tours.create.duration_desc', 'Approximate duration in minutes.')}
@@ -300,7 +333,7 @@ export const CreateTourForm = () => {
                                                 <FormItem>
                                                     <FormLabel>{t('tours.create.max_group_size', 'Max Group Size')}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="12" {...field} />
+                                                        <Input type="number" placeholder="12" {...field} value={field.value ?? ''} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -308,79 +341,157 @@ export const CreateTourForm = () => {
                                         />
                                     </div>
 
+                                    {/* Availability Section */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <FormField
                                             control={form.control}
-                                            name="startDate"
+                                            name="availabilityType"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-col">
-                                                    <FormLabel>{t('tours.create.start_date', 'Start Date & Time')}</FormLabel>
-                                                    <div className="flex gap-2 flex-wrap">
-                                                        <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
-                                                            <PopoverTrigger asChild>
-                                                                <FormControl>
-                                                                    <Button
-                                                                        variant={"outline"}
-                                                                        className={cn(
-                                                                            "w-[240px] pl-3 text-left font-normal",
-                                                                            !field.value && "text-muted-foreground"
-                                                                        )}
-                                                                    >
-                                                                        {field.value ? (
-                                                                            format(field.value, "PPP")
-                                                                        ) : (
-                                                                            <span>{t('tours.create.pick_date', 'Pick a date')}</span>
-                                                                        )}
-                                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                                    </Button>
-                                                                </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-auto p-0" align="start">
-                                                                <Calendar
-                                                                    mode="single"
-                                                                    selected={field.value}
-                                                                    onSelect={(date: Date | undefined) => {
-                                                                        if (date) {
-                                                                            const newDate = new Date(date);
-                                                                            if (field.value) {
-                                                                                newDate.setHours(field.value.getHours());
-                                                                                newDate.setMinutes(field.value.getMinutes());
-                                                                            } else {
-                                                                                newDate.setHours(10); // Default to 10:00 AM if no time set
-                                                                                newDate.setMinutes(0);
-                                                                            }
-                                                                            field.onChange(newDate);
-                                                                            setDatePopoverOpen(false);
-                                                                            setFocusTimePicker(true);
-                                                                        } else {
-                                                                            field.onChange(undefined);
-                                                                        }
-                                                                    }}
-                                                                    disabled={(date) => {
-                                                                        const today = new Date();
-                                                                        today.setHours(0, 0, 0, 0);
-                                                                        return date < today;
-                                                                    }}
-                                                                />
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <TimePicker
-                                                            value={field.value}
-                                                            onChange={(newDate) => {
-                                                                field.onChange(newDate);
-                                                                setFocusTimePicker(false);
-                                                            }}
-                                                            focusOnMount={focusTimePicker}
-                                                        />
-                                                    </div>
+                                                <FormItem>
+                                                    <FormLabel>{t('tours.create.availability_type', 'Availability')}</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder={t('tours.create.select_availability', 'Select availability')} />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="BY_REQUEST">{t('tour_availability.by_request', 'By request')}</SelectItem>
+                                                            <SelectItem value="DAILY">{t('tour_availability.daily', 'Available daily')}</SelectItem>
+                                                            <SelectItem value="WEEKDAYS">{t('tour_availability.weekdays', 'Weekdays only')}</SelectItem>
+                                                            <SelectItem value="WEEKENDS">{t('tour_availability.weekends', 'Weekends only')}</SelectItem>
+                                                            <SelectItem value="SPECIFIC_DATES">{t('tour_availability.specific_dates', 'Specific dates')}</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
                                                     <FormDescription>
-                                                        {t('tours.create.start_date_desc', 'When does this tour start?')}
+                                                        {t('tours.create.availability_type_desc', 'When is this tour available?')}
                                                     </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
+                                        <FormField
+                                            control={form.control}
+                                            name="startTime"
+                                            render={({ field }) => {
+                                                const timeDate = (() => {
+                                                    if (!field.value) return undefined;
+                                                    const [h, m] = field.value.split(':').map(Number);
+                                                    const d = new Date();
+                                                    d.setHours(h, m, 0, 0);
+                                                    return d;
+                                                })();
+
+                                                return (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>{t('tours.create.default_start_time', 'Default Start Time')}</FormLabel>
+                                                        <TimePicker
+                                                            value={timeDate}
+                                                            onChange={(date) => {
+                                                                const hh = date.getHours().toString().padStart(2, '0');
+                                                                const mm = date.getMinutes().toString().padStart(2, '0');
+                                                                field.onChange(`${hh}:${mm}`);
+                                                            }}
+                                                        />
+                                                        <FormDescription>
+                                                            {t('tours.create.default_start_time_desc', 'Optional default start time (e.g. 09:00).')}
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
                                     </div>
+
+                                    {/* Specific Dates Picker — shown only when SPECIFIC_DATES is selected */}
+                                    {form.watch('availabilityType') === 'SPECIFIC_DATES' && (
+                                        <FormField
+                                            control={form.control}
+                                            name="availableDates"
+                                            render={({ field }) => {
+                                                const selectedDates = (field.value || []).map((d: string) => new Date(d));
+
+                                                const handleDateSelect = (date: Date | undefined) => {
+                                                    if (!date) return;
+                                                    const dateStr = date.toISOString().split('T')[0];
+                                                    const current = field.value || [];
+                                                    if (current.includes(dateStr)) {
+                                                        field.onChange(current.filter((d: string) => d !== dateStr));
+                                                    } else {
+                                                        field.onChange([...current, dateStr].sort());
+                                                    }
+                                                };
+
+                                                const removeDate = (dateStr: string) => {
+                                                    field.onChange((field.value || []).filter((d: string) => d !== dateStr));
+                                                };
+
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>{t('tours.create.available_dates', 'Available Dates')}</FormLabel>
+                                                        <div className="space-y-3">
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <FormControl>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            className={cn(
+                                                                                "w-full justify-start text-left font-normal",
+                                                                                !selectedDates.length && "text-muted-foreground"
+                                                                            )}
+                                                                        >
+                                                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                                                            {selectedDates.length > 0
+                                                                                ? t('tours.create.dates_selected', '{{count}} date(s) selected', { count: selectedDates.length })
+                                                                                : t('tours.create.pick_dates', 'Pick dates')}
+                                                                        </Button>
+                                                                    </FormControl>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-0" align="start">
+                                                                    <Calendar
+                                                                        mode="single"
+                                                                        selected={undefined}
+                                                                        onSelect={handleDateSelect}
+                                                                        modifiers={{ selected: selectedDates }}
+                                                                        modifiersClassNames={{ selected: 'bg-primary text-primary-foreground' }}
+                                                                        disabled={(date) => {
+                                                                            const today = new Date();
+                                                                            today.setHours(0, 0, 0, 0);
+                                                                            return date < today;
+                                                                        }}
+                                                                    />
+                                                                </PopoverContent>
+                                                            </Popover>
+
+                                                            {selectedDates.length > 0 && (
+                                                                <div className="flex flex-wrap gap-1.5">
+                                                                    {(field.value || []).map((dateStr: string) => (
+                                                                        <span
+                                                                            key={dateStr}
+                                                                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium"
+                                                                        >
+                                                                            {new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => removeDate(dateStr)}
+                                                                                className="hover:text-destructive transition-colors"
+                                                                            >
+                                                                                <X className="h-3 w-3" />
+                                                                            </button>
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <FormDescription>
+                                                            {t('tours.create.available_dates_desc', 'Click dates to add or remove them.')}
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+                                    )}
 
                                     <div className="flex flex-col gap-4 border p-4 rounded-lg bg-muted/20">
                                         <FormField
@@ -429,6 +540,116 @@ export const CreateTourForm = () => {
                                         />
                                     </div>
 
+                                </CardContent>
+                            </Card>
+
+                            {/* Itinerary Card */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>{t('tours.create.itinerary', 'Itinerary')}</CardTitle>
+                                    <CardDescription>
+                                        {t('tours.create.itinerary_desc', 'Add a step-by-step plan for your tour. This helps travelers understand what to expect.')}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {itineraryFields.length > 0 && (
+                                        <div className="space-y-4">
+                                            {itineraryFields.map((field, index) => (
+                                                <div
+                                                    key={field.id}
+                                                    className="relative flex gap-3 p-4 rounded-xl border bg-card"
+                                                >
+                                                    {/* Step number */}
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-semibold mt-0.5">
+                                                        {index + 1}
+                                                    </div>
+
+                                                    {/* Fields */}
+                                                    <div className="flex-1 space-y-3 min-w-0">
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`itinerary.${index}.title`}
+                                                            render={({ field: titleField }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            placeholder={t('tours.create.itinerary_step_title', 'Step title (e.g. Day 1: Tbilisi)')}
+                                                                            {...titleField}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`itinerary.${index}.description`}
+                                                            render={({ field: descField }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <Textarea
+                                                                            placeholder={t('tours.create.itinerary_step_desc', 'Describe what happens during this step...')}
+                                                                            className="resize-none min-h-[80px]"
+                                                                            {...descField}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+
+                                                    {/* Actions */}
+                                                    <div className="flex flex-col gap-1 shrink-0">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleMoveUp(index)}
+                                                            disabled={index === 0}
+                                                            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                                            aria-label={t('tours.create.itinerary_move_up', 'Move up')}
+                                                        >
+                                                            <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleMoveDown(index)}
+                                                            disabled={index === itineraryFields.length - 1}
+                                                            className="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                                            aria-label={t('tours.create.itinerary_move_down', 'Move down')}
+                                                        >
+                                                            <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeStep(index)}
+                                                            className="p-1 rounded hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                                            aria-label={t('tours.create.itinerary_remove', 'Remove step')}
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleAddStep}
+                                        disabled={itineraryFields.length >= 30}
+                                        className="w-full border-dashed"
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        {t('tours.create.itinerary_add_step', 'Add Step')}
+                                    </Button>
+
+                                    {itineraryFields.length === 0 && (
+                                        <p className="text-sm text-muted-foreground text-center py-2">
+                                            {t('tours.create.itinerary_empty', 'No itinerary steps yet. Add steps to show travelers what to expect.')}
+                                        </p>
+                                    )}
                                 </CardContent>
                             </Card>
 
@@ -551,7 +772,7 @@ export const CreateTourForm = () => {
                                                 <FormLabel>{t('tours.create.original_price', 'Original Price')}</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Input type="number" step="0.01" {...field} className="pl-9" />
+                                                        <Input type="number" step="0.01" {...field} value={field.value ?? ''} className="pl-9" />
                                                         <div className="absolute left-3 top-2.5 text-muted-foreground text-sm">
                                                             {form.watch('currency') === 'USD' ? '$' : form.watch('currency') === 'EUR' ? '€' : '₾'}
                                                         </div>

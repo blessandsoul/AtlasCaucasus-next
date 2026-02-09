@@ -76,7 +76,7 @@ export const ReviewsSection = ({
   return (
     <Card className={cn('', className)}>
       <CardHeader>
-        <CardTitle>{t('reviews.section_title', 'Reviews')}</CardTitle>
+        <CardTitle>{t('reviews.section_title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Stats */}
@@ -94,14 +94,14 @@ export const ReviewsSection = ({
             {hasReviewed && existingReview ? (
               <div className="bg-muted/50 rounded-lg p-4">
                 <p className="text-sm text-muted-foreground mb-2">
-                  {t('reviews.already_reviewed', 'You have already reviewed this item.')}
+                  {t('reviews.already_reviewed')}
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setEditingReview(existingReview)}
                 >
-                  {t('reviews.edit_your_review', 'Edit Your Review')}
+                  {t('reviews.edit_your_review')}
                 </Button>
               </div>
             ) : (
@@ -109,7 +109,7 @@ export const ReviewsSection = ({
                 {showWriteReview ? (
                   <div className="border rounded-lg p-4">
                     <h4 className="font-medium mb-4">
-                      {t('reviews.write_review', 'Write a Review')}
+                      {t('reviews.write_review')}
                     </h4>
                     <ReviewForm
                       targetType={targetType}
@@ -120,7 +120,7 @@ export const ReviewsSection = ({
                   </div>
                 ) : (
                   <Button onClick={() => setShowWriteReview(true)}>
-                    {t('reviews.write_review', 'Write a Review')}
+                    {t('reviews.write_review')}
                   </Button>
                 )}
               </div>
@@ -130,7 +130,7 @@ export const ReviewsSection = ({
 
         {!isAuthenticated && (
           <p className="text-sm text-muted-foreground">
-            {t('reviews.login_to_review', 'Please log in to write a review.')}
+            {t('reviews.login_to_review')}
           </p>
         )}
 
@@ -155,10 +155,10 @@ export const ReviewsSection = ({
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
-              {t('reviews.edit_title', 'Edit Your Review')}
+              {t('reviews.edit_title')}
             </DialogTitle>
             <DialogDescription>
-              {t('reviews.edit_description', 'Update your rating and comment below.')}
+              {t('reviews.edit_description')}
             </DialogDescription>
           </DialogHeader>
           {editingReview && (

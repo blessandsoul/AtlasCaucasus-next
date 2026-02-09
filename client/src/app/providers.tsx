@@ -9,6 +9,7 @@ import { store } from '@/store';
 import { queryClient } from '@/lib/api/query-client';
 import { LoadingProvider } from '@/context/LoadingContext';
 import { WebSocketProvider } from '@/context/WebSocketContext';
+import { CurrencyProvider } from '@/context/CurrencyContext';
 import { NotificationInitializer } from '@/features/notifications/components/NotificationInitializer';
 import { AgentationProvider } from '@/components/dev/AgentationProvider';
 
@@ -16,14 +17,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <LoadingProvider>
-          <WebSocketProvider>
-            <NotificationInitializer />
-            {children}
-            <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
-            <AgentationProvider />
-          </WebSocketProvider>
-        </LoadingProvider>
+        <CurrencyProvider>
+          <LoadingProvider>
+            <WebSocketProvider>
+              <NotificationInitializer />
+              {children}
+              <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
+              <AgentationProvider />
+            </WebSocketProvider>
+          </LoadingProvider>
+        </CurrencyProvider>
       </QueryClientProvider>
     </Provider>
   );

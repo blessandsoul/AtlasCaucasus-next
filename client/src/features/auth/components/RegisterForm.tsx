@@ -17,6 +17,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ROUTES } from '@/lib/constants/routes';
 import { createRegisterSchema, type RegisterFormData } from '../schemas/validation';
 import { useRegister } from '../hooks/useRegister';
@@ -36,13 +37,15 @@ export const RegisterForm = () => {
             lastName: "",
             email: "",
             password: "",
+            agreeToTerms: undefined as unknown as true,
         },
     });
 
     const password = form.watch('password');
 
     const onSubmit = async (data: RegisterFormData) => {
-        registerMutation.mutate(data);
+        const { agreeToTerms: _, ...requestData } = data;
+        registerMutation.mutate(requestData);
     };
 
     return (
@@ -126,6 +129,34 @@ export const RegisterForm = () => {
                             </div>
                             <FormMessage />
                             <PasswordStrengthIndicator password={password} />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="agreeToTerms"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                                <Checkbox
+                                    checked={field.value === true}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm font-normal text-muted-foreground cursor-pointer">
+                                    {t('auth.agree_to')}{' '}
+                                    <Link href={ROUTES.LEGAL.TERMS} className="text-primary hover:underline" target="_blank">
+                                        {t('header.footer.terms_of_service')}
+                                    </Link>
+                                    {' '}{t('auth.and')}{' '}
+                                    <Link href={ROUTES.LEGAL.PRIVACY} className="text-primary hover:underline" target="_blank">
+                                        {t('header.footer.privacy_policy')}
+                                    </Link>
+                                </FormLabel>
+                                <FormMessage />
+                            </div>
                         </FormItem>
                     )}
                 />

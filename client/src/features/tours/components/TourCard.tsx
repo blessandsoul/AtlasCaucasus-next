@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import {
     Heart,
-    Layers,
     Star,
     MapPin,
     Route,
@@ -21,18 +20,20 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Tour } from '@/features/tours/types/tour.types';
-import { formatCurrency } from '@/lib/utils/format';
 import { getMediaUrl } from '@/lib/utils/media';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface TourCardProps {
     tour: Tour;
     className?: string;
+    isFavorited?: boolean;
     onFavorite?: (id: string) => void;
 }
 
-export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
+export const TourCard = ({ tour, className, isFavorited, onFavorite }: TourCardProps) => {
     const { t } = useTranslation();
     const router = useRouter();
+    const { formatPrice } = useCurrency();
     const containerRef = useRef<HTMLDivElement>(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
@@ -97,18 +98,21 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
         ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
         : null;
 
-    // Format next available date
-    const formatDate = (dateStr: string | null) => {
-        if (!dateStr) return t('tour_card.check_dates');
-        const date = new Date(dateStr);
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        if (date.toDateString() === today.toDateString()) return t('tour_card.today');
-        if (date.toDateString() === tomorrow.toDateString()) return t('tour_card.tomorrow');
-
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    // Get availability label based on type
+    const getAvailabilityLabel = (): string => {
+        switch (tour.availabilityType) {
+            case 'DAILY':
+                return t('tour_availability.daily');
+            case 'WEEKDAYS':
+                return t('tour_availability.weekdays');
+            case 'WEEKENDS':
+                return t('tour_availability.weekends');
+            case 'SPECIFIC_DATES':
+                return t('tour_availability.specific_dates');
+            case 'BY_REQUEST':
+            default:
+                return t('tour_availability.by_request');
+        }
     };
 
     return (
@@ -143,14 +147,17 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
 
                 {/* Top Right Actions */}
                 <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-                    <button className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-colors">
-                        <Layers className="h-4 w-4 text-white" />
-                    </button>
                     <button
                         onClick={handleFavoriteClick}
                         className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-colors group/heart"
+                        aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
                     >
-                        <Heart className="h-4 w-4 text-white group-hover/heart:text-red-500 transition-colors" />
+                        <Heart className={cn(
+                            "h-4 w-4 transition-colors",
+                            isFavorited
+                                ? "fill-red-500 text-red-500"
+                                : "text-white group-hover/heart:text-red-500"
+                        )} />
                     </button>
                 </div>
 
@@ -236,17 +243,14 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
 
                     <div className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5" />
-                        <span>{formatDate(tour.startDate ?? tour.nextAvailableDate)}</span>
+                        <span>{getAvailabilityLabel()}</span>
                     </div>
-                    {/* Start Time */}
-                    <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>
-                            {tour.startDate
-                                ? new Date(tour.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                : t('tour_card.flexible')}
-                        </span>
-                    </div>
+                    {tour.startTime && (
+                        <div className="flex items-center gap-1.5">
+                            <Clock className="h-3.5 w-3.5" />
+                            <span>{tour.startTime}</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Badges Row */}
@@ -270,13 +274,13 @@ export const TourCard = ({ tour, className, onFavorite }: TourCardProps) => {
                     <div className="flex flex-col">
                         {originalPrice && discountPercent && (
                             <div className="flex items-center gap-2 text-xs text-gray-500">
-                                <span className="line-through">{formatCurrency(originalPrice, tour.currency)}</span>
+                                <span className="line-through">{formatPrice(originalPrice, tour.currency)}</span>
                                 <span className="bg-red-500/10 text-red-600 dark:text-red-500 px-1.5 py-0.5 rounded text-[10px] font-bold">-{discountPercent}%</span>
                             </div>
                         )}
                         <div className="flex items-baseline gap-1.5">
                             <span className="text-xl max-[600px]:text-lg font-bold text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-gray-400">
-                                {formatCurrency(currentPrice, tour.currency)}
+                                {formatPrice(currentPrice, tour.currency)}
                             </span>
                             <span className="text-gray-500 text-xs">{t('tour_card.per_person')}</span>
                         </div>

@@ -44,14 +44,14 @@ export const ResetPasswordForm = () => {
 
     const onSubmit = async (data: ResetPasswordFormData) => {
         if (!token) {
-            toast.error(t('auth.invalid_reset_link') || 'Invalid reset link');
+            toast.error(t('auth.invalid_reset_link'));
             return;
         }
 
         setIsSubmitting(true);
         try {
             await authService.resetPassword(token, data.newPassword);
-            toast.success(t('auth.password_reset_success') || 'Password reset successfully!');
+            toast.success(t('auth.password_reset_success'));
             router.push(ROUTES.LOGIN);
         } catch (error) {
             toast.error(getErrorMessage(error));
@@ -64,13 +64,13 @@ export const ResetPasswordForm = () => {
         return (
             <div className="text-center space-y-4">
                 <p className="text-destructive">
-                    {t('auth.invalid_reset_link') || 'Invalid or missing reset link'}
+                    {t('auth.invalid_reset_link')}
                 </p>
                 <Button
                     onClick={() => router.push(ROUTES.FORGOT_PASSWORD)}
                     variant="outline"
                 >
-                    {t('auth.request_new_link') || 'Request a new link'}
+                    {t('auth.request_new_link')}
                 </Button>
             </div>
         );
@@ -84,7 +84,7 @@ export const ResetPasswordForm = () => {
                     name="newPassword"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('auth.new_password') || 'New password'}</FormLabel>
+                            <FormLabel>{t('auth.new_password')}</FormLabel>
                             <FormControl>
                                 <Input
                                     type="password"
@@ -104,7 +104,7 @@ export const ResetPasswordForm = () => {
                     name="confirmPassword"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('auth.confirm_password') || 'Confirm password'}</FormLabel>
+                            <FormLabel>{t('auth.confirm_password')}</FormLabel>
                             <FormControl>
                                 <Input
                                     type="password"
@@ -125,8 +125,8 @@ export const ResetPasswordForm = () => {
                 >
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {isSubmitting
-                        ? (t('auth.resetting_password') || 'Resetting password...')
-                        : (t('auth.reset_password') || 'Reset password')}
+                        ? t('auth.resetting_password')
+                        : t('auth.reset_password')}
                 </Button>
 
                 <div className="text-center">
@@ -136,7 +136,7 @@ export const ResetPasswordForm = () => {
                         onClick={() => router.push(ROUTES.LOGIN)}
                         className="text-sm"
                     >
-                        {t('auth.back_to_login') || 'Back to login'}
+                        {t('auth.back_to_login')}
                     </Button>
                 </div>
             </form>

@@ -11,11 +11,14 @@ import {
   countAllActiveTours,
   listToursByCompany,
   countToursByCompany,
+  listRelatedTours,
   type TourFilters,
 } from "./tour.repo.js";
 import { NotFoundError, ForbiddenError, BadRequestError } from "../../libs/errors.js";
 import { deleteTourImages } from "../media/media.helpers.js";
 import { findById as getCompanyById } from "../companies/company.repo.js";
+import { redisClient, isRedisConnected } from "../../libs/redis.js";
+import { logger } from "../../libs/logger.js";
 
 function assertOwnerOrAdmin(tour: SafeTour, currentUser: JwtUser): void {
   const isOwner = tour.ownerId === currentUser.id;
@@ -168,4 +171,43 @@ export async function listCompanyToursPublic(
   const totalItems = await countToursByCompany(companyId);
 
   return { items, totalItems };
+}
+
+export async function getRelatedTours(
+  tourId: string,
+  limit: number
+): Promise<SafeTour[]> {
+  const CACHE_KEY = `related-tours:${tourId}:${limit}`;
+  const CACHE_TTL = 600; // 10 minutes
+
+  // Try cache first
+  if (isRedisConnected()) {
+    try {
+      const cached = await redisClient.get(CACHE_KEY);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (err) {
+      logger.warn({ err }, "Redis cache read failed for related tours");
+    }
+  }
+
+  // Fetch the current tour to get its category and city
+  const tour = await getTourById(tourId);
+  if (!tour || !tour.isActive) {
+    return [];
+  }
+
+  const items = await listRelatedTours(tourId, tour.category, tour.city, limit);
+
+  // Cache the result
+  if (isRedisConnected()) {
+    try {
+      await redisClient.set(CACHE_KEY, JSON.stringify(items), { EX: CACHE_TTL });
+    } catch (err) {
+      logger.warn({ err }, "Redis cache write failed for related tours");
+    }
+  }
+
+  return items;
 }

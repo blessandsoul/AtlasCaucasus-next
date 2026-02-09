@@ -1,7 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import * as userController from "./user.controller.js";
 import { authGuard, requireRole, requireSelfOrAdmin } from "../../middlewares/authGuard.js";
-import { requireVerifiedEmail } from "../../middlewares/requireVerifiedEmail.js";
 
 export async function userRoutes(fastify: FastifyInstance): Promise<void> {
   // Admin-only: create user with optional role
@@ -28,7 +27,7 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
   // Self-or-admin: update user (controller enforces field restrictions for non-admins)
   fastify.patch(
     "/users/:id",
-    { preHandler: [authGuard, requireVerifiedEmail, requireSelfOrAdmin] },
+    { preHandler: [authGuard, requireSelfOrAdmin] },
     userController.updateUser
   );
 
@@ -49,7 +48,7 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
   // Self-or-admin: delete user
   fastify.delete(
     "/users/:id",
-    { preHandler: [authGuard, requireVerifiedEmail, requireSelfOrAdmin] },
+    { preHandler: [authGuard, requireSelfOrAdmin] },
     userController.deleteUser
   );
 

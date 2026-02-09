@@ -44,19 +44,18 @@ export const RestoreUserDialog = ({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <RotateCcw className="h-5 w-5 text-green-600" />
-            {t('admin.users.restore_title', 'Restore User')}
+            {t('admin.users.restore_title')}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {t(
               'admin.users.restore_description',
-              'Are you sure you want to restore the user "{{name}}"? This will reactivate their account and they will be able to log in again.',
               { name: `${user.firstName} ${user.lastName}` }
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={restoreMutation.isPending}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleRestore}
@@ -66,12 +65,12 @@ export const RestoreUserDialog = ({
             {restoreMutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {t('admin.users.restoring', 'Restoring...')}
+                {t('admin.users.restoring')}
               </>
             ) : (
               <>
                 <RotateCcw className="h-4 w-4 mr-2" />
-                {t('admin.users.restore', 'Restore')}
+                {t('admin.users.restore')}
               </>
             )}
           </AlertDialogAction>

@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
 import { authGuard } from "../../middlewares/authGuard.js";
-import { requireVerifiedEmail } from "../../middlewares/requireVerifiedEmail.js";
 import {
   uploadMediaHandler,
   getMediaHandler,
@@ -51,21 +50,21 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
   // Auth required: upload single media file
   fastify.post<{ Params: MediaParams }>(
     "/media/:entityType/:entityId",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadMediaHandler
   );
 
   // Auth required: upload multiple media files (batch)
   fastify.post<{ Params: MediaParams }>(
     "/media/:entityType/:entityId/batch",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadMultipleMediaHandler
   );
 
   // Auth required: delete media (owner or admin)
   fastify.delete<{ Params: DeleteParams }>(
     "/media/:id",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     deleteMediaHandler
   );
 
@@ -76,7 +75,7 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
   // Tours: Upload tour image
   fastify.post<{ Params: { tourId: string } }>(
     "/tours/:tourId/images",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadTourImageHandler
   );
 
@@ -85,35 +84,35 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
   // Guides: Upload guide photo
   fastify.post<{ Params: { guideId: string } }>(
     "/guides/:guideId/photo",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadGuidePhotoHandler
   );
 
   // Drivers: Upload driver photo
   fastify.post<{ Params: { driverId: string } }>(
     "/drivers/:driverId/photo",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadDriverPhotoHandler
   );
 
   // Users: Upload user avatar
   fastify.post<{ Params: { userId: string } }>(
     "/users/:userId/avatar",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadUserAvatarHandler
   );
 
   // Drivers: Upload driver avatar (profile photo - replaces existing)
   fastify.post<{ Params: { driverId: string } }>(
     "/drivers/:driverId/avatar",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadDriverAvatarHandler
   );
 
   // Guides: Upload guide avatar (profile photo - replaces existing)
   fastify.post<{ Params: { guideId: string } }>(
     "/guides/:guideId/avatar",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadGuideAvatarHandler
   );
 
@@ -124,42 +123,42 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
   // Companies: Upload company cover image (replaces existing)
   fastify.post<{ Params: { companyId: string } }>(
     "/companies/:companyId/cover",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadCompanyCoverHandler
   );
 
   // Guides: Upload guide cover image (replaces existing)
   fastify.post<{ Params: { guideId: string } }>(
     "/guides/:guideId/cover",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadGuideCoverHandler
   );
 
   // Drivers: Upload driver cover image (replaces existing)
   fastify.post<{ Params: { driverId: string } }>(
     "/drivers/:driverId/cover",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     uploadDriverCoverHandler
   );
 
   // Companies: Delete company cover image
   fastify.delete<{ Params: { companyId: string } }>(
     "/companies/:companyId/cover",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     deleteCompanyCoverHandler
   );
 
   // Guides: Delete guide cover image
   fastify.delete<{ Params: { guideId: string } }>(
     "/guides/:guideId/cover",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     deleteGuideCoverHandler
   );
 
   // Drivers: Delete driver cover image
   fastify.delete<{ Params: { driverId: string } }>(
     "/drivers/:driverId/cover",
-    { preHandler: [authGuard, requireVerifiedEmail] },
+    { preHandler: [authGuard] },
     deleteDriverCoverHandler
   );
 }

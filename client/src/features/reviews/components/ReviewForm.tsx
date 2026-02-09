@@ -53,12 +53,12 @@ export const ReviewForm = ({
       z.object({
         rating: z
           .number()
-          .min(1, t('reviews.validation.rating_required', 'Please select a rating'))
+          .min(1, t('reviews.validation.rating_required'))
           .max(5),
         comment: z
           .string()
-          .min(10, t('reviews.validation.comment_min', 'Comment must be at least 10 characters'))
-          .max(1000, t('reviews.validation.comment_max', 'Comment must be at most 1000 characters'))
+          .min(10, t('reviews.validation.comment_min'))
+          .max(1000, t('reviews.validation.comment_max'))
           .optional()
           .or(z.literal('')),
       }),
@@ -126,7 +126,7 @@ export const ReviewForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                {t('reviews.rating_label', 'Your Rating')} *
+                {t('reviews.rating_label')} *
               </FormLabel>
               <FormControl>
                 <div className="flex items-center gap-2">
@@ -155,13 +155,12 @@ export const ReviewForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                {t('reviews.comment_label', 'Your Review')}
+                {t('reviews.comment_label')}
               </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder={t(
-                    'reviews.comment_placeholder',
-                    'Share your experience... (optional, min 10 characters)'
+                    'reviews.comment_placeholder'
                   )}
                   className="min-h-[100px] resize-none"
                   {...field}
@@ -180,8 +179,8 @@ export const ReviewForm = ({
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             {isEditing
-              ? t('reviews.update_button', 'Update Review')
-              : t('reviews.submit_button', 'Submit Review')}
+              ? t('reviews.update_button')
+              : t('reviews.submit_button')}
           </Button>
           {onCancel && (
             <Button

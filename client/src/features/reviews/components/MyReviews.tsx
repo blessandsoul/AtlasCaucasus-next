@@ -92,7 +92,7 @@ export const MyReviews = ({ limit = 10, className }: MyReviewsProps) => {
   if (error) {
     return (
       <div className={cn('text-center py-8 text-muted-foreground', className)}>
-        {t('reviews.load_error', 'Failed to load reviews')}
+        {t('reviews.load_error')}
       </div>
     );
   }
@@ -105,11 +105,11 @@ export const MyReviews = ({ limit = 10, className }: MyReviewsProps) => {
       <div className={cn('text-center py-12', className)}>
         <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
         <p className="text-muted-foreground mb-4">
-          {t('reviews.no_my_reviews', "You haven't written any reviews yet.")}
+          {t('reviews.no_my_reviews')}
         </p>
         <Button asChild variant="outline">
           <Link href="/explore/tours">
-            {t('reviews.explore_tours', 'Explore Tours')}
+            {t('reviews.explore_tours')}
           </Link>
         </Button>
       </div>
@@ -133,7 +133,7 @@ export const MyReviews = ({ limit = 10, className }: MyReviewsProps) => {
                     {targetTypeLabels[review.targetType]}
                   </Badge>
                   <span className="hover:underline">
-                    {t('reviews.view_reviewed_item', 'View reviewed item')}
+                    {t('reviews.view_reviewed_item')}
                   </span>
                 </Link>
               </div>
@@ -159,10 +159,10 @@ export const MyReviews = ({ limit = 10, className }: MyReviewsProps) => {
               disabled={!pagination.hasPreviousPage}
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
-              {t('common.previous', 'Previous')}
+              {t('common.previous')}
             </Button>
             <span className="text-sm text-muted-foreground px-4">
-              {t('common.page_of', 'Page {{current}} of {{total}}', {
+              {t('common.page_of', {
                 current: pagination.page,
                 total: pagination.totalPages,
               })}
@@ -173,7 +173,7 @@ export const MyReviews = ({ limit = 10, className }: MyReviewsProps) => {
               onClick={() => setPage((p) => p + 1)}
               disabled={!pagination.hasNextPage}
             >
-              {t('common.next', 'Next')}
+              {t('common.next')}
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
@@ -185,10 +185,10 @@ export const MyReviews = ({ limit = 10, className }: MyReviewsProps) => {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
-              {t('reviews.edit_title', 'Edit Your Review')}
+              {t('reviews.edit_title')}
             </DialogTitle>
             <DialogDescription>
-              {t('reviews.edit_description', 'Update your rating and comment below.')}
+              {t('reviews.edit_description')}
             </DialogDescription>
           </DialogHeader>
           {editingReview && (

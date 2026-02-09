@@ -684,7 +684,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    log(`All notifications marked as read (${data.data.updatedCount} updated)`, 'success');
+                    log(`All notifications marked as read (${data.data.count} updated)`, 'success');
                     loadNotifications();
                     loadUnreadCount();
                 }

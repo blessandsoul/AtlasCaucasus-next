@@ -25,6 +25,7 @@ const envSchema = z.object({
   // Email configuration (Resend)
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default("Tourism Georgia <noreply@tourism-georgia.com>"),
+  ADMIN_EMAIL: z.string().email().optional(), // Admin email for contact form submissions
 
   // Frontend URL for email links (used for verification, password reset, etc.)
   FRONTEND_URL: z.string().url().default("http://localhost:5173"),
@@ -39,6 +40,21 @@ const envSchema = z.object({
   REDIS_HOST: z.string().default("localhost"),
   REDIS_PORT: z.coerce.number().int().positive().default(6379),
   REDIS_PASSWORD: z.string().optional(),
+
+  // AI Provider Configuration
+  AI_PROVIDER: z.enum(["gemini", "groq"]).default("gemini"),
+
+  // Gemini AI Configuration (used when AI_PROVIDER=gemini)
+  GEMINI_API_KEY: z.string().min(1).optional(),
+  GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
+
+  // Groq AI Configuration (used when AI_PROVIDER=groq)
+  GROQ_API_KEY: z.string().min(1).optional(),
+  GROQ_MODEL: z.string().default("llama-3.3-70b-versatile"),
+
+  // Shared AI Configuration
+  AI_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(10),
+  AI_INITIAL_CREDITS: z.coerce.number().int().min(0).default(10),
 
   // Media Upload Configuration
   MAX_FILE_SIZE: z.coerce.number().int().positive().default(5 * 1024 * 1024), // 5MB default

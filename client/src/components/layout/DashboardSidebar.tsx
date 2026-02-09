@@ -16,6 +16,11 @@ import {
     MessageSquare,
     Users,
     Star,
+    Heart,
+    CalendarCheck,
+    BarChart3,
+    FileText,
+    Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
@@ -78,19 +83,33 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                     {/* Overview Group */}
                     <div className="px-3 py-1">
                         <h2 className="mb-2 px-0 text-xs font-semibold tracking-tight text-muted-foreground uppercase">
-                            {t('dashboard.overview', 'Overview')}
+                            {t('dashboard.overview')}
                         </h2>
                         <div className="space-y-1">
                             <SidebarItem
+                                icon={Heart}
+                                label={t('dashboard.menu.favorites')}
+                                href={ROUTES.FAVORITES}
+                                isActive={pathname === ROUTES.FAVORITES}
+                                onClick={onItemClick}
+                            />
+                            <SidebarItem
+                                icon={CalendarCheck}
+                                label={t('dashboard.menu.bookings')}
+                                href={ROUTES.BOOKINGS}
+                                isActive={pathname === ROUTES.BOOKINGS}
+                                onClick={onItemClick}
+                            />
+                            <SidebarItem
                                 icon={Star}
-                                label={t('dashboard.menu.reviews', 'My Reviews')}
+                                label={t('dashboard.menu.reviews')}
                                 href={ROUTES.REVIEWS}
                                 isActive={pathname === ROUTES.REVIEWS}
                                 onClick={onItemClick}
                             />
                             <SidebarItem
                                 icon={MessageSquare}
-                                label={t('dashboard.menu.inquiries', 'Inquiries')}
+                                label={t('dashboard.menu.inquiries')}
                                 href={ROUTES.INQUIRIES.ROOT}
                                 isActive={pathname.startsWith(ROUTES.INQUIRIES.ROOT)}
                                 onClick={onItemClick}
@@ -106,28 +125,28 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                         user?.roles?.includes('GUIDE')) && (
                             <div className="px-3 py-1">
                                 <h2 className="mb-2 px-0 text-xs font-semibold tracking-tight text-muted-foreground uppercase">
-                                    {t('company.management.group_title', 'Management')}
+                                    {t('company.management.group_title')}
                                 </h2>
                                 <div className="space-y-1">
                                     {user?.roles?.includes('COMPANY') && (
                                         <>
                                             <SidebarItem
                                                 icon={LayoutDashboard}
-                                                label={t('company.operations.title', 'Operations')}
+                                                label={t('company.operations.title')}
                                                 href={ROUTES.OPERATIONS.ROOT}
                                                 isActive={pathname.startsWith(ROUTES.OPERATIONS.ROOT)}
                                                 onClick={onItemClick}
                                             />
                                             <SidebarItem
                                                 icon={Building2}
-                                                label={t('company.management.title', 'My Company')}
+                                                label={t('company.management.title')}
                                                 href={ROUTES.COMPANY_MANAGEMENT}
                                                 isActive={pathname === ROUTES.COMPANY_MANAGEMENT}
                                                 onClick={onItemClick}
                                             />
                                             <SidebarItem
                                                 icon={UserPlus}
-                                                label={t('auth.create_agent', 'Create Agent')}
+                                                label={t('auth.create_agent')}
                                                 href={ROUTES.CREATE_AGENT}
                                                 isActive={pathname === ROUTES.CREATE_AGENT}
                                                 onClick={onItemClick}
@@ -139,18 +158,45 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                                     {(user?.roles?.includes('COMPANY') || user?.roles?.includes('TOUR_AGENT')) && (
                                         <SidebarItem
                                             icon={MapIcon}
-                                            label={t('auth.create_tour', 'Create Tour')}
+                                            label={t('auth.create_tour')}
                                             href={ROUTES.TOURS.CREATE}
                                             isActive={pathname === ROUTES.TOURS.CREATE}
                                             onClick={onItemClick}
                                         />
                                     )}
 
+                                    {/* Analytics - Visible to all providers */}
+                                    {(user?.roles?.includes('COMPANY') ||
+                                        user?.roles?.includes('GUIDE') ||
+                                        user?.roles?.includes('DRIVER')) && (
+                                            <SidebarItem
+                                                icon={BarChart3}
+                                                label={t('analytics.title')}
+                                                href={ROUTES.ANALYTICS}
+                                                isActive={pathname === ROUTES.ANALYTICS}
+                                                onClick={onItemClick}
+                                            />
+                                        )}
+
+                                    {/* AI Studio - Visible to all providers */}
+                                    {(user?.roles?.includes('COMPANY') ||
+                                        user?.roles?.includes('GUIDE') ||
+                                        user?.roles?.includes('DRIVER') ||
+                                        user?.roles?.includes('ADMIN')) && (
+                                            <SidebarItem
+                                                icon={Sparkles}
+                                                label={t('ai.studio_title', 'AI Studio')}
+                                                href={ROUTES.AI_STUDIO}
+                                                isActive={pathname === ROUTES.AI_STUDIO}
+                                                onClick={onItemClick}
+                                            />
+                                        )}
+
                                     {/* Driver Dashboard Item */}
                                     {user?.roles?.includes('DRIVER') && (
                                         <SidebarItem
                                             icon={LayoutDashboard}
-                                            label={t('driver.dashboard.title', 'Driver Dashboard')}
+                                            label={t('driver.dashboard.title')}
                                             href="/dashboard/driver"
                                             isActive={pathname.startsWith('/dashboard/driver')}
                                             onClick={onItemClick}
@@ -161,7 +207,7 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                                     {user?.roles?.includes('GUIDE') && (
                                         <SidebarItem
                                             icon={LayoutDashboard}
-                                            label={t('guide.dashboard.title', 'Guide Dashboard')}
+                                            label={t('guide.dashboard.title')}
                                             href="/dashboard/guide"
                                             isActive={pathname.startsWith('/dashboard/guide')}
                                             onClick={onItemClick}
@@ -175,21 +221,28 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                     {user?.roles?.includes('ADMIN') && (
                         <div className="px-3 py-1">
                             <h2 className="mb-2 px-0 text-xs font-semibold tracking-tight text-muted-foreground uppercase">
-                                {t('admin.title', 'Admin')}
+                                {t('admin.title')}
                             </h2>
                             <div className="space-y-1">
                                 <SidebarItem
                                     icon={Users}
-                                    label={t('admin.tabs.users', 'Users')}
+                                    label={t('admin.tabs.users')}
                                     href={ROUTES.ADMIN.USERS}
                                     isActive={pathname === ROUTES.ADMIN.USERS || pathname === ROUTES.ADMIN.ROOT}
                                     onClick={onItemClick}
                                 />
                                 <SidebarItem
                                     icon={MapPin}
-                                    label={t('admin.tabs.locations', 'Locations')}
+                                    label={t('admin.tabs.locations')}
                                     href={ROUTES.ADMIN.LOCATIONS}
                                     isActive={pathname === ROUTES.ADMIN.LOCATIONS}
+                                    onClick={onItemClick}
+                                />
+                                <SidebarItem
+                                    icon={FileText}
+                                    label={t('dashboard.blog.title')}
+                                    href={ROUTES.BLOG.DASHBOARD}
+                                    isActive={pathname.startsWith(ROUTES.BLOG.DASHBOARD)}
                                     onClick={onItemClick}
                                 />
                             </div>
@@ -199,33 +252,33 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                     {/* Account Group */}
                     <div className="px-3 py-1">
                         <h2 className="mb-2 px-0 text-xs font-semibold tracking-tight text-muted-foreground uppercase">
-                            {t('dashboard.menu.account', 'Account')}
+                            {t('dashboard.menu.account')}
                         </h2>
                         <div className="space-y-1">
                             <SidebarItem
                                 icon={User}
-                                label={t('auth.profile', 'Profile')}
+                                label={t('auth.profile')}
                                 href={ROUTES.PROFILE}
                                 isActive={pathname === ROUTES.PROFILE}
                                 onClick={onItemClick}
                             />
                             <SidebarItem
                                 icon={Briefcase}
-                                label={t('partner.become_partner', 'Become Partner')}
+                                label={t('partner.become_partner')}
                                 href={ROUTES.BECOME_PARTNER}
                                 isActive={pathname === ROUTES.BECOME_PARTNER}
                                 onClick={onItemClick}
                             />
                             <SidebarItem
                                 icon={Settings}
-                                label={t('dashboard.menu.settings', 'Settings')}
+                                label={t('dashboard.menu.settings')}
                                 href={ROUTES.SETTINGS}
                                 isActive={pathname === ROUTES.SETTINGS}
                                 onClick={onItemClick}
                             />
                             <SidebarButton
                                 icon={LogOut}
-                                label={t('auth.logout', 'Logout')}
+                                label={t('auth.logout')}
                                 onClick={() => {
                                     if (onItemClick) onItemClick();
                                     logout();

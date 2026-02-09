@@ -16,6 +16,7 @@ declare module "fastify" {
  * Verifies JWT access token and attaches user to request.
  * Also checks tokenVersion against database to ensure immediate invalidation
  * after password reset or logout-all operations.
+ * ENFORCES email verification by default — unverified users get a 403 EMAIL_NOT_VERIFIED.
  * Use as preHandler for protected routes.
  */
 export async function authGuard(
@@ -46,6 +47,7 @@ export async function authGuard(
         id: true,
         tokenVersion: true,
         isActive: true,
+        emailVerified: true, // Fetch fresh emailVerified from DB
         deletedAt: true,
         roles: { select: { role: true } }, // Fetch fresh roles
       },
@@ -67,14 +69,87 @@ export async function authGuard(
     request.user = {
       id: payload.userId,
       roles: user.roles.map((r) => r.role), // Use fresh roles from DB
-      emailVerified: payload.emailVerified || false,
+      emailVerified: user.emailVerified, // Use fresh value from DB
     };
+
+    // Enforce email verification — unverified users can only access exempt routes
+    if (!user.emailVerified) {
+      throw new ForbiddenError(
+        "Please verify your email address before continuing",
+        "EMAIL_NOT_VERIFIED"
+      );
+    }
   } catch (error) {
     // Differentiate between expired and invalid tokens without leaking internal details
     if (error instanceof jwt.TokenExpiredError) {
       throw new UnauthorizedError("Token has expired", "TOKEN_EXPIRED");
     }
-    // Re-throw our custom errors
+    // Re-throw our custom errors (UnauthorizedError and ForbiddenError)
+    if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
+      throw error;
+    }
+    throw new UnauthorizedError("Invalid token", "INVALID_TOKEN");
+  }
+}
+
+/**
+ * Same as authGuard but does NOT enforce email verification.
+ * Use for routes that unverified users need access to
+ * (e.g. /auth/me, /auth/logout, /auth/resend-verification).
+ */
+export async function authGuardNoEmailCheck(
+  request: FastifyRequest,
+  _reply: FastifyReply
+): Promise<void> {
+  const authHeader = request.headers.authorization;
+
+  if (!authHeader) {
+    throw new UnauthorizedError("Authorization header missing", "NO_AUTH_HEADER");
+  }
+
+  const parts = authHeader.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
+    throw new UnauthorizedError("Invalid authorization format", "INVALID_AUTH_FORMAT");
+  }
+
+  const token = parts[1];
+
+  try {
+    const payload = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as AccessTokenPayload;
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        tokenVersion: true,
+        isActive: true,
+        emailVerified: true,
+        deletedAt: true,
+        roles: { select: { role: true } },
+      },
+    });
+
+    if (!user || user.deletedAt !== null) {
+      throw new UnauthorizedError("User not found", "USER_NOT_FOUND");
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedError("Account is deactivated", "ACCOUNT_DEACTIVATED");
+    }
+
+    if (payload.tokenVersion !== undefined && user.tokenVersion !== payload.tokenVersion) {
+      throw new UnauthorizedError("Session has been invalidated", "SESSION_INVALIDATED");
+    }
+
+    request.user = {
+      id: payload.userId,
+      roles: user.roles.map((r) => r.role),
+      emailVerified: user.emailVerified,
+    };
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new UnauthorizedError("Token has expired", "TOKEN_EXPIRED");
+    }
     if (error instanceof UnauthorizedError) {
       throw error;
     }

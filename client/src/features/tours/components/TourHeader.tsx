@@ -2,6 +2,7 @@
 
 import { MapPin, Star } from 'lucide-react';
 import type { Tour } from '@/features/tours/types/tour.types';
+import { ShareButton } from '@/components/common/ShareButton';
 import { cn } from '@/lib/utils';
 
 interface TourHeaderProps {
@@ -14,7 +15,7 @@ export const TourHeader = ({ tour, className }: TourHeaderProps) => {
   const reviewCount = tour.reviewCount || 0;
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('space-y-3', className)}>
       <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
         {tour.title}
       </h1>
@@ -36,6 +37,13 @@ export const TourHeader = ({ tour, className }: TourHeaderProps) => {
             ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
           </span>
         </div>
+
+        <ShareButton
+          url={`/explore/tours/${tour.id}`}
+          title={tour.title}
+          description={tour.summary || undefined}
+          variant="default"
+        />
       </div>
     </div>
   );

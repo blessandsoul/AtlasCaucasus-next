@@ -1,6 +1,12 @@
 import type { SafeMedia } from "../media/media.types.js";
 
 export type TourDifficulty = 'easy' | 'moderate' | 'challenging';
+export type AvailabilityType = 'DAILY' | 'WEEKDAYS' | 'WEEKENDS' | 'SPECIFIC_DATES' | 'BY_REQUEST';
+
+export interface ItineraryStep {
+  title: string;
+  description: string;
+}
 
 export interface Tour {
   id: string;
@@ -26,6 +32,10 @@ export interface Tour {
   updatedAt: Date;
   nextAvailableDate: Date | null;
   startDate: Date | null;
+  availabilityType: string;
+  availableDates: string | null;
+  startTime: string | null;
+  itinerary: string | null;
 }
 
 export interface CreateTourData {
@@ -48,6 +58,10 @@ export interface CreateTourData {
   isFeatured?: boolean;
   nextAvailableDate?: Date | null;
   startDate?: Date | null;
+  availabilityType?: AvailabilityType;
+  availableDates?: string[] | null;
+  startTime?: string | null;
+  itinerary?: ItineraryStep[] | null;
 }
 
 export interface UpdateTourData {
@@ -69,6 +83,10 @@ export interface UpdateTourData {
   isFeatured?: boolean;
   nextAvailableDate?: Date | null;
   startDate?: Date | null;
+  availabilityType?: AvailabilityType;
+  availableDates?: string[] | null;
+  startTime?: string | null;
+  itinerary?: ItineraryStep[] | null;
 }
 
 export interface SafeTour {
@@ -95,5 +113,9 @@ export interface SafeTour {
   updatedAt: Date;
   nextAvailableDate: Date | null;
   startDate: Date | null;
+  availabilityType: string;
+  availableDates: string[] | null;
+  startTime: string | null;
+  itinerary: ItineraryStep[] | null;
   images?: SafeMedia[]; // Media images associated with tour
 }

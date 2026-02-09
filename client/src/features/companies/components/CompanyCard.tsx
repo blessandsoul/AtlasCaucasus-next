@@ -8,19 +8,26 @@ import {
   Phone,
   Building2,
   Star,
+  Layers,
+  Clock,
+  ShieldCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Company } from '../types/company.types';
 import { getMediaUrl } from '@/lib/utils/media';
+import { formatResponseTime } from '@/lib/utils/format';
 
 interface CompanyCardProps {
   company: Company;
   className?: string;
+  isFavorited?: boolean;
   onFavorite?: (id: string) => void;
+  isCompareSelected?: boolean;
+  onCompareToggle?: (id: string, meta: { label: string; imageUrl: string | null }) => void;
 }
 
-export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps) => {
+export const CompanyCard = ({ company, className, isFavorited, onFavorite, isCompareSelected, onCompareToggle }: CompanyCardProps) => {
   const router = useRouter();
 
   if (!company) return null;
@@ -53,6 +60,7 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
     <div
       className={cn(
         "group relative flex flex-col w-full bg-white dark:bg-[#1c1c1c] rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-[#2a2a2a] cursor-pointer",
+        isCompareSelected && "ring-2 ring-primary border-primary/50",
         className
       )}
       onClick={handleCardClick}
@@ -78,10 +86,31 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
         {/* Top Right Actions */}
         <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
           <button
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              onCompareToggle?.(company.id, { label: company.companyName, imageUrl: imageUrl });
+            }}
+            className={cn(
+              "h-8 w-8 rounded-full backdrop-blur-md flex items-center justify-center transition-colors",
+              isCompareSelected
+                ? "bg-primary text-primary-foreground"
+                : "bg-white/20 hover:bg-white/30"
+            )}
+            aria-label={isCompareSelected ? "Remove from comparison" : "Add to comparison"}
+          >
+            <Layers className={cn("h-4 w-4", !isCompareSelected && "text-white")} />
+          </button>
+          <button
             onClick={handleFavoriteClick}
             className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-colors group/heart"
+            aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
           >
-            <Heart className="h-4 w-4 text-gray-600 dark:text-white group-hover/heart:text-red-500 transition-colors" />
+            <Heart className={cn(
+              "h-4 w-4 transition-colors",
+              isFavorited
+                ? "fill-red-500 text-red-500"
+                : "text-gray-600 dark:text-white group-hover/heart:text-red-500"
+            )} />
           </button>
         </div>
 
@@ -127,6 +156,31 @@ export const CompanyCard = ({ company, className, onFavorite }: CompanyCardProps
               <span className="text-xs">{company.phoneNumber}</span>
             </div>
           )}
+        </div>
+
+        {/* Badges Row */}
+        <div className="flex items-center flex-wrap gap-2 text-xs max-[600px]:hidden">
+          {company.isVerified && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">
+              <ShieldCheck className="h-3 w-3" />
+              Verified
+            </span>
+          )}
+          {(() => {
+            const rt = formatResponseTime(company.avgResponseTimeMinutes);
+            if (!rt) return null;
+            const variantClasses = {
+              success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+              warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+              muted: 'bg-gray-500/10 text-gray-500 dark:text-gray-400',
+            };
+            return (
+              <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium', variantClasses[rt.variant])}>
+                <Clock className="h-3 w-3" />
+                Responds {rt.label}
+              </span>
+            );
+          })()}
         </div>
 
         {/* Description Excerpt */}

@@ -32,6 +32,10 @@ function toSafeTour(tour: PrismaTour): SafeTour {
     updatedAt: tour.updatedAt,
     nextAvailableDate: tour.nextAvailableDate,
     startDate: tour.startDate,
+    availabilityType: tour.availabilityType,
+    availableDates: tour.availableDates ? JSON.parse(tour.availableDates) : null,
+    startTime: tour.startTime,
+    itinerary: tour.itinerary ? JSON.parse(tour.itinerary) : null,
   };
 }
 
@@ -104,6 +108,10 @@ export async function createTour(
       isFeatured: data.isFeatured ?? false,
       nextAvailableDate: data.nextAvailableDate ?? null,
       startDate: data.startDate ?? null,
+      availabilityType: data.availabilityType ?? "BY_REQUEST",
+      availableDates: data.availableDates ? JSON.stringify(data.availableDates) : null,
+      startTime: data.startTime ?? null,
+      itinerary: data.itinerary ? JSON.stringify(data.itinerary) : null,
     },
   });
 
@@ -176,6 +184,14 @@ export async function updateTour(
         isFeatured: data.isFeatured,
         nextAvailableDate: data.nextAvailableDate,
         startDate: data.startDate,
+        availabilityType: data.availabilityType,
+        availableDates: data.availableDates !== undefined
+          ? (data.availableDates === null ? null : JSON.stringify(data.availableDates))
+          : undefined,
+        startTime: data.startTime,
+        itinerary: data.itinerary !== undefined
+          ? (data.itinerary === null ? null : JSON.stringify(data.itinerary))
+          : undefined,
       },
     });
 
@@ -429,6 +445,48 @@ export async function listToursByCompany(
   });
 
   // Use batch fetch to avoid N+1 queries
+  return toSafeToursWithMediaBatch(tours);
+}
+
+// ==========================================
+// RELATED TOURS
+// ==========================================
+
+export async function listRelatedTours(
+  tourId: string,
+  category: string | null,
+  city: string | null,
+  limit: number
+): Promise<SafeTour[]> {
+  // Find tours that share the same category OR same city, excluding the current tour
+  const conditions: Record<string, unknown>[] = [];
+
+  if (category) {
+    conditions.push({ category });
+  }
+  if (city) {
+    conditions.push({ city });
+  }
+
+  // If no category or city, fall back to just returning newest active tours
+  const where: Record<string, unknown> = {
+    isActive: true,
+    id: { not: tourId },
+  };
+
+  if (conditions.length > 0) {
+    where.OR = conditions;
+  }
+
+  const tours = await prisma.tour.findMany({
+    where,
+    orderBy: [
+      { averageRating: 'desc' },
+      { createdAt: 'desc' },
+    ],
+    take: limit,
+  });
+
   return toSafeToursWithMediaBatch(tours);
 }
 

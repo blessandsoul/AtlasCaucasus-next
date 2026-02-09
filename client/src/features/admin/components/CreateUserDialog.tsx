@@ -71,11 +71,11 @@ export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) 
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{t('admin.users.createUser', 'Create User')}</DialogTitle>
+                    <DialogTitle>{t('admin.users.createUser')}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="email">{t('common.email', 'Email')}</Label>
+                        <Label htmlFor="email">{t('common.email')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -88,7 +88,7 @@ export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) 
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password">{t('common.password', 'Password')}</Label>
+                        <Label htmlFor="password">{t('common.password')}</Label>
                         <Input
                             id="password"
                             type="password"
@@ -102,7 +102,7 @@ export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) 
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName">{t('common.firstName', 'First Name')}</Label>
+                            <Label htmlFor="firstName">{t('common.firstName')}</Label>
                             <Input
                                 id="firstName"
                                 {...register('firstName')}
@@ -114,7 +114,7 @@ export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) 
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="lastName">{t('common.lastName', 'Last Name')}</Label>
+                            <Label htmlFor="lastName">{t('common.lastName')}</Label>
                             <Input
                                 id="lastName"
                                 {...register('lastName')}
@@ -127,10 +127,10 @@ export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) 
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="role">{t('common.role', 'Role')} ({t('common.optional', 'Optional')})</Label>
+                        <Label htmlFor="role">{t('common.role')} ({t('common.optional')})</Label>
                         <Select onValueChange={(value) => setValue('role', value)}>
                             <SelectTrigger>
-                                <SelectValue placeholder={t('admin.users.selectRole', 'Select a role')} />
+                                <SelectValue placeholder={t('admin.users.selectRole')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {ROLES.map((role) => (
@@ -144,10 +144,10 @@ export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) 
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                            {t('common.cancel', 'Cancel')}
+                            {t('common.cancel')}
                         </Button>
                         <Button type="submit" disabled={isPending}>
-                            {isPending ? t('common.creating', 'Creating...') : t('common.create', 'Create')}
+                            {isPending ? t('common.creating') : t('common.create')}
                         </Button>
                     </DialogFooter>
                 </form>

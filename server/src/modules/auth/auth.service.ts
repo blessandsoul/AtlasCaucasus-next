@@ -15,6 +15,7 @@ import * as sessionRepo from "./session.repo.js";
 import * as mediaRepo from "../media/media.repo.js";
 import * as securityService from "./security.service.js";
 import { sendTourAgentInvitationLink } from "../../libs/email.js";
+import { getOrCreateBalance } from "../credits/credit.repo.js";
 import type { SafeUser, User, UserRole } from "../users/user.types.js";
 import type {
   AccessTokenPayload,
@@ -56,6 +57,7 @@ async function toSafeUser(user: User): Promise<SafeUser> {
       roles,
       isActive: user.isActive,
       emailVerified: user.emailVerified,
+      emailNotifications: user.emailNotifications,
       driverProfileId: undefined,
       guideProfileId: undefined,
       createdAt: user.createdAt,
@@ -76,6 +78,7 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     roles: userWithRelations.roles,
     isActive: userWithRelations.isActive,
     emailVerified: userWithRelations.emailVerified,
+    emailNotifications: userWithRelations.emailNotifications,
     driverProfileId: userWithRelations.driverProfileId,
     guideProfileId: userWithRelations.guideProfileId,
     createdAt: userWithRelations.createdAt,
@@ -185,6 +188,13 @@ export async function register(
     role: "USER",
   });
 
+  // Grant initial AI credits
+  try {
+    await getOrCreateBalance(user.id);
+  } catch (err) {
+    logger.error({ err, userId: user.id }, "Failed to grant initial credits");
+  }
+
   // Send verification email with proper error handling
   const warnings: string[] = [];
   try {
@@ -242,6 +252,13 @@ export async function registerCompany(
     websiteUrl: input.websiteUrl,
     phoneNumber: input.phoneNumber,
   });
+
+  // Grant initial AI credits
+  try {
+    await getOrCreateBalance(user.id);
+  } catch (err) {
+    logger.error({ err, userId: user.id }, "Failed to grant initial credits");
+  }
 
   // Send verification email with proper error handling
   const warnings: string[] = [];

@@ -96,7 +96,7 @@ export const AdminLocationsPage = () => {
 
     const columns: ColumnDef<Location>[] = useMemo(() => [
         {
-            header: t('admin.locations.table.name', 'Name'),
+            header: t('admin.locations.table.name'),
             cell: (location) => (
                 <div className="flex items-center gap-2 font-medium">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -106,16 +106,16 @@ export const AdminLocationsPage = () => {
             className: "w-[200px]"
         },
         {
-            header: t('admin.locations.table.region', 'Region'),
+            header: t('admin.locations.table.region'),
             accessorKey: 'region',
             cell: (location) => location.region || '-'
         },
         {
-            header: t('admin.locations.table.country', 'Country'),
+            header: t('admin.locations.table.country'),
             accessorKey: 'country'
         },
         {
-            header: t('admin.locations.table.coordinates', 'Coordinates'),
+            header: t('admin.locations.table.coordinates'),
             cell: (location) => location.latitude && location.longitude ? (
                 <span className="text-sm text-muted-foreground">
                     {Number(location.latitude).toFixed(4)}, {Number(location.longitude).toFixed(4)}
@@ -123,7 +123,7 @@ export const AdminLocationsPage = () => {
             ) : '-'
         },
         {
-            header: t('admin.locations.table.status', 'Status'),
+            header: t('admin.locations.table.status'),
             cell: (location) => (
                 <div className="flex justify-center">
                     <StatusIndicator isActive={location.isActive} />
@@ -132,7 +132,7 @@ export const AdminLocationsPage = () => {
             className: "w-[100px] text-center"
         },
         {
-            header: t('admin.locations.table.created', 'Created'),
+            header: t('admin.locations.table.created'),
             cell: (location) => (
                 <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <Calendar className="h-3.5 w-3.5" />
@@ -152,15 +152,15 @@ export const AdminLocationsPage = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        {t('admin.locations.title', 'Locations')}
+                        {t('admin.locations.title')}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t('admin.locations.subtitle', 'Manage locations available in the system.')}
+                        {t('admin.locations.subtitle')}
                     </p>
                 </div>
                 <Button onClick={handleCreate} className="w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
-                    {t('admin.locations.add_new', 'Add Location')}
+                    {t('admin.locations.add_new')}
                 </Button>
             </div>
 
@@ -176,7 +176,7 @@ export const AdminLocationsPage = () => {
                         }}
                         className="whitespace-nowrap"
                     >
-                        {t('common.active', 'Active')}
+                        {t('common.active')}
                     </Button>
                     <Button
                         variant={includeInactive ? "default" : "outline"}
@@ -187,12 +187,12 @@ export const AdminLocationsPage = () => {
                         }}
                         className="whitespace-nowrap"
                     >
-                        {t('admin.locations.all_locations', 'All Locations')}
+                        {t('admin.locations.all_locations')}
                     </Button>
                 </div>
                 {pagination && (
                     <p className="text-sm text-muted-foreground">
-                        {t('admin.locations.showing_count', 'Showing {{count}} of {{total}} locations', {
+                        {t('admin.locations.showing_count', {
                             count: locations.length,
                             total: pagination.totalItems,
                         })}
@@ -217,7 +217,7 @@ export const AdminLocationsPage = () => {
                 }}
                 emptyState={{
                     icon: MapPin,
-                    title: t('admin.locations.empty_state', 'No locations found. Create your first location to get started.')
+                    title: t('admin.locations.empty_state')
                 }}
             />
 
@@ -241,17 +241,17 @@ export const AdminLocationsPage = () => {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {t('admin.locations.delete_dialog.title', 'Delete Location')}
+                            {t('admin.locations.delete_dialog.title')}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('admin.locations.delete_dialog.description', 'Are you sure you want to delete "{{name}}"? This action will deactivate the location.', {
+                            {t('admin.locations.delete_dialog.description', {
                                 name: deletingLocation?.name,
                             })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel disabled={deleteLocation.isPending}>
-                            {t('common.cancel', 'Cancel')}
+                            {t('common.cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
@@ -259,8 +259,8 @@ export const AdminLocationsPage = () => {
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             {deleteLocation.isPending
-                                ? t('common.deleting', 'Deleting...')
-                                : t('common.delete', 'Delete')
+                                ? t('common.deleting')
+                                : t('common.delete')
                             }
                         </AlertDialogAction>
                     </AlertDialogFooter>

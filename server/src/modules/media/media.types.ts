@@ -16,7 +16,7 @@ export interface SafeMedia {
 }
 
 // Base entity types for standard media uploads (tours, profiles, etc.)
-export type BaseMediaEntityType = "tour" | "company" | "guide" | "driver" | "user";
+export type BaseMediaEntityType = "tour" | "company" | "guide" | "driver" | "user" | "blog";
 
 // All entity types including avatar and cover variants (for separate storage)
 export type MediaEntityType = BaseMediaEntityType

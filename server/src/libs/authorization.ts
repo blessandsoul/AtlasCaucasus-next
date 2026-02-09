@@ -292,7 +292,7 @@ export async function verifyTourOwnership(
 /**
  * Media entity types that can have media attached
  */
-export type MediaEntityType = "tour" | "company" | "guide" | "driver" | "user" | "guide-avatar" | "driver-avatar";
+export type MediaEntityType = "tour" | "company" | "guide" | "driver" | "user" | "guide-avatar" | "driver-avatar" | "blog";
 
 /**
  * Verify ownership of the entity that media is attached to
@@ -344,6 +344,11 @@ export async function verifyMediaEntityOwnership(
     case "user": {
       // For user entities, the entityId IS the userId
       return entityId === userId;
+    }
+
+    case "blog": {
+      // Blog media is admin-only (already checked above)
+      return false;
     }
 
     default:

@@ -20,7 +20,8 @@ import {
 
 import { useMyTours, useDeleteTour } from '@/features/tours/hooks/useTours';
 import { EditTourDialog } from '@/features/tours/components/EditTourDialog';
-import { formatDate, formatCurrency } from '@/lib/utils/format';
+import { formatDate } from '@/lib/utils/format';
+import { useCurrency } from '@/context/CurrencyContext';
 import { ROUTES } from '@/lib/constants/routes';
 import type { Tour } from '@/features/tours/types/tour.types';
 import { DataTable } from '@/components/common/DataTable';
@@ -31,6 +32,7 @@ const ITEMS_PER_PAGE = 10;
 
 export const CompanyToursTable = () => {
     const { t } = useTranslation();
+    const { formatPrice } = useCurrency();
     const [page, setPage] = useState(1);
     const [includeInactive, setIncludeInactive] = useState(false);
 
@@ -103,7 +105,7 @@ export const CompanyToursTable = () => {
             header: t('company.operations.tours.table.price', 'Price'),
             cell: (tour) => (
                 <div className="font-medium">
-                    {formatCurrency(Number(tour.price), tour.currency)}
+                    {formatPrice(Number(tour.price), tour.currency)}
                 </div>
             )
         },

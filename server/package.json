@@ -34,7 +34,8 @@
     "db:reset:realistic": "npm run db:clear && npm run db:seed:realistic",
     "db:seed:prod": "node dist/scripts/db/seed.js",
     "db:clear:prod": "node dist/scripts/db/clear-data.js",
-    "db:seed:realistic:prod": "node dist/scripts/db/seed-realistic.js"
+    "db:seed:realistic:prod": "node dist/scripts/db/seed-realistic.js",
+    "db:seed:bookings": "tsx src/scripts/db/seed-bookings.ts"
   },
   "prisma": {
     "seed": "tsx src/scripts/db/seed.ts"
@@ -51,11 +52,13 @@
     "@fastify/rate-limit": "^10.3.0",
     "@fastify/static": "^9.0.0",
     "@fastify/websocket": "^11.2.0",
+    "@google/genai": "^1.40.0",
     "@prisma/client": "^6.19.1",
     "argon2": "^0.41.1",
     "dotenv": "^16.4.5",
     "fastify": "^5.2.1",
     "file-type": "^21.3.0",
+    "groq-sdk": "^0.37.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",

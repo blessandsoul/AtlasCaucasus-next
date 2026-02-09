@@ -125,6 +125,15 @@ export const useUploadTourImage = () => {
     });
 };
 
+export const useRelatedTours = (tourId: string, limit: number = 4) => {
+    return useQuery({
+        queryKey: ['tours', 'related', tourId, limit],
+        queryFn: () => tourService.getRelatedTours(tourId, limit),
+        enabled: !!tourId,
+        staleTime: 10 * 60 * 1000, // 10 minutes (matches server cache TTL)
+    });
+};
+
 export const useDeleteTourImage = () => {
     const queryClient = useQueryClient();
     const { t } = useTranslation();

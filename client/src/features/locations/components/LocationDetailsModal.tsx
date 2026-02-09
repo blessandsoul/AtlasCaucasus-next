@@ -36,9 +36,9 @@ export const LocationDetailsModal = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>{t('admin.locations.details.title', 'Location Details')}</DialogTitle>
+                    <DialogTitle>{t('admin.locations.details.title')}</DialogTitle>
                     <DialogDescription>
-                        {t('admin.locations.details.description', 'Full information about the selected location.')}
+                        {t('admin.locations.details.description')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -69,7 +69,7 @@ export const LocationDetailsModal = ({
                                     : "text-muted-foreground bg-muted"
                                 }
                             >
-                                {location.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
+                                {location.isActive ? t('common.active') : t('common.inactive')}
                             </Badge>
                         </div>
 
@@ -77,7 +77,7 @@ export const LocationDetailsModal = ({
                         <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
                             <div>
                                 <span className="text-xs font-medium text-muted-foreground uppercase">
-                                    {t('admin.locations.latitude', 'Latitude')}
+                                    {t('admin.locations.latitude')}
                                 </span>
                                 <p className="font-mono text-sm mt-1">
                                     {location.latitude ?? '-'}
@@ -85,7 +85,7 @@ export const LocationDetailsModal = ({
                             </div>
                             <div>
                                 <span className="text-xs font-medium text-muted-foreground uppercase">
-                                    {t('admin.locations.longitude', 'Longitude')}
+                                    {t('admin.locations.longitude')}
                                 </span>
                                 <p className="font-mono text-sm mt-1">
                                     {location.longitude ?? '-'}
@@ -98,14 +98,14 @@ export const LocationDetailsModal = ({
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground flex items-center gap-2">
                                     <Calendar className="h-4 w-4" />
-                                    {t('common.created_at', 'Created At')}
+                                    {t('common.created_at')}
                                 </span>
                                 <span>{formatDate(location.createdAt)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground flex items-center gap-2">
                                     <Activity className="h-4 w-4" />
-                                    {t('common.updated_at', 'Updated At')}
+                                    {t('common.updated_at')}
                                 </span>
                                 <span>{formatDate(location.updatedAt)}</span>
                             </div>
@@ -118,7 +118,7 @@ export const LocationDetailsModal = ({
 
                         <div className="flex justify-end">
                             <Button variant="outline" onClick={() => onOpenChange(false)}>
-                                {t('common.close', 'Close')}
+                                {t('common.close')}
                             </Button>
                         </div>
                     </div>

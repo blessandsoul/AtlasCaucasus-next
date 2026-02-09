@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
     allowedRoles?: string[];
 }
 
-export const ProtectedRoute = ({ children, requireVerified = false, allowedRoles }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ children, requireVerified = true, allowedRoles }: ProtectedRouteProps) => {
     const router = useRouter();
     const { isAuthenticated, user } = useAppSelector((state) => state.auth);
     const [hasMounted, setHasMounted] = useState(false);

@@ -98,7 +98,7 @@ export class NotificationService {
      */
     async markAllAsRead(userId: string, notificationIds?: string[]) {
         const result = await notificationRepo.markManyAsRead(userId, notificationIds);
-        return { updatedCount: result.count };
+        return { count: result.count };
     }
 
     /**
@@ -106,7 +106,7 @@ export class NotificationService {
      */
     async markChatNotificationsAsRead(userId: string, chatId: string) {
         const result = await notificationRepo.markChatNotificationsAsRead(userId, chatId);
-        return { updatedCount: result.count };
+        return { count: result.count };
     }
 
     /**

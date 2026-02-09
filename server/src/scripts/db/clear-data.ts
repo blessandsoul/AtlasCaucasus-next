@@ -22,6 +22,9 @@ const TABLES_TO_CLEAR = [
   'audit_logs',
   'notifications',
 
+  // Bookings (depends on users, inquiries)
+  'bookings',
+
   // Chat system (messages → participants → chats)
   'message_read_receipts',
   'chat_messages',

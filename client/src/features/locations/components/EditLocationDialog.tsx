@@ -139,23 +139,23 @@ export const EditLocationDialog = ({
                 <DialogHeader>
                     <DialogTitle>
                         {isEditing
-                            ? t('admin.locations.edit_title', 'Edit Location')
-                            : t('admin.locations.create_title', 'Create Location')}
+                            ? t('admin.locations.edit_title')
+                            : t('admin.locations.create_title')}
                     </DialogTitle>
                     <DialogDescription>
                         {isEditing
-                            ? t('admin.locations.edit_description', 'Update the location details.')
-                            : t('admin.locations.create_description', 'Add a new location to the system.')}
+                            ? t('admin.locations.edit_description')
+                            : t('admin.locations.create_description')}
                     </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">{t('admin.locations.name', 'Name')} *</Label>
+                        <Label htmlFor="name">{t('admin.locations.name')} *</Label>
                         <Input
                             id="name"
                             {...register('name')}
-                            placeholder={t('admin.locations.name_placeholder', 'e.g. Tbilisi')}
+                            placeholder={t('admin.locations.name_placeholder')}
                             aria-invalid={!!errors.name}
                         />
                         {errors.name && (
@@ -165,33 +165,33 @@ export const EditLocationDialog = ({
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="region">{t('admin.locations.region', 'Region')}</Label>
+                            <Label htmlFor="region">{t('admin.locations.region')}</Label>
                             <Input
                                 id="region"
                                 {...register('region')}
-                                placeholder={t('admin.locations.region_placeholder', 'e.g. Tbilisi')}
+                                placeholder={t('admin.locations.region_placeholder')}
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="country">{t('admin.locations.country', 'Country')}</Label>
+                            <Label htmlFor="country">{t('admin.locations.country')}</Label>
                             <Input
                                 id="country"
                                 {...register('country')}
-                                placeholder={t('admin.locations.country_placeholder', 'e.g. Georgia')}
+                                placeholder={t('admin.locations.country_placeholder')}
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="latitude">{t('admin.locations.latitude', 'Latitude')}</Label>
+                            <Label htmlFor="latitude">{t('admin.locations.latitude')}</Label>
                             <Input
                                 id="latitude"
                                 type="number"
                                 step="any"
                                 {...register('latitude')}
-                                placeholder={t('admin.locations.latitude_placeholder', 'e.g. 41.7151')}
+                                placeholder={t('admin.locations.latitude_placeholder')}
                             />
                             {errors.latitude && (
                                 <p className="text-sm text-destructive">{errors.latitude.message}</p>
@@ -199,13 +199,13 @@ export const EditLocationDialog = ({
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="longitude">{t('admin.locations.longitude', 'Longitude')}</Label>
+                            <Label htmlFor="longitude">{t('admin.locations.longitude')}</Label>
                             <Input
                                 id="longitude"
                                 type="number"
                                 step="any"
                                 {...register('longitude')}
-                                placeholder={t('admin.locations.longitude_placeholder', 'e.g. 44.8271')}
+                                placeholder={t('admin.locations.longitude_placeholder')}
                             />
                             {errors.longitude && (
                                 <p className="text-sm text-destructive">{errors.longitude.message}</p>
@@ -223,10 +223,10 @@ export const EditLocationDialog = ({
                                 />
                                 <div className="grid gap-0.5">
                                     <Label htmlFor="isActive" className="cursor-pointer">
-                                        {t('admin.locations.is_active', 'Active')}
+                                        {t('admin.locations.is_active')}
                                     </Label>
                                     <p className="text-sm text-muted-foreground">
-                                        {t('admin.locations.is_active_desc', 'Location is available for selection')}
+                                        {t('admin.locations.is_active_desc')}
                                     </p>
                                 </div>
                             </div>
@@ -239,16 +239,16 @@ export const EditLocationDialog = ({
                             variant="outline"
                             onClick={() => onOpenChange(false)}
                         >
-                            {t('common.cancel', 'Cancel')}
+                            {t('common.cancel')}
                         </Button>
                         <Button type="submit" disabled={isPending}>
                             {isPending
                                 ? isEditing
-                                    ? t('common.saving', 'Saving...')
-                                    : t('common.creating', 'Creating...')
+                                    ? t('common.saving')
+                                    : t('common.creating')
                                 : isEditing
-                                    ? t('common.save', 'Save Changes')
-                                    : t('admin.locations.add_new', 'Add Location')}
+                                    ? t('common.save')
+                                    : t('admin.locations.add_new')}
                         </Button>
                     </DialogFooter>
                 </form>

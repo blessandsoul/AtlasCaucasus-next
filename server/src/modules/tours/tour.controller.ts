@@ -11,11 +11,13 @@ import {
   softDeleteTourForUser,
   listAllToursPublic,
   listCompanyToursPublic,
+  getRelatedTours,
 } from "./tour.service.js";
 import {
   createTourSchema,
   updateTourSchema,
   listAllToursQuerySchema,
+  relatedToursQuerySchema,
 } from "./tour.schemas.js";
 
 interface IdParams {
@@ -178,4 +180,21 @@ export async function listCompanyToursHandler(
   return reply.send(
     paginatedResponse("Company tours retrieved successfully", items, page, limit, totalItems)
   );
+}
+
+export async function getRelatedToursHandler(
+  request: FastifyRequest<{ Params: IdParams }>,
+  reply: FastifyReply,
+): Promise<void> {
+  const id = validateUuidParam(request.params.id);
+
+  const parsed = relatedToursQuerySchema.safeParse(request.query);
+  if (!parsed.success) {
+    throw new ValidationError(parsed.error.errors[0].message);
+  }
+
+  const { limit } = parsed.data;
+  const items = await getRelatedTours(id, limit);
+
+  return reply.send(successResponse("Related tours retrieved successfully", items));
 }

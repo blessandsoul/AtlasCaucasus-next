@@ -18,6 +18,7 @@ function toUser(prismaUser: PrismaUser & { companyProfile?: any; guideProfile?: 
     deletedAt: prismaUser.deletedAt,
     parentCompanyId: prismaUser.parentCompanyId,
     emailVerified: prismaUser.emailVerified,
+    emailNotifications: prismaUser.emailNotifications,
     verificationToken: prismaUser.verificationToken,
     verificationTokenExpiresAt: prismaUser.verificationTokenExpiresAt,
     resetPasswordToken: prismaUser.resetPasswordToken,
@@ -110,6 +111,7 @@ export async function updateUser(id: string, data: UpdateUserData): Promise<User
       phoneNumber: data.phoneNumber,
       passwordHash: data.passwordHash,
       emailVerified: data.emailVerified,
+      emailNotifications: data.emailNotifications,
       verificationToken: data.verificationToken,
       verificationTokenExpiresAt: data.verificationTokenExpiresAt,
       resetPasswordToken: data.resetPasswordToken,
@@ -417,6 +419,7 @@ export interface UserWithRelationsForSafeUser {
   phoneNumber: string | null;
   isActive: boolean;
   emailVerified: boolean;
+  emailNotifications: boolean;
   createdAt: Date;
   updatedAt: Date;
   roles: UserRole[];
@@ -453,6 +456,7 @@ export async function findUserWithRelationsForSafeUser(
     phoneNumber: user.phoneNumber,
     isActive: user.isActive,
     emailVerified: user.emailVerified,
+    emailNotifications: user.emailNotifications,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     roles: user.roles.map((r) => r.role as UserRole),

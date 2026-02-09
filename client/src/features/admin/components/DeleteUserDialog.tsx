@@ -39,26 +39,25 @@ export const DeleteUserDialog = ({ user, open, onOpenChange }: DeleteUserDialogP
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        {t('admin.users.deleteUser', 'Delete User')}
+                        {t('admin.users.deleteUser')}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                         {t(
                             'admin.users.deleteConfirm',
-                            'Are you sure you want to delete {{name}}? This action cannot be undone.',
                             { name: user ? `${user.firstName} ${user.lastName}` : '' }
                         )}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={isPending}>
-                        {t('common.cancel', 'Cancel')}
+                        {t('common.cancel')}
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleDelete}
                         disabled={isPending}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                        {isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
+                        {isPending ? t('common.deleting') : t('common.delete')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

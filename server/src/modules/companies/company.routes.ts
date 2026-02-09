@@ -2,7 +2,6 @@ import type { FastifyInstance } from "fastify";
 import * as companyController from "./company.controller.js";
 import { listCompanyToursHandler } from "../tours/tour.controller.js";
 import { authGuard } from "../../middlewares/authGuard.js";
-import { requireVerifiedEmail } from "../../middlewares/requireVerifiedEmail.js";
 
 export async function companyRoutes(fastify: FastifyInstance): Promise<void> {
     // Public: List all companies (paginated, filterable)
@@ -21,14 +20,14 @@ export async function companyRoutes(fastify: FastifyInstance): Promise<void> {
     // Auth required: Update company (ownership checked in service)
     fastify.patch(
         "/companies/:id",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         companyController.update
     );
 
     // Auth required: Delete company (ownership checked in service)
     fastify.delete(
         "/companies/:id",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         companyController.deleteCompany
     );
 
@@ -42,7 +41,7 @@ export async function companyRoutes(fastify: FastifyInstance): Promise<void> {
     // Auth required: Delete a tour agent (ownership checked in service)
     fastify.delete(
         "/companies/:id/tour-agents/:agentId",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         companyController.deleteTourAgent
     );
 
@@ -59,14 +58,14 @@ export async function companyRoutes(fastify: FastifyInstance): Promise<void> {
     // Auth required: Upload photos for company (ownership checked in helper)
     fastify.post(
         "/companies/:id/photos",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         companyController.uploadPhotos
     );
 
     // Auth required: Delete a specific photo (ownership checked in helper)
     fastify.delete(
         "/companies/:id/photos/:photoId",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         companyController.deletePhoto
     );
 
@@ -77,14 +76,14 @@ export async function companyRoutes(fastify: FastifyInstance): Promise<void> {
     // Auth required: Upload logo for company (ownership checked in service)
     fastify.post(
         "/companies/:id/logo",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         companyController.uploadLogo
     );
 
     // Auth required: Delete company logo (ownership checked in service)
     fastify.delete(
         "/companies/:id/logo",
-        { preHandler: [authGuard, requireVerifiedEmail] },
+        { preHandler: [authGuard] },
         companyController.deleteLogo
     );
 }

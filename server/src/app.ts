@@ -29,7 +29,14 @@ import { notificationRoutes } from "./modules/notifications/notification.routes.
 import { inquiryRoutes } from "./modules/inquiries/inquiry.routes.js";
 import { searchRoutes } from "./modules/search/search.routes.js";
 import { reviewRoutes } from "./modules/reviews/review.routes.js";
+import { favoriteRoutes } from "./modules/favorites/favorite.routes.js";
 import { docsRoutes } from "./modules/docs/docs.routes.js";
+import { contactRoutes } from "./modules/contact/contact.routes.js";
+import { bookingRoutes } from "./modules/bookings/booking.routes.js";
+import { analyticsRoutes } from "./modules/analytics/analytics.routes.js";
+import { blogRoutes } from "./modules/blog/blog.routes.js";
+import { creditRoutes } from "./modules/credits/credit.routes.js";
+import { aiRoutes } from "./modules/ai/ai.routes.js";
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -242,6 +249,13 @@ function buildApp() {
   app.register(inquiryRoutes, { prefix: "/api/v1" });
   app.register(searchRoutes, { prefix: "/api/v1" });
   app.register(reviewRoutes, { prefix: "/api/v1" });
+  app.register(favoriteRoutes, { prefix: "/api/v1" });
+  app.register(contactRoutes, { prefix: "/api/v1" });
+  app.register(bookingRoutes, { prefix: "/api/v1" });
+  app.register(analyticsRoutes, { prefix: "/api/v1" });
+  app.register(blogRoutes, { prefix: "/api/v1" });
+  app.register(creditRoutes, { prefix: "/api/v1" });
+  app.register(aiRoutes, { prefix: "/api/v1" });
 
   // Register WebSocket routes (no prefix - available at /ws)
   app.register(websocketRoutes);

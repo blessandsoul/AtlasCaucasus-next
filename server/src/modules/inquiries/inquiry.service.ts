@@ -4,7 +4,9 @@ import { BadRequestError, NotFoundError, ForbiddenError } from "../../libs/error
 import { prisma } from "../../libs/prisma.js";
 import { notificationService } from "../notifications/notification.service.js";
 import { logger } from "../../libs/logger.js";
+import { sendInquiryReceivedEmail, sendInquiryResponseEmail, sendBookingConfirmedEmail } from "../../libs/email.js";
 import { CreateInquiryData, InquiryFilters, InquiryWithResponses } from "./inquiry.types.js";
+import { bookingService } from "../bookings/booking.service.js";
 
 export class InquiryService {
     /**
@@ -51,6 +53,37 @@ export class InquiryService {
                 )
             )
         );
+
+        // Send email notifications to all recipients (fire-and-forget)
+        const recipientUsers = await prisma.user.findMany({
+            where: { id: { in: recipientUserIds } },
+            select: { id: true, email: true, firstName: true, emailNotifications: true },
+        });
+
+        const messagePreview = data.message.substring(0, 200);
+
+        Promise.allSettled(
+            recipientUsers
+                .filter((u) => u.emailNotifications !== false)
+                .map((recipient) =>
+                    sendInquiryReceivedEmail(
+                        recipient.email,
+                        recipient.firstName,
+                        senderName,
+                        data.subject,
+                        messagePreview,
+                        inquiry.id
+                    )
+                )
+        ).then((results) => {
+            const failed = results.filter((r) => r.status === "rejected");
+            if (failed.length > 0) {
+                logger.error(
+                    { inquiryId: inquiry.id, failedCount: failed.length },
+                    "Some inquiry notification emails failed to send"
+                );
+            }
+        });
 
         // Fetch complete inquiry with responses
         const completeInquiry = await inquiryRepo.findById(inquiry.id);
@@ -274,12 +307,169 @@ export class InquiryService {
             },
         });
 
+        // Send email notification to inquiry creator (fire-and-forget)
+        const inquiryCreator = await prisma.user.findUnique({
+            where: { id: inquiry.userId },
+            select: { email: true, firstName: true, emailNotifications: true },
+        });
+
+        if (inquiryCreator && inquiryCreator.emailNotifications !== false) {
+            sendInquiryResponseEmail(
+                inquiryCreator.email,
+                inquiryCreator.firstName,
+                recipientName,
+                status as "ACCEPTED" | "DECLINED" | "RESPONDED",
+                message || null,
+                inquiryId
+            ).catch((err) => {
+                logger.error(
+                    { err, inquiryId, recipientId },
+                    "Failed to send inquiry response email"
+                );
+            });
+        }
+
+        // Calculate and update provider's average response time (fire-and-forget)
+        this.updateProviderResponseTime(inquiry, recipientId).catch((err) => {
+            logger.error(
+                { err, inquiryId, recipientId },
+                "Failed to update provider response time"
+            );
+        });
+
+        // Auto-create booking when inquiry is accepted
+        if (status === InquiryStatus.ACCEPTED) {
+            this.createBookingFromInquiry(inquiry, recipientId, recipientName).catch((err) => {
+                logger.error(
+                    { err, inquiryId, recipientId },
+                    "Failed to auto-create booking from accepted inquiry"
+                );
+            });
+        }
+
         logger.info(
             { inquiryId, recipientId, status },
             "Inquiry response updated"
         );
 
         return updatedResponse;
+    }
+
+    /**
+     * Calculate response time and update the provider's rolling average
+     */
+    private async updateProviderResponseTime(
+        inquiry: { createdAt: Date; targetType: InquiryTargetType },
+        recipientId: string
+    ): Promise<void> {
+        const responseTimeMinutes = Math.round(
+            (Date.now() - inquiry.createdAt.getTime()) / (1000 * 60)
+        );
+
+        // Find which profile type this recipient has and update accordingly
+        const [guide, driver, company] = await Promise.all([
+            prisma.guide.findUnique({ where: { userId: recipientId }, select: { id: true, avgResponseTimeMinutes: true, responseCount: true } }),
+            prisma.driver.findUnique({ where: { userId: recipientId }, select: { id: true, avgResponseTimeMinutes: true, responseCount: true } }),
+            prisma.company.findUnique({ where: { userId: recipientId }, select: { id: true, avgResponseTimeMinutes: true, responseCount: true } }),
+        ]);
+
+        const updateAvg = (oldAvg: number | null, count: number, newTime: number): number => {
+            if (oldAvg === null || count === 0) return newTime;
+            return Math.round(((oldAvg * count) + newTime) / (count + 1));
+        };
+
+        if (guide) {
+            const newAvg = updateAvg(guide.avgResponseTimeMinutes, guide.responseCount, responseTimeMinutes);
+            await prisma.guide.update({
+                where: { id: guide.id },
+                data: { avgResponseTimeMinutes: newAvg, responseCount: { increment: 1 } },
+            });
+        }
+
+        if (driver) {
+            const newAvg = updateAvg(driver.avgResponseTimeMinutes, driver.responseCount, responseTimeMinutes);
+            await prisma.driver.update({
+                where: { id: driver.id },
+                data: { avgResponseTimeMinutes: newAvg, responseCount: { increment: 1 } },
+            });
+        }
+
+        if (company) {
+            const newAvg = updateAvg(company.avgResponseTimeMinutes, company.responseCount, responseTimeMinutes);
+            await prisma.company.update({
+                where: { id: company.id },
+                data: { avgResponseTimeMinutes: newAvg, responseCount: { increment: 1 } },
+            });
+        }
+    }
+
+    /**
+     * Auto-create a booking when an inquiry is accepted
+     */
+    private async createBookingFromInquiry(
+        inquiry: { id: string; userId: string; targetType: InquiryTargetType; targetIds: string },
+        recipientId: string,
+        recipientName: string
+    ): Promise<void> {
+        let parsedTargetIds: string[];
+        try {
+            parsedTargetIds = JSON.parse(inquiry.targetIds) as string[];
+        } catch {
+            logger.warn({ inquiryId: inquiry.id }, "Failed to parse targetIds for booking creation");
+            return;
+        }
+
+        // Map InquiryTargetType to BookingEntityType (skip COMPANY — not bookable)
+        const entityTypeMap: Record<string, string> = {
+            TOUR: "TOUR",
+            GUIDE: "GUIDE",
+            DRIVER: "DRIVER",
+        };
+
+        const bookingEntityType = entityTypeMap[inquiry.targetType];
+        if (!bookingEntityType) {
+            return; // COMPANY inquiries don't auto-create bookings
+        }
+
+        // Create a booking for each target entity
+        for (const entityId of parsedTargetIds) {
+            await bookingService.createBooking({
+                userId: inquiry.userId,
+                entityType: bookingEntityType as "TOUR" | "GUIDE" | "DRIVER",
+                entityId,
+                inquiryId: inquiry.id,
+            });
+        }
+
+        // Send booking confirmation email to the user (fire-and-forget)
+        const inquiryCreator = await prisma.user.findUnique({
+            where: { id: inquiry.userId },
+            select: { email: true, firstName: true, emailNotifications: true },
+        });
+
+        if (inquiryCreator && inquiryCreator.emailNotifications !== false) {
+            sendBookingConfirmedEmail(
+                inquiryCreator.email,
+                inquiryCreator.firstName,
+                recipientName,
+                bookingEntityType,
+                inquiry.id
+            ).catch((err) => {
+                logger.error(
+                    { err, inquiryId: inquiry.id },
+                    "Failed to send booking confirmation email"
+                );
+            });
+        }
+
+        // Send notification
+        await notificationService.createNotification({
+            userId: inquiry.userId,
+            type: NotificationType.BOOKING_REQUEST,
+            title: "Booking Confirmed",
+            message: `Your booking with ${recipientName} has been confirmed!`,
+            data: { inquiryId: inquiry.id, entityType: bookingEntityType },
+        });
     }
 
     /**

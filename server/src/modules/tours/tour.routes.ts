@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
 import { authGuard } from "../../middlewares/authGuard.js";
-import { requireVerifiedEmail } from "../../middlewares/requireVerifiedEmail.js";
 import {
   createTourHandler,
   getTourByIdHandler,
@@ -8,6 +7,7 @@ import {
   updateTourHandler,
   deleteTourHandler,
   listAllToursHandler,
+  getRelatedToursHandler,
 } from "./tour.controller.js";
 
 interface IdParams {
@@ -21,15 +21,18 @@ export async function tourRoutes(fastify: FastifyInstance): Promise<void> {
   // Public: get a single active tour by ID
   fastify.get<{ Params: IdParams }>("/tours/:id", getTourByIdHandler);
 
+  // Public: get related tours for a tour
+  fastify.get<{ Params: IdParams }>("/tours/:id/related", getRelatedToursHandler);
+
   // Auth required: create a new tour
-  fastify.post("/tours", { preHandler: [authGuard, requireVerifiedEmail] }, createTourHandler);
+  fastify.post("/tours", { preHandler: [authGuard] }, createTourHandler);
 
   // Auth required: list current user's tours
-  fastify.get("/me/tours", { preHandler: [authGuard, requireVerifiedEmail] }, listMyToursHandler);
+  fastify.get("/me/tours", { preHandler: [authGuard] }, listMyToursHandler);
 
   // Auth required: update a tour (owner or admin)
-  fastify.patch<{ Params: IdParams }>("/tours/:id", { preHandler: [authGuard, requireVerifiedEmail] }, updateTourHandler);
+  fastify.patch<{ Params: IdParams }>("/tours/:id", { preHandler: [authGuard] }, updateTourHandler);
 
   // Auth required: soft delete a tour (owner or admin)
-  fastify.delete<{ Params: IdParams }>("/tours/:id", { preHandler: [authGuard, requireVerifiedEmail] }, deleteTourHandler);
+  fastify.delete<{ Params: IdParams }>("/tours/:id", { preHandler: [authGuard] }, deleteTourHandler);
 }

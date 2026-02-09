@@ -8,20 +8,29 @@ import {
   ArrowRight,
   Users,
   Car,
+  Layers,
+  Clock,
+  ShieldCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Driver } from '../types/driver.types';
 import { getMediaUrl } from '@/lib/utils/media';
+import { formatResponseTime } from '@/lib/utils/format';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface DriverCardProps {
   driver: Driver;
   className?: string;
+  isFavorited?: boolean;
   onFavorite?: (id: string) => void;
+  isCompareSelected?: boolean;
+  onCompareToggle?: (id: string, meta: { label: string; imageUrl: string | null }) => void;
 }
 
-export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) => {
+export const DriverCard = ({ driver, className, isFavorited, onFavorite, isCompareSelected, onCompareToggle }: DriverCardProps) => {
   const router = useRouter();
+  const { formatPrice } = useCurrency();
 
   if (!driver) return null;
 
@@ -64,6 +73,7 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
     <div
       className={cn(
         "group relative flex flex-col w-full bg-white dark:bg-[#1c1c1c] rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-[#2a2a2a] cursor-pointer",
+        isCompareSelected && "ring-2 ring-primary border-primary/50",
         className
       )}
       onClick={handleCardClick}
@@ -80,10 +90,31 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
 
         <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
           <button
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              onCompareToggle?.(driver.id, { label: fullName, imageUrl: photoUrl });
+            }}
+            className={cn(
+              "h-8 w-8 rounded-full backdrop-blur-md flex items-center justify-center transition-colors",
+              isCompareSelected
+                ? "bg-primary text-primary-foreground"
+                : "bg-white/20 hover:bg-white/30"
+            )}
+            aria-label={isCompareSelected ? "Remove from comparison" : "Add to comparison"}
+          >
+            <Layers className={cn("h-4 w-4", !isCompareSelected && "text-white")} />
+          </button>
+          <button
             onClick={handleFavoriteClick}
             className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-colors group/heart"
+            aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
           >
-            <Heart className="h-4 w-4 text-white group-hover/heart:text-red-500 transition-colors" />
+            <Heart className={cn(
+              "h-4 w-4 transition-colors",
+              isFavorited
+                ? "fill-red-500 text-red-500"
+                : "text-white group-hover/heart:text-red-500"
+            )} />
           </button>
         </div>
 
@@ -140,9 +171,29 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
           </div>
         </div>
 
-        {/* Info Row */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-white/10 pt-3 max-[600px]:hidden">
-          <span>Professional driver services</span>
+        {/* Badges Row */}
+        <div className="flex items-center flex-wrap gap-2 text-xs border-t border-gray-100 dark:border-white/10 pt-3 max-[600px]:hidden">
+          {driver.isVerified && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">
+              <ShieldCheck className="h-3 w-3" />
+              Verified
+            </span>
+          )}
+          {(() => {
+            const rt = formatResponseTime(driver.avgResponseTimeMinutes);
+            if (!rt) return null;
+            const variantClasses = {
+              success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+              warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+              muted: 'bg-gray-500/10 text-gray-500 dark:text-gray-400',
+            };
+            return (
+              <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium', variantClasses[rt.variant])}>
+                <Clock className="h-3 w-3" />
+                Responds {rt.label}
+              </span>
+            );
+          })()}
         </div>
 
         {/* Footer: Price and Action */}
@@ -152,7 +203,7 @@ export const DriverCard = ({ driver, className, onFavorite }: DriverCardProps) =
               {driver.pricePerDay ? (
                 <>
                   <span className="text-xl max-[600px]:text-lg font-bold text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-gray-400">
-                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: driver.currency || 'GEL' }).format(Number(driver.pricePerDay))}
+                    {formatPrice(Number(driver.pricePerDay), driver.currency || 'GEL')}
                   </span>
                   <span className="text-gray-500 text-xs">/ day</span>
                 </>

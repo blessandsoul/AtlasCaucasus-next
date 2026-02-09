@@ -94,7 +94,7 @@ export const ReviewCard = ({
                   >
                     <MoreHorizontal className="h-4 w-4" />
                     <span className="sr-only">
-                      {t('reviews.actions', 'Review actions')}
+                      {t('reviews.actions')}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -102,7 +102,7 @@ export const ReviewCard = ({
                   {onEdit && (
                     <DropdownMenuItem onClick={() => onEdit(review)}>
                       <Pencil className="h-4 w-4 mr-2" />
-                      {t('common.edit', 'Edit')}
+                      {t('common.edit')}
                     </DropdownMenuItem>
                   )}
                   {onDelete && (
@@ -111,7 +111,7 @@ export const ReviewCard = ({
                       className="text-destructive focus:text-destructive"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
-                      {t('common.delete', 'Delete')}
+                      {t('common.delete')}
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -133,24 +133,23 @@ export const ReviewCard = ({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {t('reviews.delete_confirm_title', 'Delete Review')}
+              {t('reviews.delete_confirm_title')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {t(
-                'reviews.delete_confirm_description',
-                'Are you sure you want to delete this review? This action cannot be undone.'
+                'reviews.delete_confirm_description'
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>
-              {t('common.cancel', 'Cancel')}
+              {t('common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {t('common.delete', 'Delete')}
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

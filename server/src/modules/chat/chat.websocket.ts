@@ -9,9 +9,12 @@ import { wsManager } from "../websocket/websocket.manager.js";
 import { chatService } from "./chat.service.js";
 import { chatRepo } from "./chat.repo.js";
 import { logger } from "../../libs/logger.js";
-import { redisClient } from "../../libs/redis.js";
+import { redisClient, isRedisConnected } from "../../libs/redis.js";
 import { prisma } from "../../libs/prisma.js";
 import { notificationService } from "../notifications/notification.service.js";
+import { sendChatMessageEmail } from "../../libs/email.js";
+
+const CHAT_EMAIL_COOLDOWN_SECONDS = 15 * 60; // 15 minutes
 
 /**
  * Handle incoming chat message via WebSocket
@@ -108,6 +111,16 @@ export async function handleChatMessage(
                 logger.error({ err, participantId }, "Failed to create message notification");
             }
         }
+
+        // Send email to offline participants (fire-and-forget, with 15-min cooldown per chat)
+        sendOfflineChatEmails(
+            participantIds.filter((id) => id !== ws.userId),
+            chatId,
+            senderName,
+            messagePreview
+        ).catch((err) => {
+            logger.error({ err, chatId }, "Failed to send offline chat emails");
+        });
 
         logger.info(
             { chatId, messageId: message.id, senderId: ws.userId },
@@ -299,5 +312,69 @@ export async function broadcastParticipantLeft(
         });
     } catch (error) {
         logger.error({ error, chatId, leftUserId }, "Failed to broadcast participant left");
+    }
+}
+
+/**
+ * Send email notifications to offline chat participants
+ * Uses Redis cooldown key to avoid spamming (one email per chat per recipient per 15 min)
+ */
+async function sendOfflineChatEmails(
+    recipientIds: string[],
+    chatId: string,
+    senderName: string,
+    messagePreview: string
+): Promise<void> {
+    // Find offline recipients (not connected via WebSocket)
+    const offlineRecipientIds = recipientIds.filter(
+        (id) => !wsManager.isUserConnected(id)
+    );
+
+    if (offlineRecipientIds.length === 0) return;
+
+    // Look up user info for offline recipients
+    const offlineUsers = await prisma.user.findMany({
+        where: { id: { in: offlineRecipientIds } },
+        select: { id: true, email: true, firstName: true, emailNotifications: true },
+    });
+
+    for (const user of offlineUsers) {
+        // Skip if user has disabled email notifications
+        if (user.emailNotifications === false) continue;
+
+        // Check Redis cooldown to avoid email spam
+        const cooldownKey = `chat-email:${user.id}:${chatId}`;
+
+        if (isRedisConnected()) {
+            try {
+                const exists = await redisClient.exists(cooldownKey);
+                if (exists) {
+                    logger.debug(
+                        { userId: user.id, chatId },
+                        "Skipping chat email - cooldown active"
+                    );
+                    continue;
+                }
+
+                // Set cooldown key
+                await redisClient.setEx(cooldownKey, CHAT_EMAIL_COOLDOWN_SECONDS, "1");
+            } catch (err) {
+                // If Redis fails, still send the email (better to occasionally double-send than never send)
+                logger.warn({ err, userId: user.id, chatId }, "Redis cooldown check failed, sending email anyway");
+            }
+        }
+
+        sendChatMessageEmail(
+            user.email,
+            user.firstName,
+            senderName,
+            messagePreview,
+            chatId
+        ).catch((err) => {
+            logger.error(
+                { err, userId: user.id, chatId },
+                "Failed to send offline chat email"
+            );
+        });
     }
 }

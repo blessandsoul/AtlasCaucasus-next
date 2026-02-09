@@ -136,3 +136,28 @@ export function validateIdParams(params: { id: string }): { id: string } {
     }
     return result.data;
 }
+
+/**
+ * Create a Fastify preValidation hook that validates a part of the request
+ * against a Zod schema
+ * @param schema - Zod schema to validate against
+ * @param source - Which part of the request to validate ("body", "params", "query")
+ * @returns Fastify preValidation hook function
+ * @throws ValidationError if validation fails
+ */
+export function validateRequest<T extends z.ZodTypeAny>(
+    schema: T,
+    source: "body" | "params" | "query" = "body"
+) {
+    return async (request: any) => {
+        const result = schema.safeParse(request[source]);
+        if (!result.success) {
+            const errorMessage = result.error.errors
+                .map((err) => `${err.path.join(".")}: ${err.message}`)
+                .join(", ");
+            throw new ValidationError(errorMessage, "VALIDATION_FAILED");
+        }
+        // Replace the request part with validated data
+        request[source] = result.data;
+    };
+}

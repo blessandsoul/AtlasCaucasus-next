@@ -12,6 +12,8 @@ export interface CompanyProfile {
   websiteUrl: string | null;
   phoneNumber: string | null;
   isVerified: boolean;
+  avgResponseTimeMinutes: number | null;
+  responseCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +27,8 @@ export interface GuideProfile {
   phoneNumber: string | null;
   isVerified: boolean;
   isAvailable: boolean;
+  avgResponseTimeMinutes: number | null;
+  responseCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +46,8 @@ export interface DriverProfile {
   phoneNumber: string | null;
   isVerified: boolean;
   isAvailable: boolean;
+  avgResponseTimeMinutes: number | null;
+  responseCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -82,6 +88,9 @@ export interface User {
   invitationToken: string | null;
   invitationTokenExpiresAt: Date | null;
 
+  // Email notification preference
+  emailNotifications: boolean;
+
   // Account lockout
   failedLoginAttempts: number;
   lockedUntil: Date | null;
@@ -98,6 +107,7 @@ export interface SafeUser {
   roles: UserRole[];
   isActive: boolean;
   emailVerified: boolean;
+  emailNotifications: boolean;
 
   // Profiles
   companyProfile?: CompanyProfile | null;
@@ -128,6 +138,7 @@ export interface UpdateUserData {
   lastName?: string;
   phoneNumber?: string | null;
   isActive?: boolean;
+  emailNotifications?: boolean;
   tokenVersion?: number;
   // Email verification
   emailVerified?: boolean;

@@ -1,8 +1,12 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+import { Send, ShieldCheck, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Guide } from '../types/guide.types';
+import { formatResponseTime } from '@/lib/utils/format';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface GuideSidebarProps {
   guide: Guide;
@@ -10,27 +14,16 @@ interface GuideSidebarProps {
   className?: string;
 }
 
-import { useTranslation } from 'react-i18next'; // Added import
-
 export const GuideSidebar = ({ guide, onBook, className }: GuideSidebarProps) => {
-  const { t } = useTranslation(); // Added hook
+  const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const price = guide.pricePerDay ? Number(guide.pricePerDay) : null;
-  const currency = guide.currency || 'USD';
+  const currency = guide.currency || 'GEL';
+  const responseTime = formatResponseTime(guide.avgResponseTimeMinutes);
 
-  const formatPrice = (amount: number, curr: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: curr,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const handleBook = () => {
+  const handleBook = (): void => {
     if (onBook) {
       onBook();
-    } else {
-      console.log('Book guide:', guide.id);
     }
   };
 
@@ -42,6 +35,29 @@ export const GuideSidebar = ({ guide, onBook, className }: GuideSidebarProps) =>
       )}
     >
       <div className="p-4 md:p-6">
+        {/* Provider Trust Badges - Desktop only */}
+        {(guide.isVerified || responseTime) && (
+          <div className="hidden md:flex items-center flex-wrap gap-2 mb-4 pb-4 border-b border-border">
+            {guide.isVerified && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                {t('provider_badges.verified', 'Verified')}
+              </span>
+            )}
+            {responseTime && (
+              <span className={cn(
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
+                responseTime.variant === 'success' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+                responseTime.variant === 'warning' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                responseTime.variant === 'muted' && 'bg-muted text-muted-foreground',
+              )}>
+                <Clock className="h-3.5 w-3.5" />
+                {t('provider_badges.responds', 'Responds')} {responseTime.label}
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
             <span className="text-xs text-muted-foreground mb-0.5">
@@ -66,7 +82,8 @@ export const GuideSidebar = ({ guide, onBook, className }: GuideSidebarProps) =>
             onClick={handleBook}
             className="bg-cyan-500 hover:bg-cyan-600 text-white dark:text-black font-semibold rounded-full px-8 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all"
           >
-            {t('guide_details.book_now')}
+            <Send className="mr-2 h-4 w-4" />
+            {t('inquiry_dialog.request_guide')}
           </Button>
         </div>
       </div>

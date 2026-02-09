@@ -110,12 +110,12 @@ export const EditUserDialog = ({ user, open, onOpenChange }: EditUserDialogProps
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>{t('admin.users.editUser', 'Edit User')}</DialogTitle>
+                    <DialogTitle>{t('admin.users.editUser')}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName">{t('common.firstName', 'First Name')}</Label>
+                            <Label htmlFor="firstName">{t('common.firstName')}</Label>
                             <Input
                                 id="firstName"
                                 value={firstName}
@@ -123,7 +123,7 @@ export const EditUserDialog = ({ user, open, onOpenChange }: EditUserDialogProps
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="lastName">{t('common.lastName', 'Last Name')}</Label>
+                            <Label htmlFor="lastName">{t('common.lastName')}</Label>
                             <Input
                                 id="lastName"
                                 value={lastName}
@@ -133,7 +133,7 @@ export const EditUserDialog = ({ user, open, onOpenChange }: EditUserDialogProps
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email">{t('common.email', 'Email')}</Label>
+                        <Label htmlFor="email">{t('common.email')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -148,11 +148,11 @@ export const EditUserDialog = ({ user, open, onOpenChange }: EditUserDialogProps
                             checked={isActive}
                             onCheckedChange={(checked) => setIsActive(checked as boolean)}
                         />
-                        <Label htmlFor="isActive">{t('admin.users.isActive', 'Active')}</Label>
+                        <Label htmlFor="isActive">{t('admin.users.isActive')}</Label>
                     </div>
 
                     <div className="space-y-2">
-                        <Label>{t('admin.users.roles', 'Roles')}</Label>
+                        <Label>{t('admin.users.roles')}</Label>
                         <div className="flex flex-wrap gap-2">
                             {currentRoles.map((role) => (
                                 <Badge key={role} variant="secondary" className="gap-1">
@@ -173,7 +173,7 @@ export const EditUserDialog = ({ user, open, onOpenChange }: EditUserDialogProps
                         <div className="flex gap-2">
                             <Select value={selectedRole} onValueChange={setSelectedRole}>
                                 <SelectTrigger className="flex-1">
-                                    <SelectValue placeholder={t('admin.users.selectRole', 'Select a role')} />
+                                    <SelectValue placeholder={t('admin.users.selectRole')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {availableRoles.map((role) => (
@@ -189,17 +189,17 @@ export const EditUserDialog = ({ user, open, onOpenChange }: EditUserDialogProps
                                 onClick={handleAddRole}
                                 disabled={!selectedRole}
                             >
-                                {t('admin.users.addRole', 'Add Role')}
+                                {t('admin.users.addRole')}
                             </Button>
                         </div>
                     )}
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                        {t('common.cancel', 'Cancel')}
+                        {t('common.cancel')}
                     </Button>
                     <Button onClick={handleSubmit} disabled={isPending}>
-                        {isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
+                        {isPending ? t('common.saving') : t('common.save')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

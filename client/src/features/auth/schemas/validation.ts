@@ -51,6 +51,9 @@ export const createRegisterSchema = (t: TFunction) => z.object({
     password: createStrongPasswordSchema(t),
     firstName: createNameSchema(t),
     lastName: createNameSchema(t),
+    agreeToTerms: z.literal(true, {
+        errorMap: () => ({ message: t('validation.agree_to_terms') }),
+    }),
 });
 
 /**
@@ -66,6 +69,9 @@ export const createCompanyRegisterSchema = (t: TFunction) => z.object({
     registrationNumber: z.string().max(100, 'Registration number is too long').optional().or(z.literal('')),
     websiteUrl: z.string().url('Invalid website URL').max(512, 'URL is too long').optional().or(z.literal('')),
     phoneNumber: z.string().max(20, 'Phone number is too long').optional().or(z.literal('')),
+    agreeToTerms: z.literal(true, {
+        errorMap: () => ({ message: t('validation.agree_to_terms') }),
+    }),
 });
 
 /**
@@ -107,6 +113,7 @@ export type RegisterFormData = {
     password: string;
     firstName: string;
     lastName: string;
+    agreeToTerms: true;
 };
 
 // CompanyRegisterFormData type
@@ -120,6 +127,7 @@ export type CompanyRegisterFormData = {
     registrationNumber?: string;
     websiteUrl?: string;
     phoneNumber?: string;
+    agreeToTerms: true;
 };
 
 // ForgotPasswordFormData type

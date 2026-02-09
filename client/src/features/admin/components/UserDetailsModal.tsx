@@ -51,7 +51,7 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{t('admin.users.userDetails', 'User Details')}</DialogTitle>
+                    <DialogTitle>{t('admin.users.userDetails')}</DialogTitle>
                 </DialogHeader>
 
                 {isLoading ? (
@@ -61,35 +61,35 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
                 ) : user ? (
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         <TabsList className="grid w-full grid-cols-4">
-                            <TabsTrigger value="overview">{t('common.overview', 'Overview')}</TabsTrigger>
+                            <TabsTrigger value="overview">{t('common.overview')}</TabsTrigger>
                             <TabsTrigger value="company" disabled={!user.companyProfile}>
                                 <Building className="h-4 w-4 mr-1" />
-                                {t('common.company', 'Company')}
+                                {t('common.company')}
                             </TabsTrigger>
                             <TabsTrigger value="guide" disabled={!user.guideProfile}>
                                 <MapPin className="h-4 w-4 mr-1" />
-                                {t('common.guide', 'Guide')}
+                                {t('common.guide')}
                             </TabsTrigger>
                             <TabsTrigger value="driver" disabled={!user.driverProfile}>
                                 <Car className="h-4 w-4 mr-1" />
-                                {t('common.driver', 'Driver')}
+                                {t('common.driver')}
                             </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="overview" className="space-y-4 mt-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t('common.name', 'Name')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('common.name')}</p>
                                     <p className="font-medium">{user.firstName} {user.lastName}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t('common.email', 'Email')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('common.email')}</p>
                                     <p className="font-medium">{user.email}</p>
                                 </div>
                             </div>
 
                             <div>
-                                <p className="text-sm text-muted-foreground mb-2">{t('admin.users.roles', 'Roles')}</p>
+                                <p className="text-sm text-muted-foreground mb-2">{t('admin.users.roles')}</p>
                                 <div className="flex flex-wrap gap-2">
                                     {user.roles.map((role) => (
                                         <Badge key={role} variant="secondary">
@@ -103,24 +103,24 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t('admin.users.status', 'Status')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('admin.users.status')}</p>
                                     <StatusIndicator isActive={user.isActive} showLabel />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t('admin.users.emailVerified', 'Email Verified')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('admin.users.emailVerified')}</p>
                                     <Badge variant={user.emailVerified ? 'default' : 'secondary'}>
-                                        {user.emailVerified ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                                        {user.emailVerified ? t('common.yes') : t('common.no')}
                                     </Badge>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t('admin.users.joined', 'Joined')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('admin.users.joined')}</p>
                                     <p className="font-medium">{formatDate(user.createdAt)}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t('admin.users.lastUpdated', 'Last Updated')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('admin.users.lastUpdated')}</p>
                                     <p className="font-medium">{formatDate(user.updatedAt)}</p>
                                 </div>
                             </div>
@@ -131,33 +131,33 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
                                 <>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('company.name', 'Company Name')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('company.name')}</p>
                                             <p className="font-medium">{user.companyProfile.name || 'N/A'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('company.registrationNumber', 'Registration Number')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('company.registration_number')}</p>
                                             <p className="font-medium">{user.companyProfile.registrationNumber || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('company.website', 'Website')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('company.website')}</p>
                                             <p className="font-medium">{user.companyProfile.websiteUrl || 'N/A'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('company.phone', 'Phone')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('company.phone')}</p>
                                             <p className="font-medium">{user.companyProfile.phoneNumber || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-muted-foreground">{t('company.verified', 'Verified')}</p>
+                                        <p className="text-sm text-muted-foreground">{t('company.verified')}</p>
                                         <Badge variant={user.companyProfile.isVerified ? 'default' : 'secondary'}>
-                                            {user.companyProfile.isVerified ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                                            {user.companyProfile.isVerified ? t('common.yes') : t('common.no')}
                                         </Badge>
                                     </div>
                                 </>
                             ) : (
-                                <p className="text-muted-foreground">{t('admin.users.noCompanyProfile', 'No company profile')}</p>
+                                <p className="text-muted-foreground">{t('admin.users.noCompanyProfile')}</p>
                             )}
                         </TabsContent>
 
@@ -166,33 +166,33 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
                                 <>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('guide.languages', 'Languages')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('guide.languages')}</p>
                                             <p className="font-medium">{parseLanguages(user.guideProfile.languages)}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('guide.experience', 'Years of Experience')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('guide.experience')}</p>
                                             <p className="font-medium">{user.guideProfile.yearsOfExperience || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('guide.phone', 'Phone')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('guide.phone')}</p>
                                             <p className="font-medium">{user.guideProfile.phoneNumber || 'N/A'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('guide.available', 'Available')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('guide.available')}</p>
                                             <Badge variant={user.guideProfile.isAvailable ? 'default' : 'secondary'}>
-                                                {user.guideProfile.isAvailable ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                                                {user.guideProfile.isAvailable ? t('common.yes') : t('common.no')}
                                             </Badge>
                                         </div>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-muted-foreground">{t('guide.bio', 'Bio')}</p>
+                                        <p className="text-sm text-muted-foreground">{t('guide.bio')}</p>
                                         <p className="font-medium">{user.guideProfile.bio || 'N/A'}</p>
                                     </div>
                                 </>
                             ) : (
-                                <p className="text-muted-foreground">{t('admin.users.noGuideProfile', 'No guide profile')}</p>
+                                <p className="text-muted-foreground">{t('admin.users.noGuideProfile')}</p>
                             )}
                         </TabsContent>
 
@@ -201,40 +201,40 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
                                 <>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('driver.vehicleType', 'Vehicle Type')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('driver.vehicle_type')}</p>
                                             <p className="font-medium">{user.driverProfile.vehicleType || 'N/A'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('driver.capacity', 'Capacity')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('driver.capacity')}</p>
                                             <p className="font-medium">{user.driverProfile.vehicleCapacity || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('driver.vehicle', 'Vehicle')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('driver.vehicle')}</p>
                                             <p className="font-medium">
                                                 {user.driverProfile.vehicleMake} {user.driverProfile.vehicleModel} ({user.driverProfile.vehicleYear})
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('driver.license', 'License Number')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('driver.license')}</p>
                                             <p className="font-medium">{user.driverProfile.licenseNumber || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('driver.phone', 'Phone')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('driver.phone')}</p>
                                             <p className="font-medium">{user.driverProfile.phoneNumber || 'N/A'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">{t('driver.available', 'Available')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('driver.available')}</p>
                                             <Badge variant={user.driverProfile.isAvailable ? 'default' : 'secondary'}>
-                                                {user.driverProfile.isAvailable ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                                                {user.driverProfile.isAvailable ? t('common.yes') : t('common.no')}
                                             </Badge>
                                         </div>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-muted-foreground">{t('driver.bio', 'Bio')}</p>
+                                        <p className="text-sm text-muted-foreground">{t('driver.bio')}</p>
                                         <p className="font-medium">{user.driverProfile.bio || 'N/A'}</p>
                                     </div>
                                 </>
@@ -245,7 +245,7 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
                     </Tabs>
                 ) : (
                     <p className="text-muted-foreground text-center py-8">
-                        {t('admin.users.userNotFound', 'User not found')}
+                        {t('admin.users.userNotFound')}
                     </p>
                 )}
             </DialogContent>

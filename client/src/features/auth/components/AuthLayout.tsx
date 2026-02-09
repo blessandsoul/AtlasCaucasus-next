@@ -21,7 +21,7 @@ export const AuthLayout = ({ children, title, subtitle, showSocialAuth = true }:
                 <div className="text-center">
                     <Link href={ROUTES.HOME} className="inline-block mb-6">
                         <span className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                            {t('header.brand.name') || 'AtlasCaucasus'}
+                            {t('header.brand.name')}
                         </span>
                     </Link>
                     <h2 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
@@ -44,7 +44,7 @@ export const AuthLayout = ({ children, title, subtitle, showSocialAuth = true }:
                             </div>
                             <div className="relative flex justify-center text-sm">
                                 <span className="px-2 bg-white text-gray-500">
-                                    {t('auth.or_continue_with') || 'Or continue with'}
+                                    {t('auth.or_continue_with')}
                                 </span>
                             </div>
                         </div>
@@ -72,7 +72,7 @@ export const AuthLayout = ({ children, title, subtitle, showSocialAuth = true }:
                                         fill="#EA4335"
                                     />
                                 </svg>
-                                {t('auth.continue_with_google') || 'Continue with Google'}
+                                {t('auth.continue_with_google')}
                             </button>
                         </div>
                     </div>

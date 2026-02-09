@@ -61,7 +61,7 @@ export const ReviewList = ({
   if (error) {
     return (
       <div className={cn('text-center py-8 text-muted-foreground', className)}>
-        {t('reviews.load_error', 'Failed to load reviews')}
+        {t('reviews.load_error')}
       </div>
     );
   }
@@ -74,7 +74,7 @@ export const ReviewList = ({
       <div className={cn('text-center py-12', className)}>
         <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
         <p className="text-muted-foreground">
-          {t('reviews.no_reviews', 'No reviews yet. Be the first to leave a review!')}
+          {t('reviews.no_reviews')}
         </p>
       </div>
     );
@@ -106,10 +106,10 @@ export const ReviewList = ({
             disabled={!pagination.hasPreviousPage}
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
-            {t('common.previous', 'Previous')}
+            {t('common.previous')}
           </Button>
           <span className="text-sm text-muted-foreground px-4">
-            {t('common.page_of', 'Page {{current}} of {{total}}', {
+            {t('common.page_of', {
               current: pagination.page,
               total: pagination.totalPages,
             })}
@@ -120,7 +120,7 @@ export const ReviewList = ({
             onClick={() => setPage((p) => p + 1)}
             disabled={!pagination.hasNextPage}
           >
-            {t('common.next', 'Next')}
+            {t('common.next')}
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>

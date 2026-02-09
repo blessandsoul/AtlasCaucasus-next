@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Compass, Building2, Headset, Map as MapIcon, Hotel, Users, Car, ChevronRight, LogOut, LayoutDashboard, MessageSquare, Bell, User, Home } from 'lucide-react';
+import { Menu, X, Compass, Building2, Headset, Map as MapIcon, Hotel, Users, Car, ChevronRight, LogOut, LayoutDashboard, MessageSquare, Bell, User, Home, Info, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,8 @@ import { useAppDispatch } from '@/store/hooks';
 import { openDrawer } from '@/features/chat/store/chatSlice';
 import { useChats } from '@/features/chat/hooks/useChats';
 import { useUnreadCount } from '@/features/notifications/hooks/useNotifications';
+import { useCurrency } from '@/context/CurrencyContext';
+import { SUPPORTED_CURRENCIES, CURRENCY_SYMBOLS } from '@/lib/utils/currency';
 
 interface MobileMenuProps {
     className?: string;
@@ -43,6 +45,7 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
     const { isAuthenticated, user, logout } = useAuth();
     const { startLoading, stopLoading } = useLoading();
     const dispatch = useAppDispatch();
+    const { currency: selectedCurrency, setCurrency: setSelectedCurrency } = useCurrency();
 
     // Fetch unread counts
     const { data: chatsData } = useChats({}, { enabled: isAuthenticated && mounted });
@@ -168,7 +171,7 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
                                             <Home className="h-5 w-5" />
                                         </div>
-                                        <span className="font-semibold text-sm">{t('header.nav.home', 'მთავარი')}</span>
+                                        <span className="font-semibold text-sm">{t('header.nav.home')}</span>
                                     </Link>
 
                                     {navSections.map((section) => (
@@ -227,14 +230,36 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                     ))}
 
                                     <Link
-                                        href="#"
+                                        href={ROUTES.BLOG.LIST}
                                         onClick={closeMenu}
                                         className="flex items-center gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors mt-2"
                                     >
                                         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+                                            <BookOpen className="h-5 w-5" />
+                                        </div>
+                                        <span className="font-semibold text-sm">{t('header.nav.blog')}</span>
+                                    </Link>
+
+                                    <Link
+                                        href="/about"
+                                        onClick={closeMenu}
+                                        className="flex items-center gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors"
+                                    >
+                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+                                            <Info className="h-5 w-5" />
+                                        </div>
+                                        <span className="font-semibold text-sm">{t('header.nav.about')}</span>
+                                    </Link>
+
+                                    <Link
+                                        href="/contact"
+                                        onClick={closeMenu}
+                                        className="flex items-center gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors"
+                                    >
+                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
                                             <Headset className="h-5 w-5" />
                                         </div>
-                                        <span className="font-semibold text-sm">{t('header.nav.support')}</span>
+                                        <span className="font-semibold text-sm">{t('header.nav.contact')}</span>
                                     </Link>
                                 </div>
 
@@ -255,6 +280,25 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                             >
                                                 <span className={`fi fis fi-${getFlagCode(lang)} rounded-sm`} />
                                                 <span className="uppercase">{lang}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Currency Switcher - Compact Row */}
+                                    <div className="flex items-center justify-center gap-2 p-1 bg-muted/50 rounded-lg">
+                                        {SUPPORTED_CURRENCIES.map((c) => (
+                                            <button
+                                                key={c}
+                                                onClick={() => setSelectedCurrency(c)}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
+                                                    selectedCurrency === c
+                                                        ? "bg-background shadow-sm text-primary"
+                                                        : "text-muted-foreground hover:text-foreground"
+                                                )}
+                                            >
+                                                <span className="font-semibold">{CURRENCY_SYMBOLS[c]}</span>
+                                                <span>{c}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -304,7 +348,7 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                                     }}
                                                 >
                                                     <MessageSquare className="mr-2 h-3.5 w-3.5" />
-                                                    {t('auth.messages', 'Messages')}
+                                                    {t('auth.messages')}
                                                     {totalUnreadChats > 0 && (
                                                         <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-destructive ring-1 ring-background" />
                                                     )}
@@ -320,7 +364,7 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                                     }}
                                                 >
                                                     <Bell className="mr-2 h-3.5 w-3.5" />
-                                                    {t('header.nav.notifications', 'Notifications')}
+                                                    {t('header.nav.notifications')}
                                                     {notificationCount > 0 && (
                                                         <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-destructive ring-1 ring-background" />
                                                     )}

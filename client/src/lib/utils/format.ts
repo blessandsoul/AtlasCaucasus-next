@@ -40,3 +40,26 @@ export const formatRelativeTime = (date: string | Date): string => {
 export const truncate = (str: string, length: number): string => {
     return str.length > length ? `${str.substring(0, length)}...` : str;
 };
+
+/**
+ * Format response time in minutes to a human-readable label.
+ * Returns { label, variant } where variant indicates urgency color.
+ */
+export const formatResponseTime = (
+    minutes: number | null | undefined
+): { label: string; variant: 'success' | 'warning' | 'muted' } | null => {
+    if (minutes === null || minutes === undefined) return null;
+
+    if (minutes < 60) {
+        return { label: `< 1 hour`, variant: 'success' };
+    }
+    if (minutes < 180) {
+        return { label: `< 3 hours`, variant: 'success' };
+    }
+    if (minutes < 1440) {
+        const hours = Math.round(minutes / 60);
+        return { label: `< ${hours} hours`, variant: 'warning' };
+    }
+    const days = Math.round(minutes / 1440);
+    return { label: `~ ${days} day${days > 1 ? 's' : ''}`, variant: 'muted' };
+};

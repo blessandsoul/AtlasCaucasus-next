@@ -26,6 +26,9 @@ export const ERROR_CODES = {
   FILE_SIGNATURE_MISMATCH: 'FILE_SIGNATURE_MISMATCH',
   FILE_TOO_LARGE: 'FILE_TOO_LARGE',
 
+  // Email verification
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+
   // Resources
   NOT_FOUND: 'NOT_FOUND',
   FORBIDDEN: 'FORBIDDEN',
@@ -48,6 +51,7 @@ export const ERROR_MESSAGES: Record<string, string> = {
   [ERROR_CODES.VERIFICATION_TOKEN_EXPIRED]: 'Your verification link has expired. Please request a new one.',
   [ERROR_CODES.TOKEN_ALREADY_USED]: 'This token has already been used.',
   [ERROR_CODES.INVALID_UUID]: 'Invalid identifier format.',
+  [ERROR_CODES.EMAIL_NOT_VERIFIED]: 'Please verify your email address to continue.',
   [ERROR_CODES.UNAUTHORIZED]: 'Please log in to continue.',
   [ERROR_CODES.FORBIDDEN]: 'You do not have permission to perform this action.',
   [ERROR_CODES.NOT_FOUND]: 'The requested resource was not found.',

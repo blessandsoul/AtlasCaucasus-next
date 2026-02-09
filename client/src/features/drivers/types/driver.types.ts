@@ -37,6 +37,8 @@ export interface Driver {
   phoneNumber: string | null;
   isVerified: boolean;
   isAvailable: boolean;
+  avgResponseTimeMinutes: number | null;
+  responseCount: number;
   createdAt: string;
   updatedAt: string;
   user: {

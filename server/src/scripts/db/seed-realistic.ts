@@ -14,9 +14,9 @@
  * Usage: npx tsx scripts/db/seed-realistic.ts
  */
 
-import { PrismaClient, UserRole, ChatType, NotificationType, InquiryTargetType, InquiryStatus, ReviewTargetType, AuditAction, TourDifficulty } from '@prisma/client';
+import { PrismaClient, UserRole, ChatType, NotificationType, InquiryTargetType, InquiryStatus, ReviewTargetType, AuditAction, TourDifficulty, BookingStatus } from '@prisma/client';
 import { getHashedPassword, DEFAULT_PASSWORD } from './utils/password.js';
-import { uuid, randomItem, randomItems, randomInt, randomBool, randomImageUrl, randomRating, pastDate, futureDate, createProgressLogger } from './utils/helpers.js';
+import { uuid, randomItem, randomItems, randomInt, randomBool, randomImageUrl, randomRating, pastDate, futureDate, createProgressLogger, slugify } from './utils/helpers.js';
 import { ALL_USERS, ADMIN_USERS, COMPANY_OWNER_USERS, TOUR_AGENT_USERS, GUIDE_USERS, DRIVER_USERS, TRAVELER_USERS, MULTI_ROLE_USERS } from './data/users.js';
 import { COMPANIES } from './data/companies.js';
 import { GUIDE_PROFILES, MULTI_ROLE_GUIDE_PROFILES, ALL_GUIDE_PROFILES } from './data/guides.js';
@@ -24,6 +24,7 @@ import { DRIVER_PROFILES, MULTI_ROLE_DRIVER_PROFILES, ALL_DRIVER_PROFILES } from
 import { ALL_TOURS, COMPANY_TOURS, INDIVIDUAL_TOURS } from './data/tours.js';
 import { getRandomComment } from './data/reviews.js';
 import { INQUIRY_MESSAGES, RESPONSE_MESSAGES, FOLLOW_UP_MESSAGES, CASUAL_CHAT_MESSAGES, generateConversation } from './data/messages.js';
+import { BLOG_POSTS } from './data/blogs.js';
 
 // Define UserData type based on usage
 interface UserData {
@@ -76,6 +77,7 @@ interface CreatedIds {
   drivers: string[];
   tours: string[];
   chats: string[];
+  blogPosts: string[];
 }
 
 const createdIds: CreatedIds = {
@@ -86,6 +88,7 @@ const createdIds: CreatedIds = {
   drivers: [],
   tours: [],
   chats: [],
+  blogPosts: [],
 };
 
 // ============================================================================
@@ -1281,6 +1284,226 @@ async function seedAuditLogs(): Promise<void> {
 }
 
 // ============================================================================
+// PHASE 13: BOOKINGS
+// ============================================================================
+
+const BOOKING_NOTES_TEMPLATES = [
+  'Looking forward to this experience!',
+  'We have 2 children in our group.',
+  'Celebrating our anniversary trip.',
+  'First time visiting Georgia, very excited!',
+  'Need vegetarian meal options if food is included.',
+  'Can we start 30 minutes earlier?',
+  'Group of photography enthusiasts.',
+  'Airport pickup — flight lands at 14:30.',
+  'We have 3 large suitcases.',
+  null,
+  null,
+  null,
+  null,
+  null,
+];
+
+async function seedBookings(): Promise<void> {
+  console.log('\n📅 Phase 13: Seeding Bookings...');
+
+  let bookingCount = 0;
+  const travelerEmails = TRAVELER_USERS.map((u: UserData) => u.email);
+  const currencies = ['GEL', 'USD', 'EUR'];
+  const statusWeights: BookingStatus[] = [
+    BookingStatus.CONFIRMED,
+    BookingStatus.CONFIRMED,
+    BookingStatus.CONFIRMED,
+    BookingStatus.COMPLETED,
+    BookingStatus.COMPLETED,
+    BookingStatus.CANCELLED,
+  ];
+
+  // Tour bookings (10-12)
+  const tourCount = Math.min(12, createdIds.tours.length);
+  const selectedTourIds = randomItems(createdIds.tours, tourCount);
+
+  for (const tourId of selectedTourIds) {
+    const travelerEmail = randomItem(travelerEmails);
+    const travelerId = createdIds.users.get(travelerEmail);
+    if (!travelerId) continue;
+
+    const tour = await prisma.tour.findUnique({
+      where: { id: tourId },
+      select: { ownerId: true, price: true, currency: true },
+    });
+    if (!tour || tour.ownerId === travelerId) continue;
+
+    const status = randomItem(statusWeights);
+    const guests = randomInt(1, 8);
+    const price = tour.price ? Number(tour.price) * guests : randomInt(100, 800);
+
+    await prisma.booking.create({
+      data: {
+        id: uuid(),
+        userId: travelerId,
+        entityType: 'TOUR',
+        entityId: tourId,
+        status,
+        date: status === BookingStatus.COMPLETED ? pastDate(60) : futureDate(30),
+        guests,
+        totalPrice: price,
+        currency: tour.currency || 'GEL',
+        notes: randomItem(BOOKING_NOTES_TEMPLATES),
+        createdAt: pastDate(status === BookingStatus.COMPLETED ? 90 : 30),
+        cancelledAt: status === BookingStatus.CANCELLED ? pastDate(15) : null,
+      },
+    });
+    bookingCount++;
+  }
+
+  // Guide bookings (5-8)
+  const guideCount = Math.min(8, createdIds.guides.length);
+  const selectedGuideIds = randomItems(createdIds.guides, guideCount);
+
+  for (const guideId of selectedGuideIds) {
+    const travelerEmail = randomItem(travelerEmails);
+    const travelerId = createdIds.users.get(travelerEmail);
+    if (!travelerId) continue;
+
+    const guide = await prisma.guide.findUnique({
+      where: { id: guideId },
+      select: { userId: true, pricePerDay: true, currency: true },
+    });
+    if (!guide || guide.userId === travelerId) continue;
+
+    const status = randomItem(statusWeights);
+    const days = randomInt(1, 5);
+    const pricePerDay = guide.pricePerDay ? Number(guide.pricePerDay) : randomInt(80, 300);
+
+    await prisma.booking.create({
+      data: {
+        id: uuid(),
+        userId: travelerId,
+        entityType: 'GUIDE',
+        entityId: guideId,
+        status,
+        date: status === BookingStatus.COMPLETED ? pastDate(45) : futureDate(21),
+        guests: randomInt(1, 6),
+        totalPrice: pricePerDay * days,
+        currency: guide.currency || 'GEL',
+        notes: randomItem(BOOKING_NOTES_TEMPLATES),
+        createdAt: pastDate(status === BookingStatus.COMPLETED ? 75 : 21),
+        cancelledAt: status === BookingStatus.CANCELLED ? pastDate(10) : null,
+      },
+    });
+    bookingCount++;
+  }
+
+  // Driver bookings (4-6)
+  const driverCount = Math.min(6, createdIds.drivers.length);
+  const selectedDriverIds = randomItems(createdIds.drivers, driverCount);
+
+  for (const driverId of selectedDriverIds) {
+    const travelerEmail = randomItem(travelerEmails);
+    const travelerId = createdIds.users.get(travelerEmail);
+    if (!travelerId) continue;
+
+    const driver = await prisma.driver.findUnique({
+      where: { id: driverId },
+      select: { userId: true },
+    });
+    if (!driver || driver.userId === travelerId) continue;
+
+    const status = randomItem(statusWeights);
+
+    await prisma.booking.create({
+      data: {
+        id: uuid(),
+        userId: travelerId,
+        entityType: 'DRIVER',
+        entityId: driverId,
+        status,
+        date: status === BookingStatus.COMPLETED ? pastDate(30) : futureDate(14),
+        guests: randomInt(1, 4),
+        totalPrice: randomInt(50, 400),
+        currency: randomItem(currencies),
+        notes: randomItem(BOOKING_NOTES_TEMPLATES),
+        createdAt: pastDate(status === BookingStatus.COMPLETED ? 60 : 14),
+        cancelledAt: status === BookingStatus.CANCELLED ? pastDate(7) : null,
+      },
+    });
+    bookingCount++;
+  }
+
+  console.log(`  ✓ Created ${bookingCount} bookings (tours, guides, drivers)`);
+}
+
+// ============================================================================
+// PHASE 14: BLOG POSTS
+// ============================================================================
+
+async function seedBlogPosts(): Promise<void> {
+  console.log('\n📝 Phase 14: Seeding Blog Posts...');
+
+  // Find an admin user to be the author
+  const adminEmail = ADMIN_USERS[0].email;
+  const authorId = createdIds.users.get(adminEmail);
+
+  if (!authorId) {
+    console.log('  ⚠️  No admin user found, skipping blog posts');
+    return;
+  }
+
+  for (let i = 0; i < BLOG_POSTS.length; i++) {
+    const blogData = BLOG_POSTS[i];
+
+    // Generate slug from title with random suffix
+    const baseSlug = slugify(blogData.title).substring(0, 250);
+    const suffix = Math.random().toString(36).substring(2, 8);
+    const slug = `${baseSlug}-${suffix}`;
+
+    // Calculate reading time (strip HTML, count words, 200 wpm)
+    const textContent = blogData.content.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ');
+    const wordCount = textContent.split(/\s+/).filter(Boolean).length;
+    const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+    const publishedAt = pastDate(randomInt(7, 120));
+
+    const post = await prisma.blogPost.create({
+      data: {
+        id: uuid(),
+        authorId,
+        title: blogData.title,
+        slug,
+        excerpt: blogData.excerpt,
+        content: blogData.content,
+        tags: JSON.stringify(blogData.tags),
+        isPublished: blogData.isPublished,
+        viewCount: blogData.viewCount,
+        readingTime,
+        publishedAt: blogData.isPublished ? publishedAt : null,
+        createdAt: publishedAt,
+      },
+    });
+
+    createdIds.blogPosts.push(post.id);
+
+    // Create cover image media record
+    await prisma.media.create({
+      data: {
+        id: uuid(),
+        filename: `blog-cover-${post.id.slice(0, 8)}.jpg`,
+        originalName: `blog-cover-${i + 1}.jpg`,
+        mimeType: 'image/jpeg',
+        size: randomInt(150000, 400000),
+        url: `/seed-assets/image-${blogData.imageIndex}.jpg`,
+        entityType: 'blog',
+        entityId: post.id,
+        uploadedBy: authorId,
+      },
+    });
+  }
+
+  console.log(`  ✓ Created ${createdIds.blogPosts.length} blog posts with cover images`);
+}
+
+// ============================================================================
 // MAIN
 // ============================================================================
 
@@ -1308,6 +1531,8 @@ async function main() {
     await seedMedia();
     await seedNotifications();
     await seedAuditLogs();
+    await seedBookings();
+    await seedBlogPosts();
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
 
@@ -1323,6 +1548,7 @@ async function main() {
     console.log(`   • Guides: ${createdIds.guides.length}`);
     console.log(`   • Drivers: ${createdIds.drivers.length}`);
     console.log(`   • Tours: ${createdIds.tours.length}`);
+    console.log(`   • Blog Posts: ${createdIds.blogPosts.length}`);
     console.log(`   • Chats: ${createdIds.chats.length}`);
     console.log('');
     console.log(`⏱️  Completed in ${duration}s`);

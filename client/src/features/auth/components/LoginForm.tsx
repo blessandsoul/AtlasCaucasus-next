@@ -45,7 +45,7 @@ export const LoginForm = () => {
             const limitTime = parseInt(storedLimit, 10);
             if (limitTime > Date.now()) {
                 setLockoutUntil(new Date(limitTime));
-                setLoginError(t('auth.rate_limited') || 'Too many login attempts. Please wait before trying again.');
+                setLoginError(t('auth.rate_limited'));
             } else {
                 // Expired, clean up
                 localStorage.removeItem(RATE_LIMIT_KEY);
@@ -115,7 +115,7 @@ export const LoginForm = () => {
                     localStorage.setItem(RATE_LIMIT_KEY, lockoutDate.getTime().toString());
                 }
             }
-            setLoginError(t('auth.account_locked') || 'Account temporarily locked due to too many failed attempts.');
+            setLoginError(t('auth.account_locked'));
             setRemainingAttempts(null);
         } else if (errorCode === ERROR_CODES.INVALID_CREDENTIALS) {
             // Invalid credentials - show remaining attempts if provided
@@ -124,14 +124,13 @@ export const LoginForm = () => {
                 setRemainingAttempts(attempts);
                 if (attempts <= 2) {
                     setLoginError(
-                        t('auth.invalid_credentials_with_attempts', { count: attempts }) ||
-                        `Invalid email or password. ${attempts} attempt${attempts !== 1 ? 's' : ''} remaining before lockout.`
+                        t('auth.invalid_credentials_with_attempts', { count: attempts })
                     );
                 } else {
-                    setLoginError(t('auth.invalid_credentials') || 'Invalid email or password.');
+                    setLoginError(t('auth.invalid_credentials'));
                 }
             } else {
-                setLoginError(t('auth.invalid_credentials') || 'Invalid email or password.');
+                setLoginError(t('auth.invalid_credentials'));
                 setRemainingAttempts(null);
             }
         } else if (errorCode === ERROR_CODES.RATE_LIMIT_EXCEEDED) {
@@ -146,7 +145,7 @@ export const LoginForm = () => {
                     localStorage.setItem(RATE_LIMIT_KEY, untilMs.toString());
                 }
             }
-            setLoginError(t('auth.rate_limited') || 'Too many login attempts. Please wait before trying again.');
+            setLoginError(t('auth.rate_limited'));
         } else {
             // Generic error
             const errorMessage = (error as any)?.response?.data?.error?.message || 'An error occurred. Please try again.';
@@ -203,7 +202,7 @@ export const LoginForm = () => {
                             <FormControl>
                                 <Input
                                     type="email"
-                                    placeholder={t('auth.email_placeholder') || 'email@example.com'}
+                                    placeholder={t('auth.email_placeholder')}
                                     autoComplete="username"
                                     {...field}
                                 />
@@ -224,14 +223,14 @@ export const LoginForm = () => {
                                     href={ROUTES.FORGOT_PASSWORD}
                                     className="text-sm font-medium text-primary hover:text-primary/90"
                                 >
-                                    {t('auth.forgot_password') || 'Forgot password?'}
+                                    {t('auth.forgot_password')}
                                 </Link>
                             </div>
                             <div className="relative">
                                 <FormControl>
                                     <Input
                                         type={showPassword ? 'text' : 'password'}
-                                        placeholder={t('auth.password_placeholder') || '******'}
+                                        placeholder={t('auth.password_placeholder')}
                                         autoComplete="current-password"
                                         className="pr-10"
                                         {...field}
@@ -259,14 +258,14 @@ export const LoginForm = () => {
                     <Alert variant="destructive" className="border-destructive/50 bg-destructive/10">
                         <Lock className="h-4 w-4" />
                         <AlertTitle className="font-semibold">
-                            {t('auth.account_locked_title') || 'Account Temporarily Locked'}
+                            {t('auth.account_locked_title')}
                         </AlertTitle>
                         <AlertDescription className="mt-2">
                             <p>{loginError}</p>
                             <div className="mt-3 flex items-center gap-2 text-sm font-medium">
                                 <Clock className="h-4 w-4" />
                                 <span>
-                                    {t('auth.try_again_in') || 'Try again in'}: {formatCountdown(countdown)}
+                                    {t('auth.try_again_in')}: {formatCountdown(countdown)}
                                 </span>
                             </div>
                         </AlertDescription>
@@ -281,7 +280,7 @@ export const LoginForm = () => {
                             {loginError}
                             {remainingAttempts !== null && remainingAttempts <= 2 && (
                                 <span className="mt-1 block text-xs opacity-80">
-                                    {t('auth.lockout_warning') || 'Your account will be locked after too many failed attempts.'}
+                                    {t('auth.lockout_warning')}
                                 </span>
                             )}
                         </AlertDescription>
@@ -295,18 +294,18 @@ export const LoginForm = () => {
                 >
                     {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {isLockedOut
-                        ? (t('auth.locked_out') || 'Locked Out')
-                        : (t('auth.sign_in') || 'Sign In')
+                        ? t('auth.locked_out')
+                        : t('auth.sign_in')
                     }
                 </Button>
 
                 <div className="text-center text-sm">
-                    <span className="text-muted-foreground">{t('auth.no_account') || "Don't have an account?"} </span>
+                    <span className="text-muted-foreground">{t('auth.no_account')} </span>
                     <Link
                         href={ROUTES.REGISTER}
                         className="font-medium text-primary hover:text-primary/90"
                     >
-                        {t('auth.create_account') || 'Sign up'}
+                        {t('auth.create_account')}
                     </Link>
                 </div>
             </form>

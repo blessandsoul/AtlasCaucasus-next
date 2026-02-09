@@ -269,3 +269,307 @@ export async function sendTourAgentInvitationLink(
     text: `Hello ${firstName}! Your tour agent account has been created. Please set up your password by visiting: ${acceptUrl}. This link expires in 7 days.`,
   });
 }
+
+/**
+ * Send email when a provider receives a new inquiry
+ */
+export async function sendInquiryReceivedEmail(
+  recipientEmail: string,
+  recipientFirstName: string,
+  senderName: string,
+  subject: string,
+  messagePreview: string,
+  inquiryId: string
+): Promise<boolean> {
+  const inquiryUrl = `${env.FRONTEND_URL}/dashboard/inquiries/${inquiryId}`;
+  const preview = messagePreview.substring(0, 200);
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Inquiry Received</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Tourism Georgia</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${recipientFirstName}!</h2>
+        <p>You have received a new inquiry from <strong>${senderName}</strong>.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #667eea;">
+          <h3 style="margin-top: 0; color: #667eea;">${subject}</h3>
+          <p style="color: #555;">${preview}${messagePreview.length > 200 ? "..." : ""}</p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${inquiryUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            View & Respond to Inquiry
+          </a>
+        </div>
+
+        <p style="color: #666; font-size: 14px;">
+          Responding quickly helps build trust with potential customers.
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${inquiryUrl}" style="color: #667eea;">${inquiryUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia. To manage your email preferences, visit your profile settings.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
+    subject: `New inquiry: ${subject}`,
+    html,
+    text: `Hello ${recipientFirstName}! You have a new inquiry from ${senderName}: "${subject}". ${preview}. View and respond: ${inquiryUrl}`,
+  });
+}
+
+/**
+ * Send email when a user's inquiry gets a response
+ */
+export async function sendInquiryResponseEmail(
+  userEmail: string,
+  userFirstName: string,
+  providerName: string,
+  status: "ACCEPTED" | "DECLINED" | "RESPONDED",
+  responseMessage: string | null,
+  inquiryId: string
+): Promise<boolean> {
+  const inquiryUrl = `${env.FRONTEND_URL}/dashboard/inquiries/${inquiryId}`;
+
+  const statusLabels: Record<string, string> = {
+    ACCEPTED: "accepted",
+    DECLINED: "declined",
+    RESPONDED: "responded to",
+  };
+
+  const statusColors: Record<string, string> = {
+    ACCEPTED: "#22c55e",
+    DECLINED: "#ef4444",
+    RESPONDED: "#667eea",
+  };
+
+  const statusLabel = statusLabels[status];
+  const statusColor = statusColors[status];
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Response to Your Inquiry</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Tourism Georgia</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${userFirstName}!</h2>
+        <p><strong>${providerName}</strong> has <span style="color: ${statusColor}; font-weight: bold;">${statusLabel}</span> your inquiry.</p>
+
+        ${responseMessage ? `
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid ${statusColor};">
+          <p style="color: #555; margin: 0;">${responseMessage.substring(0, 500)}${responseMessage.length > 500 ? "..." : ""}</p>
+        </div>
+        ` : ""}
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${inquiryUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            View Inquiry Details
+          </a>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${inquiryUrl}" style="color: #667eea;">${inquiryUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia. To manage your email preferences, visit your profile settings.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: userEmail,
+    subject: `Response to your inquiry - ${providerName} ${statusLabel} your request`,
+    html,
+    text: `Hello ${userFirstName}! ${providerName} has ${statusLabel} your inquiry.${responseMessage ? ` Message: "${responseMessage.substring(0, 200)}"` : ""} View details: ${inquiryUrl}`,
+  });
+}
+
+/**
+ * Send email when a chat message is received while user is offline
+ */
+export async function sendChatMessageEmail(
+  recipientEmail: string,
+  recipientFirstName: string,
+  senderName: string,
+  messagePreview: string,
+  chatId: string
+): Promise<boolean> {
+  const chatUrl = `${env.FRONTEND_URL}/dashboard/chat/${chatId}`;
+  const preview = messagePreview.substring(0, 200);
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Message</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Tourism Georgia</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${recipientFirstName}!</h2>
+        <p>You have a new message from <strong>${senderName}</strong>.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #667eea;">
+          <p style="color: #555; margin: 0;">${preview}${messagePreview.length > 200 ? "..." : ""}</p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${chatUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            View Conversation
+          </a>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${chatUrl}" style="color: #667eea;">${chatUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia. To manage your email preferences, visit your profile settings.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
+    subject: `New message from ${senderName} - Tourism Georgia`,
+    html,
+    text: `Hello ${recipientFirstName}! You have a new message from ${senderName}: "${preview}". View conversation: ${chatUrl}`,
+  });
+}
+
+/**
+ * Send booking confirmation email to user
+ */
+export async function sendBookingConfirmedEmail(
+  userEmail: string,
+  userFirstName: string,
+  providerName: string,
+  entityType: string,
+  bookingId: string
+): Promise<boolean> {
+  const bookingUrl = `${env.FRONTEND_URL}/dashboard/bookings`;
+  const entityLabel = entityType.charAt(0) + entityType.slice(1).toLowerCase();
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Booking Confirmed</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Booking Confirmed!</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${userFirstName}!</h2>
+        <p>Great news! <strong>${providerName}</strong> has accepted your inquiry and your ${entityLabel.toLowerCase()} booking has been confirmed.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #22c55e;">
+          <p style="margin: 0; color: #555;">Your booking is now confirmed. You can view the details and manage your bookings from your dashboard.</p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${bookingUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            View My Bookings
+          </a>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${bookingUrl}" style="color: #667eea;">${bookingUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia. To manage your email preferences, visit your profile settings.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: userEmail,
+    subject: `Booking Confirmed - ${providerName}`,
+    html,
+    text: `Hello ${userFirstName}! Your booking with ${providerName} has been confirmed. View your bookings: ${bookingUrl}`,
+  });
+}
+
+/**
+ * Send contact form submission email to admin
+ */
+export async function sendContactFormEmail(
+  name: string,
+  email: string,
+  subject: string,
+  message: string,
+  adminEmail: string
+): Promise<boolean> {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Contact Form Submission</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Contact Form Submission</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">New Contact Form Submission</h2>
+        <p>You have received a new message from the AtlasCaucasus contact form.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #667eea;">
+          <p style="margin: 5px 0;"><strong>From:</strong> ${name}</p>
+          <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 5px 0;"><strong>Subject:</strong> ${subject}</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
+          <p style="margin: 10px 0 0 0;"><strong>Message:</strong></p>
+          <p style="color: #555; white-space: pre-wrap;">${message}</p>
+        </div>
+
+        <p style="color: #666; font-size: 14px;">
+          Reply to this inquiry by responding directly to ${email}.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `Contact Form: ${subject}`,
+    html,
+    text: `New contact form submission from ${name} (${email}):\n\nSubject: ${subject}\n\nMessage:\n${message}`,
+  });
+}

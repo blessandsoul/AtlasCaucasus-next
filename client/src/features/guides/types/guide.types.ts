@@ -47,6 +47,8 @@ export interface Guide {
   isAvailable: boolean;
   averageRating: string | null;
   reviewCount: number;
+  avgResponseTimeMinutes: number | null;
+  responseCount: number;
   createdAt: string;
   updatedAt: string;
   user?: {

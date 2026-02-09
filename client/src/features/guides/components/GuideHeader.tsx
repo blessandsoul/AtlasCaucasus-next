@@ -10,13 +10,15 @@ import {
   Phone,
   Globe,
   Award,
-  CheckCircle2,
+  ShieldCheck,
   Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ShareButton } from '@/components/common/ShareButton';
 import { cn } from '@/lib/utils';
 import { getMediaUrl } from '@/lib/utils/media';
+import { formatResponseTime } from '@/lib/utils/format';
 import type { Guide, Location, GuideLocation } from '../types/guide.types';
 import { useCreateDirectChat } from '@/features/chat/hooks/useChats';
 import { selectChat } from '@/features/chat/store/chatSlice';
@@ -131,13 +133,35 @@ export const GuideHeader = ({ guide, className }: GuideHeaderProps) => {
           <div className="flex-1 min-w-0 w-full flex flex-col items-center md:items-stretch">
             <div className="flex flex-col items-center md:items-start md:flex-row md:justify-between gap-4 w-full flex-1">
               <div className="flex flex-col items-center md:items-start justify-between h-full flex-1">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">
-                    {fullName}
-                  </h1>
-                  {guide.isVerified && (
-                    <CheckCircle2 className="h-6 w-6 text-cyan-500 shrink-0" />
-                  )}
+                <div className="flex flex-col items-center md:items-start gap-2">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">
+                      {fullName}
+                    </h1>
+                  </div>
+                  <div className="flex items-center flex-wrap gap-2">
+                    {guide.isVerified && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm font-medium border border-emerald-500/20" title={t('provider_badges.verified_tooltip', 'This provider has been verified by AtlasCaucasus for identity and quality.')}>
+                        <ShieldCheck className="h-4 w-4" />
+                        {t('provider_badges.verified', 'Verified')}
+                      </span>
+                    )}
+                    {(() => {
+                      const rt = formatResponseTime(guide.avgResponseTimeMinutes);
+                      if (!rt) return null;
+                      return (
+                        <span className={cn(
+                          'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium border',
+                          rt.variant === 'success' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+                          rt.variant === 'warning' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+                          rt.variant === 'muted' && 'bg-muted text-muted-foreground border-border',
+                        )}>
+                          <Clock className="h-4 w-4" />
+                          {t('provider_badges.responds', 'Responds')} {rt.label}
+                        </span>
+                      );
+                    })()}
+                  </div>
                 </div>
 
                 <div className="flex flex-col items-center md:items-start gap-2">
@@ -222,6 +246,11 @@ export const GuideHeader = ({ guide, className }: GuideHeaderProps) => {
               {t('guide_details.call')}
             </Button>
           )}
+          <ShareButton
+            url={`/explore/guides/${guide.id}`}
+            title={fullName}
+            description={guide.bio || undefined}
+          />
         </div>
       </div>
     </div>

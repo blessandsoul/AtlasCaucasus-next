@@ -68,6 +68,33 @@ enum ReviewTargetType {
   COMPANY
 }
 
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum AiGenerationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum AiGenerationType {
+  TOUR_DESCRIPTION
+  TOUR_ITINERARY
+  MARKETING_COPY
+  BLOG_CONTENT
+}
+
+enum CreditTransactionType {
+  INITIAL_GRANT
+  GENERATION_DEBIT
+  GENERATION_REFUND
+  ADMIN_GRANT
+  PURCHASE
+}
+
 // ==========================================
 // USER & AUTHENTICATION
 // ==========================================
@@ -106,6 +133,9 @@ model User {
   invitationToken          String?   @map("invitation_token") @db.VarChar(64)
   invitationTokenExpiresAt DateTime? @map("invitation_token_expires_at")
 
+  // Email notification preference
+  emailNotifications Boolean @default(true) @map("email_notifications")
+
   // Account lockout (brute force protection)
   failedLoginAttempts Int       @default(0) @map("failed_login_attempts")
   lockedUntil         DateTime? @map("locked_until")
@@ -135,8 +165,22 @@ model User {
   // Review relations
   reviews Review[] @relation("UserReviews")
 
+  // Favorite relations
+  favorites Favorite[] @relation("UserFavorites")
+
+  // Booking relations
+  bookings Booking[] @relation("UserBookings")
+
   // Media relations
   uploadedMedia Media[] @relation("UploadedMedia")
+
+  // Blog relations
+  blogPosts BlogPost[] @relation("AuthorBlogPosts")
+
+  // AI & Credits relations
+  creditBalance      CreditBalance?
+  creditTransactions CreditTransaction[] @relation("UserCreditTransactions")
+  aiGenerations      AiGeneration[]      @relation("UserAiGenerations")
 
   @@index([email])
   @@index([isActive])
@@ -207,6 +251,10 @@ model Company {
   averageRating Decimal? @map("average_rating") @db.Decimal(3, 2)
   reviewCount   Int      @default(0) @map("review_count")
 
+  // Response time tracking
+  avgResponseTimeMinutes Int? @map("avg_response_time_minutes")
+  responseCount          Int  @default(0) @map("response_count")
+
   @@index([isVerified])
   @@index([companyName])
   @@index([averageRating])
@@ -244,6 +292,10 @@ model Guide {
   averageRating Decimal? @map("average_rating") @db.Decimal(3, 2)
   reviewCount   Int      @default(0) @map("review_count")
 
+  // Response time tracking
+  avgResponseTimeMinutes Int? @map("avg_response_time_minutes")
+  responseCount          Int  @default(0) @map("response_count")
+
   @@index([isVerified])
   @@index([isAvailable])
   @@index([averageRating])
@@ -280,6 +332,10 @@ model Driver {
   // Rating fields
   averageRating Decimal? @map("average_rating") @db.Decimal(3, 2)
   reviewCount   Int      @default(0) @map("review_count")
+
+  // Response time tracking
+  avgResponseTimeMinutes Int? @map("avg_response_time_minutes")
+  responseCount          Int  @default(0) @map("response_count")
 
   @@index([isVerified])
   @@index([isAvailable])
@@ -342,6 +398,17 @@ model Tour {
   updatedAt           DateTime        @updatedAt @map("updated_at")
   nextAvailableDate   DateTime?       @map("next_available_date")
   startDate           DateTime?       @map("start_date")
+
+  // Availability scheduling
+  availabilityType    String          @default("BY_REQUEST") @map("availability_type") @db.VarChar(50)
+  // Values: "DAILY", "WEEKDAYS", "WEEKENDS", "SPECIFIC_DATES", "BY_REQUEST"
+  availableDates      String?         @map("available_dates") @db.Text
+  // JSON array of date strings ["2025-06-01", "2025-06-15", ...] — only used when availabilityType = "SPECIFIC_DATES"
+  startTime           String?         @map("start_time") @db.VarChar(10)
+  // e.g., "09:00" — optional default start time
+
+  // Itinerary (JSON array of { title, description } objects)
+  itinerary           String?         @db.Text
 
   // Relations
   owner   User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -528,6 +595,7 @@ model Inquiry {
   // Relations
   user      User              @relation("CreatedInquiries", fields: [userId], references: [id], onDelete: Cascade)
   responses InquiryResponse[]
+  bookings  Booking[]
 
   @@index([userId, createdAt])
   @@index([createdAt])
@@ -647,6 +715,53 @@ model AuditLog {
 }
 
 // ==========================================
+// FAVORITES / WISHLIST
+// ==========================================
+
+model Favorite {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  entityType String   @map("entity_type") @db.VarChar(50) // "TOUR" | "GUIDE" | "DRIVER" | "COMPANY"
+  entityId   String   @map("entity_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation("UserFavorites", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, entityType, entityId])
+  @@index([userId, entityType])
+  @@index([entityType, entityId])
+  @@map("favorites")
+}
+
+// ==========================================
+// BOOKINGS
+// ==========================================
+
+model Booking {
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  entityType  String        @map("entity_type") @db.VarChar(50) // TOUR | GUIDE | DRIVER
+  entityId    String        @map("entity_id")
+  inquiryId   String?       @map("inquiry_id")
+  status      BookingStatus @default(CONFIRMED)
+  date        DateTime?     @map("booking_date")
+  guests      Int?
+  totalPrice  Decimal?      @map("total_price") @db.Decimal(10, 2)
+  currency    String        @default("GEL") @db.VarChar(3)
+  notes       String?       @db.Text
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  cancelledAt DateTime?     @map("cancelled_at")
+
+  user    User     @relation("UserBookings", fields: [userId], references: [id])
+  inquiry Inquiry? @relation(fields: [inquiryId], references: [id])
+
+  @@index([userId, status])
+  @@index([entityType, entityId])
+  @@map("bookings")
+}
+
+// ==========================================
 // MEDIA / FILE UPLOADS
 // ==========================================
 
@@ -670,4 +785,88 @@ model Media {
   @@index([uploadedBy])
   @@index([createdAt])
   @@map("media")
+}
+
+// ==========================================
+// BLOG POSTS
+// ==========================================
+
+model BlogPost {
+  id          String    @id @default(uuid())
+  authorId    String    @map("author_id")
+  title       String    @db.VarChar(255)
+  slug        String    @unique @db.VarChar(300)
+  excerpt     String?   @db.Text
+  content     String    @db.LongText
+  tags        String?   @db.Text // JSON array of tag strings
+  isPublished Boolean   @default(false) @map("is_published")
+  viewCount   Int       @default(0) @map("view_count")
+  readingTime Int?      @map("reading_time") // Estimated minutes
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  author User @relation("AuthorBlogPosts", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([isPublished, publishedAt])
+  @@index([slug])
+  @@map("blog_posts")
+}
+
+// ==========================================
+// AI CREDITS & GENERATIONS
+// ==========================================
+
+model CreditBalance {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  balance   Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("credit_balances")
+}
+
+model CreditTransaction {
+  id           String                @id @default(uuid())
+  userId       String                @map("user_id")
+  amount       Int                   // Positive for grants, negative for debits
+  type         CreditTransactionType
+  description  String?               @db.VarChar(255)
+  metadata     String?               @db.Text // JSON metadata
+  balanceAfter Int                   @map("balance_after")
+  createdAt    DateTime              @default(now()) @map("created_at")
+
+  user User @relation("UserCreditTransactions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([type])
+  @@map("credit_transactions")
+}
+
+model AiGeneration {
+  id           String             @id @default(uuid())
+  userId       String             @map("user_id")
+  type         AiGenerationType
+  templateId   String             @map("template_id") @db.VarChar(100)
+  prompt       String             @db.Text
+  userInputs   String             @map("user_inputs") @db.Text // JSON of user-provided fields
+  result       String?            @db.LongText
+  status       AiGenerationStatus @default(PENDING)
+  creditCost   Int                @map("credit_cost")
+  errorMessage String?            @map("error_message") @db.Text
+  metadata     String?            @db.Text // JSON metadata
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  user User @relation("UserAiGenerations", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@index([type])
+  @@map("ai_generations")
 }

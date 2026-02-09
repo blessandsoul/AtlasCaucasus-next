@@ -22,6 +22,7 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     roles: user.roles || [],
     isActive: user.isActive,
     emailVerified: user.emailVerified,
+    emailNotifications: user.emailNotifications,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     avatar, // First image as avatar
@@ -108,6 +109,7 @@ export async function updateUserSelf(
     firstName: input.firstName,
     lastName: input.lastName,
     phoneNumber: input.phoneNumber,
+    emailNotifications: input.emailNotifications,
   });
 
   return await toSafeUser(user);

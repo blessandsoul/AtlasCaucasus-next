@@ -57,6 +57,18 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
     const errorCode = error.response?.data?.error?.code;
 
+    // Handle email not verified (403 with EMAIL_NOT_VERIFIED)
+    // Redirect to verify-email-pending page so user can verify their email
+    if (
+      error.response?.status === 403 &&
+      errorCode === 'EMAIL_NOT_VERIFIED'
+    ) {
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/verify-email')) {
+        window.location.href = '/verify-email-pending';
+      }
+      return Promise.reject(error);
+    }
+
     // Handle CSRF token errors (403 with INVALID_CSRF_TOKEN)
     if (
       error.response?.status === 403 &&

@@ -112,6 +112,16 @@ class TourService {
 
         return response.data.data;
     }
+
+    async getRelatedTours(id: string, limit: number = 4): Promise<Tour[]> {
+        const response = await apiClient.get<{
+            success: boolean;
+            message: string;
+            data: Tour[];
+        }>(API_ENDPOINTS.TOURS.RELATED(id), { params: { limit } });
+
+        return response.data.data;
+    }
 }
 
 export const tourService = new TourService();

@@ -54,18 +54,18 @@ export const UpdateRoleDialog = ({ user, open, onOpenChange }: UpdateRoleDialogP
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[400px]">
                 <DialogHeader>
-                    <DialogTitle>{t('admin.users.addRole', 'Add Role')}</DialogTitle>
+                    <DialogTitle>{t('admin.users.addRole')}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="text-sm text-muted-foreground">
-                        {t('admin.users.currentRoles', 'Current roles')}: {user?.roles.join(', ')}
+                        {t('admin.users.currentRoles')}: {user?.roles.join(', ')}
                     </div>
 
                     <div className="space-y-2">
-                        <Label>{t('admin.users.selectNewRole', 'Select new role')}</Label>
+                        <Label>{t('admin.users.selectNewRole')}</Label>
                         <Select value={selectedRole} onValueChange={setSelectedRole}>
                             <SelectTrigger>
-                                <SelectValue placeholder={t('admin.users.selectRole', 'Select a role')} />
+                                <SelectValue placeholder={t('admin.users.selectRolePlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {availableRoles.map((role) => (
@@ -79,10 +79,10 @@ export const UpdateRoleDialog = ({ user, open, onOpenChange }: UpdateRoleDialogP
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                        {t('common.cancel', 'Cancel')}
+                        {t('common.cancel')}
                     </Button>
                     <Button onClick={handleSubmit} disabled={isPending || !selectedRole}>
-                        {isPending ? t('common.adding', 'Adding...') : t('common.add', 'Add')}
+                        {isPending ? t('common.adding') : t('common.add')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

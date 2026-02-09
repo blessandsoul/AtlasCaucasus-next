@@ -103,40 +103,40 @@ const AuditLogDetails = ({ log }: AuditLogDetailsProps) => {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('admin.audit.details_title', 'Audit Log Details')}</DialogTitle>
+          <DialogTitle>{t('admin.audit.details_title')}</DialogTitle>
           <DialogDescription>
-            {t('admin.audit.details_description', 'Detailed information about this audit log entry.')}
+            {t('admin.audit.details_description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.action', 'Action')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.action')}</Label>
               <div className="mt-1">
                 <Badge variant={getActionBadgeVariant(log.action)}>{log.action}</Badge>
               </div>
             </div>
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.entity_type', 'Entity Type')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.entity_type')}</Label>
               <p className="font-medium">{log.entityType}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.entity_id', 'Entity ID')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.entity_id')}</Label>
               <p className="font-mono text-sm">{log.entityId || '-'}</p>
             </div>
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.timestamp', 'Timestamp')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.timestamp')}</Label>
               <p className="font-medium">{format(new Date(log.createdAt), 'PPpp')}</p>
             </div>
           </div>
 
           {log.user && (
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.performed_by', 'Performed By')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.performed_by')}</Label>
               <p className="font-medium">
                 {log.user.firstName} {log.user.lastName} ({log.user.email})
               </p>
@@ -145,21 +145,21 @@ const AuditLogDetails = ({ log }: AuditLogDetailsProps) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.ip_address', 'IP Address')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.ip_address')}</Label>
               <p className="font-mono text-sm">{log.ipAddress || '-'}</p>
             </div>
           </div>
 
           {log.userAgent && (
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.user_agent', 'User Agent')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.user_agent')}</Label>
               <p className="text-sm text-muted-foreground break-all">{log.userAgent}</p>
             </div>
           )}
 
           {log.details && Object.keys(log.details).length > 0 && (
             <div>
-              <Label className="text-muted-foreground">{t('admin.audit.details', 'Details')}</Label>
+              <Label className="text-muted-foreground">{t('admin.audit.details')}</Label>
               <pre className="mt-1 p-3 bg-muted rounded-md text-sm overflow-x-auto">
                 {JSON.stringify(log.details, null, 2)}
               </pre>
@@ -200,7 +200,7 @@ export const AuditLogViewer = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{t('admin.audit.title', 'Audit Logs')}</CardTitle>
+        <CardTitle>{t('admin.audit.title')}</CardTitle>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -208,7 +208,7 @@ export const AuditLogViewer = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="h-4 w-4 mr-2" />
-            {t('admin.audit.filters', 'Filters')}
+            {t('admin.audit.filters')}
           </Button>
           <Button
             variant="outline"
@@ -217,7 +217,7 @@ export const AuditLogViewer = () => {
             disabled={isFetching}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-            {t('common.refresh', 'Refresh')}
+            {t('common.refresh')}
           </Button>
         </div>
       </CardHeader>
@@ -227,16 +227,16 @@ export const AuditLogViewer = () => {
           <div className="mb-6 p-4 border rounded-lg bg-muted/30 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <Label htmlFor="action">{t('admin.audit.action', 'Action')}</Label>
+                <Label htmlFor="action">{t('admin.audit.action')}</Label>
                 <Select
                   value={filters.action || 'all'}
                   onValueChange={(value) => handleFilterChange('action', value)}
                 >
                   <SelectTrigger id="action">
-                    <SelectValue placeholder={t('admin.audit.all_actions', 'All Actions')} />
+                    <SelectValue placeholder={t('admin.audit.all_actions')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t('admin.audit.all_actions', 'All Actions')}</SelectItem>
+                    <SelectItem value="all">{t('admin.audit.all_actions')}</SelectItem>
                     {AUDIT_ACTIONS.map((action) => (
                       <SelectItem key={action} value={action}>
                         {action}
@@ -247,16 +247,16 @@ export const AuditLogViewer = () => {
               </div>
 
               <div>
-                <Label htmlFor="entityType">{t('admin.audit.entity_type', 'Entity Type')}</Label>
+                <Label htmlFor="entityType">{t('admin.audit.entity_type')}</Label>
                 <Select
                   value={filters.entityType || 'all'}
                   onValueChange={(value) => handleFilterChange('entityType', value)}
                 >
                   <SelectTrigger id="entityType">
-                    <SelectValue placeholder={t('admin.audit.all_entities', 'All Entities')} />
+                    <SelectValue placeholder={t('admin.audit.all_entities')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t('admin.audit.all_entities', 'All Entities')}</SelectItem>
+                    <SelectItem value="all">{t('admin.audit.all_entities')}</SelectItem>
                     {ENTITY_TYPES.map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
@@ -267,7 +267,7 @@ export const AuditLogViewer = () => {
               </div>
 
               <div>
-                <Label htmlFor="startDate">{t('admin.audit.start_date', 'Start Date')}</Label>
+                <Label htmlFor="startDate">{t('admin.audit.start_date')}</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -277,7 +277,7 @@ export const AuditLogViewer = () => {
               </div>
 
               <div>
-                <Label htmlFor="endDate">{t('admin.audit.end_date', 'End Date')}</Label>
+                <Label htmlFor="endDate">{t('admin.audit.end_date')}</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -289,7 +289,7 @@ export const AuditLogViewer = () => {
 
             <div className="flex justify-end">
               <Button variant="ghost" size="sm" onClick={clearFilters}>
-                {t('common.clear_filters', 'Clear Filters')}
+                {t('common.clear_filters')}
               </Button>
             </div>
           </div>
@@ -303,7 +303,7 @@ export const AuditLogViewer = () => {
           </div>
         ) : data?.items.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            {t('admin.audit.no_logs', 'No audit logs found.')}
+            {t('admin.audit.no_logs')}
           </div>
         ) : (
           <>
@@ -311,12 +311,12 @@ export const AuditLogViewer = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('admin.audit.timestamp', 'Timestamp')}</TableHead>
-                    <TableHead>{t('admin.audit.user', 'User')}</TableHead>
-                    <TableHead>{t('admin.audit.action', 'Action')}</TableHead>
-                    <TableHead>{t('admin.audit.entity', 'Entity')}</TableHead>
-                    <TableHead>{t('admin.audit.ip', 'IP')}</TableHead>
-                    <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
+                    <TableHead>{t('admin.audit.timestamp')}</TableHead>
+                    <TableHead>{t('admin.audit.user')}</TableHead>
+                    <TableHead>{t('admin.audit.action')}</TableHead>
+                    <TableHead>{t('admin.audit.entity')}</TableHead>
+                    <TableHead>{t('admin.audit.ip')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -364,7 +364,7 @@ export const AuditLogViewer = () => {
             {data?.pagination && data.pagination.totalPages > 1 && (
               <div className="flex items-center justify-between mt-4">
                 <p className="text-sm text-muted-foreground">
-                  {t('common.showing_page', 'Page {{page}} of {{total}}', {
+                  {t('common.pagination.page_of', {
                     page: data.pagination.page,
                     total: data.pagination.totalPages,
                   })}

@@ -14,6 +14,13 @@ export const createTourSchema = z.object({
   hasFreeCancellation: z.boolean().optional(),
   nextAvailableDate: z.coerce.date().optional(),
   startDate: z.coerce.date().optional(),
+  availabilityType: z.enum(['DAILY', 'WEEKDAYS', 'WEEKENDS', 'SPECIFIC_DATES', 'BY_REQUEST']).default('BY_REQUEST'),
+  availableDates: z.array(z.string().date()).optional(),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Start time must be in HH:MM format").optional(),
+  itinerary: z.array(z.object({
+    title: z.string().min(1, "Itinerary step title is required").max(200, "Title must be at most 200 characters"),
+    description: z.string().min(1, "Itinerary step description is required").max(2000, "Description must be at most 2000 characters"),
+  })).max(30, "Maximum 30 itinerary steps").optional(),
 });
 
 export const updateTourSchema = z.object({
@@ -31,6 +38,13 @@ export const updateTourSchema = z.object({
   hasFreeCancellation: z.boolean().optional(),
   nextAvailableDate: z.coerce.date().nullable().optional(),
   startDate: z.coerce.date().nullable().optional(),
+  availabilityType: z.enum(['DAILY', 'WEEKDAYS', 'WEEKENDS', 'SPECIFIC_DATES', 'BY_REQUEST']).optional(),
+  availableDates: z.array(z.string().date()).nullable().optional(),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Start time must be in HH:MM format").nullable().optional(),
+  itinerary: z.array(z.object({
+    title: z.string().min(1, "Itinerary step title is required").max(200, "Title must be at most 200 characters"),
+    description: z.string().min(1, "Itinerary step description is required").max(2000, "Description must be at most 2000 characters"),
+  })).max(30, "Maximum 30 itinerary steps").nullable().optional(),
 });
 
 export const listToursQuerySchema = z.object({
@@ -56,7 +70,12 @@ export const listAllToursQuerySchema = z.object({
   sortBy: z.enum(['newest', 'rating', 'price', 'price_desc']).optional(),
 });
 
+export const relatedToursQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(20).default(4),
+});
+
 export type CreateTourInput = z.infer<typeof createTourSchema>;
 export type UpdateTourInput = z.infer<typeof updateTourSchema>;
 export type ListToursQuery = z.infer<typeof listToursQuerySchema>;
 export type ListAllToursQuery = z.infer<typeof listAllToursQuerySchema>;
+export type RelatedToursQuery = z.infer<typeof relatedToursQuerySchema>;

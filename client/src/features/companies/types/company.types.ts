@@ -24,6 +24,8 @@ export interface Company {
   isVerified: boolean;
   averageRating: number | null;
   reviewCount: number;
+  avgResponseTimeMinutes: number | null;
+  responseCount: number;
   createdAt: string;
   updatedAt: string;
   user?: {

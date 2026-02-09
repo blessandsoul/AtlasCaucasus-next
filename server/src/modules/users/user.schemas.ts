@@ -15,6 +15,7 @@ export const updateUserSelfSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters").optional(),
   lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
   phoneNumber: z.string().max(20, "Phone number is too long").optional().nullable(),
+  emailNotifications: z.boolean().optional(),
 });
 
 // Admin-update: admins can update any field including role and isActive

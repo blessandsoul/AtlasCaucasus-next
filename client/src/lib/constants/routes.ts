@@ -16,6 +16,10 @@ export const ROUTES = {
   GUIDE_DASHBOARD: '/dashboard/guide',
   BECOME_PARTNER: '/dashboard/become-partner',
   REVIEWS: '/dashboard/reviews',
+  FAVORITES: '/dashboard/favorites',
+  BOOKINGS: '/dashboard/bookings',
+  ANALYTICS: '/dashboard/analytics',
+  AI_STUDIO: '/dashboard/ai-studio',
   OPERATIONS: {
     ROOT: '/dashboard/operations',
     AGENTS: '/dashboard/operations/agents',
@@ -32,8 +36,11 @@ export const ROUTES = {
     ROOT: '/explore',
     TOURS: '/explore/tours',
     COMPANIES: '/explore/companies',
+    COMPANIES_COMPARE: '/explore/companies/compare',
     GUIDES: '/explore/guides',
+    GUIDES_COMPARE: '/explore/guides/compare',
     DRIVERS: '/explore/drivers',
+    DRIVERS_COMPARE: '/explore/drivers/compare',
   },
   TOURS: {
     LIST: '/explore/tours',
@@ -59,5 +66,17 @@ export const ROUTES = {
     DASHBOARD: '/dashboard/admin',
     USERS: '/dashboard/admin/users',
     LOCATIONS: '/dashboard/admin/locations',
+  },
+  BLOG: {
+    LIST: '/blog',
+    POST: (slug: string) => `/blog/${slug}`,
+    DASHBOARD: '/dashboard/blog',
+    CREATE: '/dashboard/blog/create',
+    EDIT: (id: string) => `/dashboard/blog/${id}/edit`,
+  },
+  LEGAL: {
+    PRIVACY: '/legal/privacy',
+    TERMS: '/legal/terms',
+    COOKIES: '/legal/cookies',
   },
 } as const;
