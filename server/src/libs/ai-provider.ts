@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import Groq from "groq-sdk";
+import OpenAI from "openai";
 import { env } from "../config/env.js";
 import { logger } from "./logger.js";
 
@@ -125,6 +126,60 @@ function createGroqProvider(): AiProvider {
 }
 
 // ---------------------------------------------------------------------------
+// OpenRouter adapter (OpenAI-compatible)
+// ---------------------------------------------------------------------------
+
+function createOpenRouterProvider(): AiProvider {
+  if (!env.OPENROUTER_API_KEY) {
+    throw new Error("OPENROUTER_API_KEY is not configured");
+  }
+
+  const client = new OpenAI({
+    apiKey: env.OPENROUTER_API_KEY,
+    baseURL: "https://openrouter.ai/api/v1",
+  });
+  logger.info("OpenRouter AI provider initialized");
+
+  return {
+    async generateContent(config: AiProviderConfig): Promise<string> {
+      const completion = await client.chat.completions.create({
+        model: env.OPENROUTER_MODEL,
+        messages: [
+          { role: "system", content: config.systemPrompt },
+          { role: "user", content: config.userPrompt },
+        ],
+        max_tokens: config.maxOutputTokens,
+        temperature: config.temperature,
+        stream: false,
+      });
+      return completion.choices[0]?.message?.content ?? "";
+    },
+
+    async *generateContentStream(
+      config: AiProviderConfig,
+    ): AsyncGenerator<string, void, unknown> {
+      const stream = await client.chat.completions.create({
+        model: env.OPENROUTER_MODEL,
+        messages: [
+          { role: "system", content: config.systemPrompt },
+          { role: "user", content: config.userPrompt },
+        ],
+        max_tokens: config.maxOutputTokens,
+        temperature: config.temperature,
+        stream: true,
+      });
+
+      for await (const chunk of stream) {
+        const text = chunk.choices[0]?.delta?.content ?? "";
+        if (text) {
+          yield text;
+        }
+      }
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Factory + helpers
 // ---------------------------------------------------------------------------
 
@@ -144,6 +199,8 @@ export function getAiProvider(): AiProvider {
 
   if (providerType === "groq") {
     cachedProvider = createGroqProvider();
+  } else if (providerType === "openrouter") {
+    cachedProvider = createOpenRouterProvider();
   } else {
     cachedProvider = createGeminiProvider();
   }
@@ -158,6 +215,9 @@ export function getAiProvider(): AiProvider {
 export function isAiConfigured(): boolean {
   if (env.AI_PROVIDER === "groq") {
     return !!env.GROQ_API_KEY;
+  }
+  if (env.AI_PROVIDER === "openrouter") {
+    return !!env.OPENROUTER_API_KEY;
   }
   return !!env.GEMINI_API_KEY;
 }

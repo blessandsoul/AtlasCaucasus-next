@@ -66,6 +66,7 @@ export const ROUTES = {
     DASHBOARD: '/dashboard/admin',
     USERS: '/dashboard/admin/users',
     LOCATIONS: '/dashboard/admin/locations',
+    AI_TEMPLATES: '/dashboard/admin/ai-templates',
   },
   BLOG: {
     LIST: '/blog',

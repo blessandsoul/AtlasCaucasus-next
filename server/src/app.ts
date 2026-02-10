@@ -37,6 +37,7 @@ import { analyticsRoutes } from "./modules/analytics/analytics.routes.js";
 import { blogRoutes } from "./modules/blog/blog.routes.js";
 import { creditRoutes } from "./modules/credits/credit.routes.js";
 import { aiRoutes } from "./modules/ai/ai.routes.js";
+import { adminAiRoutes } from "./modules/admin-ai/admin-ai.routes.js";
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -256,6 +257,7 @@ function buildApp() {
   app.register(blogRoutes, { prefix: "/api/v1" });
   app.register(creditRoutes, { prefix: "/api/v1" });
   app.register(aiRoutes, { prefix: "/api/v1" });
+  app.register(adminAiRoutes, { prefix: "/api/v1" });
 
   // Register WebSocket routes (no prefix - available at /ws)
   app.register(websocketRoutes);

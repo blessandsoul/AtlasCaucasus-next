@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { Users, MapPin } from 'lucide-react';
+import { Users, MapPin, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants/routes';
 
@@ -25,6 +25,11 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             label: t('admin.tabs.locations', 'Locations'),
             href: ROUTES.ADMIN.LOCATIONS,
             icon: MapPin,
+        },
+        {
+            label: t('admin.tabs.aiTemplates', 'AI Templates'),
+            href: ROUTES.ADMIN.AI_TEMPLATES,
+            icon: Bot,
         },
     ];
 

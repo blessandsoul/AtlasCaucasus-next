@@ -10,6 +10,7 @@ import {
   InternalError,
 } from "../../libs/errors.js";
 import { getTemplate, buildPrompt } from "./ai.templates.js";
+import { getTemplateDefinition } from "./templates/index.js";
 import {
   createGeneration,
   updateGeneration,
@@ -77,12 +78,22 @@ export async function generateContent(
     generationId = generation.id;
 
     const provider = getAiProvider();
-    const text = await provider.generateContent({
+    const def = getTemplateDefinition(templateId);
+    const rawText = await provider.generateContent({
       systemPrompt: template.systemPrompt,
       userPrompt,
       maxOutputTokens: template.maxOutputTokens,
-      temperature: 0.7,
+      temperature: def?.modelConfig?.temperature ?? 0.7,
     });
+
+    // Run validator and post-processor if defined
+    let text = rawText;
+    if (def?.validateOutput) {
+      text = def.validateOutput(text);
+    }
+    if (def?.postProcessOutput) {
+      text = def.postProcessOutput(text);
+    }
 
     const updated = await updateGeneration(generation.id, {
       status: "COMPLETED",
@@ -171,11 +182,12 @@ export async function* generateContentStream(
     generationId = generation.id;
 
     const provider = getAiProvider();
+    const def = getTemplateDefinition(templateId);
     const stream = provider.generateContentStream({
       systemPrompt: template.systemPrompt,
       userPrompt,
       maxOutputTokens: template.maxOutputTokens,
-      temperature: 0.7,
+      temperature: def?.modelConfig?.temperature ?? 0.7,
     });
 
     for await (const chunkText of stream) {
@@ -183,10 +195,19 @@ export async function* generateContentStream(
       yield { type: "chunk", text: chunkText };
     }
 
-    // Update generation record with full result
+    // Run validator and post-processor on the accumulated result
+    let processedText = fullText;
+    if (def?.validateOutput) {
+      processedText = def.validateOutput(processedText);
+    }
+    if (def?.postProcessOutput) {
+      processedText = def.postProcessOutput(processedText);
+    }
+
+    // Update generation record with processed result
     await updateGeneration(generation.id, {
       status: "COMPLETED",
-      result: fullText,
+      result: processedText,
     });
 
     yield { type: "done", generationId: generation.id };
@@ -290,10 +311,24 @@ export async function applyToTour(
 
   // Build update data based on field
   if (field === "itinerary") {
-    // Parse itinerary JSON from the generation result
+    // Use the template's validator if available, otherwise fallback to basic JSON parse
+    const def = getTemplateDefinition(generation.templateId);
+    let validatedResult = generation.result;
+
+    if (def?.validateOutput) {
+      try {
+        validatedResult = def.validateOutput(generation.result);
+      } catch {
+        throw new BadRequestError(
+          "Generated content is not valid itinerary JSON",
+          "INVALID_ITINERARY_FORMAT",
+        );
+      }
+    }
+
     let itinerary: { title: string; description: string }[];
     try {
-      itinerary = JSON.parse(generation.result);
+      itinerary = JSON.parse(validatedResult);
       if (!Array.isArray(itinerary)) {
         throw new Error("Not an array");
       }

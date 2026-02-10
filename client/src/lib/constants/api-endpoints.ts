@@ -186,5 +186,9 @@ export const API_ENDPOINTS = {
   ADMIN: {
     AUDIT_LOGS: '/admin/audit-logs',
     RESTORE_USER: (id: string) => `/admin/users/${id}/restore`,
+    AI_TEMPLATES: '/admin/ai/templates',
+    AI_TEMPLATE: (id: string) => `/admin/ai/templates/${id}`,
+    AI_TEMPLATE_RESET: (id: string) => `/admin/ai/templates/${id}/reset`,
+    AI_TEMPLATE_TOGGLE: (id: string) => `/admin/ai/templates/${id}/toggle`,
   },
 } as const;

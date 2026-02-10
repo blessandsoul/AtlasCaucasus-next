@@ -42,7 +42,7 @@ const envSchema = z.object({
   REDIS_PASSWORD: z.string().optional(),
 
   // AI Provider Configuration
-  AI_PROVIDER: z.enum(["gemini", "groq"]).default("gemini"),
+  AI_PROVIDER: z.enum(["gemini", "groq", "openrouter"]).default("gemini"),
 
   // Gemini AI Configuration (used when AI_PROVIDER=gemini)
   GEMINI_API_KEY: z.string().min(1).optional(),
@@ -51,6 +51,10 @@ const envSchema = z.object({
   // Groq AI Configuration (used when AI_PROVIDER=groq)
   GROQ_API_KEY: z.string().min(1).optional(),
   GROQ_MODEL: z.string().default("llama-3.3-70b-versatile"),
+
+  // OpenRouter AI Configuration (used when AI_PROVIDER=openrouter)
+  OPENROUTER_API_KEY: z.string().min(1).optional(),
+  OPENROUTER_MODEL: z.string().default("qwen/qwen3-235b-a22b:free"),
 
   // Shared AI Configuration
   AI_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(10),

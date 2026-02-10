@@ -9,6 +9,7 @@ import { startTypingCleanup, stopTypingCleanup } from "./jobs/typingCleanup.js";
 import { startNotificationCleanup, stopNotificationCleanup } from "./jobs/notificationCleanup.js";
 import { startInquiryExpiration, stopInquiryExpiration } from "./jobs/inquiryExpiration.js";
 import { startWebSocketKeepalive } from "./modules/websocket/websocket.handler.js";
+import { refreshFromDb as refreshTemplateRegistry } from "./modules/ai/templates/index.js";
 
 const app = buildApp();
 
@@ -25,6 +26,11 @@ async function start(): Promise<void> {
     databaseAvailable = await testDatabaseConnection();
     if (!databaseAvailable) {
       logger.warn("Database unavailable - API endpoints may not work properly");
+    }
+
+    // Warm the AI template registry with DB overrides (non-fatal)
+    if (databaseAvailable) {
+      await refreshTemplateRegistry();
     }
 
     // Connect to Redis (non-fatal)

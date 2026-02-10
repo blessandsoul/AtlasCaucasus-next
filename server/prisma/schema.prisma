@@ -848,6 +848,26 @@ model CreditTransaction {
   @@map("credit_transactions")
 }
 
+model AiTemplateConfig {
+  id              String           @id @db.VarChar(100) // matches disk template id e.g. "tour-description"
+  name            String           @db.VarChar(255)
+  description     String           @db.Text
+  type            AiGenerationType
+  creditCost      Int              @map("credit_cost")
+  maxOutputTokens Int              @map("max_output_tokens")
+  temperature     Decimal          @default(0.7) @db.Decimal(3, 2)
+  topP            Decimal?         @map("top_p") @db.Decimal(3, 2)
+  systemPrompt    String           @map("system_prompt") @db.LongText
+  fields          String           @db.LongText // JSON stringified TemplateField[]
+  isActive        Boolean          @default(true) @map("is_active")
+  updatedBy       String?          @map("updated_by")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([isActive])
+  @@map("ai_template_configs")
+}
+
 model AiGeneration {
   id           String             @id @default(uuid())
   userId       String             @map("user_id")
