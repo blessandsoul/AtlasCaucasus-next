@@ -79,7 +79,8 @@ export class ReviewService {
         await this.verifyTargetExists(targetType, targetId);
 
         const cacheKey = `reviews:list:${targetType}:${targetId}:r${rating || "all"}:p${page}:l${limit}`;
-        const cached = await cacheGet(cacheKey);
+        type ReviewListResult = Awaited<ReturnType<typeof reviewRepo.findByTarget>>;
+        const cached = await cacheGet<ReviewListResult>(cacheKey);
         if (cached) return cached;
 
         const result = await reviewRepo.findByTarget(targetType, targetId, page, limit, rating);

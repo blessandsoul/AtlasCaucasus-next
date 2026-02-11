@@ -663,7 +663,7 @@ export async function uploadMultipleFiles(
 
   // Verify ownership before processing any files and generate entity slug
   const isAdmin = currentUser.roles.includes("ADMIN");
-  let entitySlug: string;
+  let entitySlug: string = "";
 
   switch (entityType) {
     case "tour": {
