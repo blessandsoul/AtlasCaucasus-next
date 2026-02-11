@@ -100,7 +100,7 @@ export function randomLicensePlate(): string {
  * Get random image URL from seed-assets folder
  */
 export function randomImageUrl(index?: number): string {
-  const imageNum = index ?? randomInt(1000, 1099);
+  const imageNum = index ?? randomInt(881, 1507);
   return `/seed-assets/image-${imageNum}.jpg`;
 }
 
@@ -109,9 +109,14 @@ export function randomImageUrl(index?: number): string {
  */
 export function randomImageUrls(count: number, startIndex?: number): string[] {
   const urls: string[] = [];
-  const start = startIndex ?? randomInt(1000, 1099 - count);
-  for (let i = 0; i < count; i++) {
-    urls.push(`/seed-assets/image-${start + i}.jpg`);
+  if (startIndex !== undefined) {
+    for (let i = 0; i < count; i++) {
+      urls.push(`/seed-assets/image-${startIndex + i}.jpg`);
+    }
+  } else {
+    for (let i = 0; i < count; i++) {
+      urls.push(`/seed-assets/image-${randomInt(881, 1507)}.jpg`);
+    }
   }
   return urls;
 }

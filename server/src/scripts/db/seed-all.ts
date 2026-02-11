@@ -1804,7 +1804,7 @@ async function seedMedia(): Promise<void> {
     const numImages = randomInt(3, 5);
 
     for (let j = 0; j < numImages; j++) {
-      const imageIndex = randomInt(1000, 1599);
+      const imageIndex = randomInt(881, 1507);
       await prisma.media.create({
         data: {
           id: uuid(),
