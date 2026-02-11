@@ -374,13 +374,22 @@ async function seedUsers(): Promise<void> {
     { role: UserRole.DRIVER, count: 16 },
   ];
 
+  const usedEmails = new Set<string>(Array.from(createdIds.users.keys()));
+  let genIndex = 0;
+
   for (const { role, count } of genRoles) {
     for (let i = 0; i < count; i++) {
       const lang = weightedRandomLanguage();
       const isMale = randomBool();
       const { firstName, lastName } = getRandomFullName(lang, isMale);
       const emailPrefix = `${firstName.toLowerCase().replace(/[^a-z]/g, '')}.${lastName.toLowerCase().replace(/[^a-z]/g, '')}`;
-      const email = `${emailPrefix}.${randomInt(100, 9999)}@test.atlascaucasus.com`;
+      let email = `${emailPrefix}.${genIndex}@test.atlascaucasus.com`;
+      while (usedEmails.has(email)) {
+        genIndex++;
+        email = `${emailPrefix}.${genIndex}@test.atlascaucasus.com`;
+      }
+      usedEmails.add(email);
+      genIndex++;
 
       const userId = uuid();
       await prisma.user.create({
