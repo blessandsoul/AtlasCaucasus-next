@@ -1154,14 +1154,10 @@ async function seedChats(): Promise<void> {
   const travelerIds = createdIds.travelerUserIds;
   const guideIds = createdIds.guideUserIds;
   const companyIds = createdIds.companyUserIds;
-  const providerIds = [...guideIds, ...companyIds];
+  const driverIds = createdIds.driverUserIds;
+  const providerIds = [...guideIds, ...companyIds, ...driverIds];
 
-  // Direct chats: traveler <-> provider (60 chats)
-  for (let i = 0; i < 60; i++) {
-    const travelerId = randomItem(travelerIds);
-    const providerId = randomItem(providerIds);
-    if (travelerId === providerId) continue;
-
+  const createDirectChat = async (travelerId: string, providerId: string, convType: 'guide' | 'company'): Promise<void> => {
     const chat = await prisma.chat.create({
       data: { id: uuid(), type: ChatType.DIRECT, creatorId: travelerId },
     });
@@ -1176,10 +1172,7 @@ async function seedChats(): Promise<void> {
       ],
     });
 
-    const isGuide = guideIds.includes(providerId);
-    const convType = isGuide ? 'guide' : 'company';
-    const messages = generateConversation(convType as 'guide' | 'company', randomInt(3, 8));
-
+    const messages = generateConversation(convType, randomInt(3, 8));
     for (let j = 0; j < messages.length; j++) {
       const senderId = j % 2 === 0 ? travelerId : providerId;
       await prisma.chatMessage.create({
@@ -1193,6 +1186,37 @@ async function seedChats(): Promise<void> {
       });
       messageCount++;
     }
+  };
+
+  // Guarantee every guide has at least 1 chat
+  for (const guideUserId of guideIds) {
+    const travelerId = randomItem(travelerIds.filter(id => id !== guideUserId));
+    if (!travelerId) continue;
+    await createDirectChat(travelerId, guideUserId, 'guide');
+  }
+
+  // Guarantee every driver has at least 1 chat
+  for (const driverUserId of driverIds) {
+    const travelerId = randomItem(travelerIds.filter(id => id !== driverUserId));
+    if (!travelerId) continue;
+    await createDirectChat(travelerId, driverUserId, 'company');
+  }
+
+  // Guarantee every company user has at least 1 chat
+  for (const companyUserId of companyIds) {
+    const travelerId = randomItem(travelerIds.filter(id => id !== companyUserId));
+    if (!travelerId) continue;
+    await createDirectChat(travelerId, companyUserId, 'company');
+  }
+
+  // Additional random direct chats to fill volume (30 more)
+  for (let i = 0; i < 30; i++) {
+    const travelerId = randomItem(travelerIds);
+    const providerId = randomItem(providerIds);
+    if (travelerId === providerId) continue;
+
+    const isGuide = guideIds.includes(providerId);
+    await createDirectChat(travelerId, providerId, isGuide ? 'guide' : 'company');
   }
 
   // Group chats (20 chats)
@@ -1334,11 +1358,49 @@ async function seedInquiries(): Promise<void> {
     }
   }
 
-  // Guide inquiries (20)
-  for (let i = 0; i < 20; i++) {
+  // --- Guarantee every guide gets at least 1 inquiry, then add extras ---
+  // First pass: one inquiry per guide
+  for (let gi = 0; gi < createdIds.guides.length; gi++) {
+    const guideId = createdIds.guides[gi];
+    const guideUserId = createdIds.guideUserIds[gi];
+    if (!guideUserId) continue;
+
     const userId = randomItem(travelerIds);
-    const numTargets = randomInt(1, 2);
-    const targetGuideIds = randomItems(createdIds.guides, numTargets);
+    const inquiry = await prisma.inquiry.create({
+      data: {
+        id: uuid(),
+        userId,
+        targetType: InquiryTargetType.GUIDE,
+        targetIds: JSON.stringify([guideId]),
+        subject: 'Guide availability inquiry',
+        message: randomItem(INQUIRY_MESSAGES.guide),
+        requiresPayment: false,
+        expiresAt: futureDate(30),
+      },
+    });
+    createdIds.inquiries.push(inquiry.id);
+    inquiryCount++;
+
+    const status = randomItem(statuses);
+    await prisma.inquiryResponse.create({
+      data: {
+        id: uuid(),
+        inquiryId: inquiry.id,
+        recipientId: guideUserId,
+        status,
+        message: status !== InquiryStatus.PENDING
+          ? randomItem(RESPONSE_MESSAGES[status === InquiryStatus.ACCEPTED ? 'positive' : 'negative'])
+          : null,
+        respondedAt: status !== InquiryStatus.PENDING ? pastDate(5) : null,
+      },
+    });
+    responseCount++;
+  }
+
+  // Extra random guide inquiries for volume
+  for (let i = 0; i < 10; i++) {
+    const userId = randomItem(travelerIds);
+    const targetGuideIds = randomItems(createdIds.guides, 1);
 
     const inquiry = await prisma.inquiry.create({
       data: {
@@ -1355,12 +1417,10 @@ async function seedInquiries(): Promise<void> {
     createdIds.inquiries.push(inquiry.id);
     inquiryCount++;
 
-    const seenGuideUserIds = new Set<string>();
     for (const guideId of targetGuideIds) {
       const guideIdx = createdIds.guides.indexOf(guideId);
       const guideUserId = createdIds.guideUserIds[guideIdx];
-      if (!guideUserId || seenGuideUserIds.has(guideUserId)) continue;
-      seenGuideUserIds.add(guideUserId);
+      if (!guideUserId) continue;
 
       const status = randomItem(statuses);
       await prisma.inquiryResponse.create({
@@ -1379,11 +1439,48 @@ async function seedInquiries(): Promise<void> {
     }
   }
 
-  // Driver inquiries (15)
-  for (let i = 0; i < 15; i++) {
+  // --- Guarantee every driver gets at least 1 inquiry, then add extras ---
+  for (let di = 0; di < createdIds.drivers.length; di++) {
+    const driverId = createdIds.drivers[di];
+    const driverUserId = createdIds.driverUserIds[di];
+    if (!driverUserId) continue;
+
     const userId = randomItem(travelerIds);
-    const numTargets = randomInt(1, 2);
-    const targetDriverIds = randomItems(createdIds.drivers, numTargets);
+    const inquiry = await prisma.inquiry.create({
+      data: {
+        id: uuid(),
+        userId,
+        targetType: InquiryTargetType.DRIVER,
+        targetIds: JSON.stringify([driverId]),
+        subject: 'Driver booking request',
+        message: randomItem(INQUIRY_MESSAGES.driver),
+        requiresPayment: false,
+        expiresAt: futureDate(30),
+      },
+    });
+    createdIds.inquiries.push(inquiry.id);
+    inquiryCount++;
+
+    const status = randomItem(statuses);
+    await prisma.inquiryResponse.create({
+      data: {
+        id: uuid(),
+        inquiryId: inquiry.id,
+        recipientId: driverUserId,
+        status,
+        message: status !== InquiryStatus.PENDING
+          ? randomItem(RESPONSE_MESSAGES.positive)
+          : null,
+        respondedAt: status !== InquiryStatus.PENDING ? pastDate(3) : null,
+      },
+    });
+    responseCount++;
+  }
+
+  // Extra random driver inquiries for volume
+  for (let i = 0; i < 10; i++) {
+    const userId = randomItem(travelerIds);
+    const targetDriverIds = randomItems(createdIds.drivers, 1);
 
     const inquiry = await prisma.inquiry.create({
       data: {
@@ -1400,12 +1497,10 @@ async function seedInquiries(): Promise<void> {
     createdIds.inquiries.push(inquiry.id);
     inquiryCount++;
 
-    const seenDriverUserIds = new Set<string>();
     for (const driverId of targetDriverIds) {
       const driverIdx = createdIds.drivers.indexOf(driverId);
       const driverUserId = createdIds.driverUserIds[driverIdx];
-      if (!driverUserId || seenDriverUserIds.has(driverUserId)) continue;
-      seenDriverUserIds.add(driverUserId);
+      if (!driverUserId) continue;
 
       const status = randomItem(statuses);
       await prisma.inquiryResponse.create({
@@ -1444,71 +1539,127 @@ async function seedBookings(): Promise<void> {
     BookingStatus.CANCELLED,
   ];
 
-  // Tour bookings (50)
-  const tourSample = randomItems(createdIds.tours, Math.min(50, createdIds.tours.length));
-  for (const tourId of tourSample) {
-    const travelerId = randomItem(travelerIds);
-    const tourIdx = createdIds.tours.indexOf(tourId);
-    const ownerId = createdIds.tourOwnerIds[tourIdx];
-    if (!ownerId || ownerId === travelerId) continue;
-
-    const tour = await prisma.tour.findUnique({
-      where: { id: tourId },
-      select: { ownerId: true, price: true, currency: true, title: true, companyId: true },
-    });
-    if (!tour) continue;
-
+  // Helper to create a single booking
+  const createBooking = async (
+    travelerId: string,
+    entityType: 'TOUR' | 'GUIDE' | 'DRIVER',
+    entityId: string,
+    providerUserId: string,
+    providerName: string | null,
+    entityName: string,
+    entityImage: string,
+    totalPrice: number,
+    currency: string,
+  ): Promise<void> => {
     const status = randomItem(statusWeights);
-    const guests = randomInt(1, 8);
-    const price = tour.price ? Number(tour.price) * guests : randomInt(100, 800);
     const traveler = await prisma.user.findUnique({
       where: { id: travelerId },
-      select: { firstName: true, lastName: true, phoneNumber: true, email: true },
+      select: { phoneNumber: true, email: true },
     });
-    const owner = await prisma.user.findUnique({
-      where: { id: tour.ownerId },
-      select: { firstName: true, lastName: true },
-    });
-
-    const createdAt = status === BookingStatus.COMPLETED ? pastDate(90) : pastDate(30);
 
     await prisma.booking.create({
       data: {
         id: uuid(),
         userId: travelerId,
-        entityType: 'TOUR',
-        entityId: tourId,
+        entityType,
+        entityId,
         status,
         date: status === BookingStatus.COMPLETED ? pastDate(60) : futureDate(30),
-        guests,
-        totalPrice: price,
-        currency: tour.currency || 'GEL',
+        guests: randomInt(1, 8),
+        totalPrice,
+        currency,
         notes: randomItem(BOOKING_NOTES_TEMPLATES),
-        createdAt,
+        createdAt: status === BookingStatus.COMPLETED ? pastDate(90) : pastDate(30),
         cancelledAt: status === BookingStatus.CANCELLED ? pastDate(15) : null,
         confirmedAt: status === BookingStatus.CONFIRMED || status === BookingStatus.COMPLETED ? pastDate(25) : null,
         declinedAt: status === BookingStatus.DECLINED ? pastDate(20) : null,
         declinedReason: status === BookingStatus.DECLINED ? 'Fully booked for the requested date.' : null,
         completedAt: status === BookingStatus.COMPLETED ? pastDate(30) : null,
-        entityName: tour.title,
-        entityImage: randomImageUrl(1100 + tourIdx),
-        providerUserId: tour.ownerId,
-        providerName: owner ? `${owner.firstName} ${owner.lastName}` : null,
+        entityName,
+        entityImage,
+        providerUserId,
+        providerName,
         contactPhone: traveler?.phoneNumber ?? null,
         contactEmail: traveler?.email ?? null,
         referenceNumber: generateBookingRef(),
       },
     });
     bookingCount++;
+  };
+
+  // --- Guarantee every tour owner gets at least 1 booking ---
+  // Build a set of unique tour owner userIds and pick one tour per owner
+  const ownerToTour = new Map<string, number>(); // ownerId -> tourIdx
+  for (let i = 0; i < createdIds.tours.length; i++) {
+    const ownerId = createdIds.tourOwnerIds[i];
+    if (ownerId && !ownerToTour.has(ownerId)) {
+      ownerToTour.set(ownerId, i);
+    }
   }
 
-  // Guide bookings (30)
-  const guideSample = randomItems(createdIds.guides, Math.min(30, createdIds.guides.length));
-  for (const guideId of guideSample) {
-    const travelerId = randomItem(travelerIds);
-    const guideIdx = createdIds.guides.indexOf(guideId);
-    const guideUserId = createdIds.guideUserIds[guideIdx];
-    if (!guideUserId || guideUserId === travelerId) continue;
+  // Tour bookings: 1 per unique owner + random extras up to 60 total
+  const ownerEntries = Array.from(ownerToTour.entries());
+  for (const [ownerId, tourIdx] of ownerEntries) {
+    const tourId = createdIds.tours[tourIdx];
+    const travelerId = randomItem(travelerIds.filter(id => id !== ownerId));
+    if (!travelerId) continue;
+
+    const tour = await prisma.tour.findUnique({
+      where: { id: tourId },
+      select: { price: true, currency: true, title: true, ownerId: true },
+    });
+    if (!tour) continue;
+
+    const owner = await prisma.user.findUnique({
+      where: { id: tour.ownerId },
+      select: { firstName: true, lastName: true },
+    });
+
+    const guests = randomInt(1, 8);
+    const price = tour.price ? Number(tour.price) * guests : randomInt(100, 800);
+    await createBooking(
+      travelerId, 'TOUR', tourId, tour.ownerId,
+      owner ? `${owner.firstName} ${owner.lastName}` : null,
+      tour.title, randomImageUrl(1100 + tourIdx),
+      price, tour.currency || 'GEL',
+    );
+  }
+
+  // Additional random tour bookings to fill volume
+  const extraTourCount = Math.max(0, 60 - ownerToTour.size);
+  const extraTourSample = randomItems(createdIds.tours, Math.min(extraTourCount, createdIds.tours.length));
+  for (const tourId of extraTourSample) {
+    const tourIdx = createdIds.tours.indexOf(tourId);
+    const ownerId = createdIds.tourOwnerIds[tourIdx];
+    const travelerId = randomItem(travelerIds.filter(id => id !== ownerId));
+    if (!travelerId || !ownerId) continue;
+
+    const tour = await prisma.tour.findUnique({
+      where: { id: tourId },
+      select: { price: true, currency: true, title: true, ownerId: true },
+    });
+    if (!tour) continue;
+
+    const owner = await prisma.user.findUnique({
+      where: { id: tour.ownerId },
+      select: { firstName: true, lastName: true },
+    });
+
+    const guests = randomInt(1, 8);
+    const price = tour.price ? Number(tour.price) * guests : randomInt(100, 800);
+    await createBooking(
+      travelerId, 'TOUR', tourId, tour.ownerId,
+      owner ? `${owner.firstName} ${owner.lastName}` : null,
+      tour.title, randomImageUrl(1100 + tourIdx),
+      price, tour.currency || 'GEL',
+    );
+  }
+
+  // --- Guarantee every guide gets at least 2 bookings + extras ---
+  for (let i = 0; i < createdIds.guides.length; i++) {
+    const guideId = createdIds.guides[i];
+    const guideUserId = createdIds.guideUserIds[i];
+    const numBookings = randomInt(2, 4);
 
     const guide = await prisma.guide.findUnique({
       where: { id: guideId },
@@ -1521,43 +1672,27 @@ async function seedBookings(): Promise<void> {
       select: { firstName: true, lastName: true },
     });
 
-    const status = randomItem(statusWeights);
-    const days = randomInt(1, 5);
-    const pricePerDay = guide.pricePerDay ? Number(guide.pricePerDay) : randomInt(80, 300);
+    for (let b = 0; b < numBookings; b++) {
+      const travelerId = randomItem(travelerIds.filter(id => id !== guideUserId));
+      if (!travelerId) continue;
 
-    await prisma.booking.create({
-      data: {
-        id: uuid(),
-        userId: travelerId,
-        entityType: 'GUIDE',
-        entityId: guideId,
-        status,
-        date: status === BookingStatus.COMPLETED ? pastDate(45) : futureDate(21),
-        guests: randomInt(1, 6),
-        totalPrice: pricePerDay * days,
-        currency: guide.currency || 'GEL',
-        notes: randomItem(BOOKING_NOTES_TEMPLATES),
-        createdAt: pastDate(status === BookingStatus.COMPLETED ? 75 : 21),
-        cancelledAt: status === BookingStatus.CANCELLED ? pastDate(10) : null,
-        confirmedAt: status === BookingStatus.CONFIRMED || status === BookingStatus.COMPLETED ? pastDate(18) : null,
-        completedAt: status === BookingStatus.COMPLETED ? pastDate(20) : null,
-        entityName: guideUser ? `Guide: ${guideUser.firstName} ${guideUser.lastName}` : 'Guide Service',
-        entityImage: randomImageUrl(1020 + guideIdx),
-        providerUserId: guide.userId,
-        providerName: guideUser ? `${guideUser.firstName} ${guideUser.lastName}` : null,
-        referenceNumber: generateBookingRef(),
-      },
-    });
-    bookingCount++;
+      const days = randomInt(1, 5);
+      const pricePerDay = guide.pricePerDay ? Number(guide.pricePerDay) : randomInt(80, 300);
+      await createBooking(
+        travelerId, 'GUIDE', guideId, guide.userId,
+        guideUser ? `${guideUser.firstName} ${guideUser.lastName}` : null,
+        guideUser ? `Guide: ${guideUser.firstName} ${guideUser.lastName}` : 'Guide Service',
+        randomImageUrl(1020 + i),
+        pricePerDay * days, guide.currency || 'GEL',
+      );
+    }
   }
 
-  // Driver bookings (20)
-  const driverSample = randomItems(createdIds.drivers, Math.min(20, createdIds.drivers.length));
-  for (const driverId of driverSample) {
-    const travelerId = randomItem(travelerIds);
-    const driverIdx = createdIds.drivers.indexOf(driverId);
-    const driverUserId = createdIds.driverUserIds[driverIdx];
-    if (!driverUserId || driverUserId === travelerId) continue;
+  // --- Guarantee every driver gets at least 2 bookings + extras ---
+  for (let i = 0; i < createdIds.drivers.length; i++) {
+    const driverId = createdIds.drivers[i];
+    const driverUserId = createdIds.driverUserIds[i];
+    const numBookings = randomInt(2, 4);
 
     const driver = await prisma.driver.findUnique({
       where: { id: driverId },
@@ -1570,34 +1705,20 @@ async function seedBookings(): Promise<void> {
       select: { firstName: true, lastName: true },
     });
 
-    const status = randomItem(statusWeights);
+    for (let b = 0; b < numBookings; b++) {
+      const travelerId = randomItem(travelerIds.filter(id => id !== driverUserId));
+      if (!travelerId) continue;
 
-    await prisma.booking.create({
-      data: {
-        id: uuid(),
-        userId: travelerId,
-        entityType: 'DRIVER',
-        entityId: driverId,
-        status,
-        date: status === BookingStatus.COMPLETED ? pastDate(30) : futureDate(14),
-        guests: randomInt(1, 4),
-        totalPrice: randomInt(50, 400),
-        currency: randomItem(['GEL', 'USD', 'EUR']),
-        notes: randomItem(BOOKING_NOTES_TEMPLATES),
-        createdAt: pastDate(status === BookingStatus.COMPLETED ? 60 : 14),
-        cancelledAt: status === BookingStatus.CANCELLED ? pastDate(7) : null,
-        confirmedAt: status === BookingStatus.CONFIRMED || status === BookingStatus.COMPLETED ? pastDate(12) : null,
-        completedAt: status === BookingStatus.COMPLETED ? pastDate(10) : null,
-        entityName: driverUser
+      await createBooking(
+        travelerId, 'DRIVER', driverId, driver.userId,
+        driverUser ? `${driverUser.firstName} ${driverUser.lastName}` : null,
+        driverUser
           ? `Driver: ${driverUser.firstName} ${driverUser.lastName} (${driver.vehicleType ?? 'Vehicle'})`
           : 'Driver Service',
-        entityImage: randomImageUrl(1050 + driverIdx),
-        providerUserId: driver.userId,
-        providerName: driverUser ? `${driverUser.firstName} ${driverUser.lastName}` : null,
-        referenceNumber: generateBookingRef(),
-      },
-    });
-    bookingCount++;
+        randomImageUrl(1050 + i),
+        randomInt(50, 400), randomItem(['GEL', 'USD', 'EUR']),
+      );
+    }
   }
 
   console.log(`  ✓ Created ${bookingCount} bookings with denormalized entity info`);
@@ -1612,62 +1733,48 @@ async function seedFavorites(): Promise<void> {
 
   let favCount = 0;
   const favKeys = new Set<string>();
-  const travelerIds = createdIds.travelerUserIds;
+  // All user types can have favorites
+  const allFavUserIds = [
+    ...createdIds.travelerUserIds,
+    ...createdIds.guideUserIds,
+    ...createdIds.driverUserIds,
+    ...createdIds.companyUserIds,
+  ];
+
+  const addFav = async (userId: string, entityType: string, entityId: string): Promise<void> => {
+    const key = `${userId}:${entityType}:${entityId}`;
+    if (favKeys.has(key)) return;
+    favKeys.add(key);
+    await prisma.favorite.create({
+      data: { id: uuid(), userId, entityType, entityId, createdAt: pastDate(60) },
+    });
+    favCount++;
+  };
+
+  // Guarantee every guide user, driver user, and company user has at least 1-2 favorites
+  for (const userId of [...createdIds.guideUserIds, ...createdIds.driverUserIds, ...createdIds.companyUserIds]) {
+    await addFav(userId, 'TOUR', randomItem(createdIds.tours));
+    if (randomBool(0.6)) await addFav(userId, 'TOUR', randomItem(createdIds.tours));
+  }
 
   // Tour favorites
   for (let i = 0; i < 120; i++) {
-    const userId = randomItem(travelerIds);
-    const entityId = randomItem(createdIds.tours);
-    const key = `${userId}:TOUR:${entityId}`;
-    if (favKeys.has(key)) continue;
-    favKeys.add(key);
-
-    await prisma.favorite.create({
-      data: { id: uuid(), userId, entityType: 'TOUR', entityId, createdAt: pastDate(60) },
-    });
-    favCount++;
+    await addFav(randomItem(allFavUserIds), 'TOUR', randomItem(createdIds.tours));
   }
 
   // Guide favorites
   for (let i = 0; i < 50; i++) {
-    const userId = randomItem(travelerIds);
-    const entityId = randomItem(createdIds.guides);
-    const key = `${userId}:GUIDE:${entityId}`;
-    if (favKeys.has(key)) continue;
-    favKeys.add(key);
-
-    await prisma.favorite.create({
-      data: { id: uuid(), userId, entityType: 'GUIDE', entityId, createdAt: pastDate(60) },
-    });
-    favCount++;
+    await addFav(randomItem(allFavUserIds), 'GUIDE', randomItem(createdIds.guides));
   }
 
   // Driver favorites
   for (let i = 0; i < 30; i++) {
-    const userId = randomItem(travelerIds);
-    const entityId = randomItem(createdIds.drivers);
-    const key = `${userId}:DRIVER:${entityId}`;
-    if (favKeys.has(key)) continue;
-    favKeys.add(key);
-
-    await prisma.favorite.create({
-      data: { id: uuid(), userId, entityType: 'DRIVER', entityId, createdAt: pastDate(60) },
-    });
-    favCount++;
+    await addFav(randomItem(allFavUserIds), 'DRIVER', randomItem(createdIds.drivers));
   }
 
   // Company favorites
   for (let i = 0; i < 40; i++) {
-    const userId = randomItem(travelerIds);
-    const entityId = randomItem(createdIds.companies);
-    const key = `${userId}:COMPANY:${entityId}`;
-    if (favKeys.has(key)) continue;
-    favKeys.add(key);
-
-    await prisma.favorite.create({
-      data: { id: uuid(), userId, entityType: 'COMPANY', entityId, createdAt: pastDate(60) },
-    });
-    favCount++;
+    await addFav(randomItem(allFavUserIds), 'COMPANY', randomItem(createdIds.companies));
   }
 
   console.log(`  ✓ Created ${favCount} favorites`);
@@ -2003,7 +2110,7 @@ async function seedNotifications(): Promise<void> {
     }
   }
 
-  // Profile verified notifications
+  // Profile verified notifications for guides
   const verifiedGuides = await prisma.guide.findMany({ where: { isVerified: true }, take: 15, select: { userId: true } });
   for (const g of verifiedGuides) {
     await prisma.notification.create({
@@ -2015,6 +2122,61 @@ async function seedNotifications(): Promise<void> {
         message: 'Your guide profile has been verified by our team. You will now appear in verified search results.',
         isRead: true,
         createdAt: pastDate(60),
+      },
+    });
+    notificationCount++;
+  }
+
+  // Profile verified notifications for drivers
+  const verifiedDrivers = await prisma.driver.findMany({ where: { isVerified: true }, take: 15, select: { userId: true } });
+  for (const d of verifiedDrivers) {
+    await prisma.notification.create({
+      data: {
+        id: uuid(),
+        userId: d.userId,
+        type: NotificationType.PROFILE_VERIFIED,
+        title: 'Profile verified!',
+        message: 'Your driver profile has been verified by our team. You will now appear in verified search results.',
+        isRead: true,
+        createdAt: pastDate(60),
+      },
+    });
+    notificationCount++;
+  }
+
+  // New review notifications for all providers
+  const recentReviews = await prisma.review.findMany({
+    take: 100,
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, targetType: true, targetId: true, rating: true, createdAt: true },
+  });
+  for (const review of recentReviews) {
+    let providerUserId: string | null = null;
+    if (review.targetType === ReviewTargetType.TOUR) {
+      const tour = await prisma.tour.findUnique({ where: { id: review.targetId }, select: { ownerId: true } });
+      providerUserId = tour?.ownerId ?? null;
+    } else if (review.targetType === ReviewTargetType.GUIDE) {
+      const guide = await prisma.guide.findUnique({ where: { id: review.targetId }, select: { userId: true } });
+      providerUserId = guide?.userId ?? null;
+    } else if (review.targetType === ReviewTargetType.DRIVER) {
+      const driver = await prisma.driver.findUnique({ where: { id: review.targetId }, select: { userId: true } });
+      providerUserId = driver?.userId ?? null;
+    } else if (review.targetType === ReviewTargetType.COMPANY) {
+      const company = await prisma.company.findUnique({ where: { id: review.targetId }, select: { userId: true } });
+      providerUserId = company?.userId ?? null;
+    }
+    if (!providerUserId) continue;
+
+    await prisma.notification.create({
+      data: {
+        id: uuid(),
+        userId: providerUserId,
+        type: NotificationType.SYSTEM,
+        title: 'New review received',
+        message: `You received a ${review.rating}-star review!`,
+        data: JSON.stringify({ reviewId: review.id }),
+        isRead: randomBool(0.5),
+        createdAt: review.createdAt,
       },
     });
     notificationCount++;
