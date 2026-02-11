@@ -1000,15 +1000,15 @@ async function seedMedia(): Promise<void> {
   console.log('\n🖼️  Phase 10: Seeding Media...');
 
   let mediaCount = 0;
-  let imageIndex = 1100;
 
-  // Tour images (3-5 per tour)
+  // Tour images (3-5 per tour, randomized)
   for (const tourId of createdIds.tours) {
     const tour = await prisma.tour.findUnique({ where: { id: tourId } });
     if (!tour) continue;
 
     const numImages = randomInt(3, 5);
     for (let i = 0; i < numImages; i++) {
+      const imageIndex = randomInt(1000, 1599);
       await prisma.media.create({
         data: {
           id: uuid(),
@@ -1023,7 +1023,6 @@ async function seedMedia(): Promise<void> {
         },
       });
       mediaCount++;
-      imageIndex = (imageIndex % 600) + 1000;
     }
   }
 
