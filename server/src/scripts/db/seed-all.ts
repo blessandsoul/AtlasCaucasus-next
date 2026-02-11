@@ -1310,10 +1310,12 @@ async function seedInquiries(): Promise<void> {
     createdIds.inquiries.push(inquiry.id);
     inquiryCount++;
 
+    const seenOwnerIds = new Set<string>();
     for (const tourId of targetTourIds) {
       const tourIdx = createdIds.tours.indexOf(tourId);
       const ownerId = createdIds.tourOwnerIds[tourIdx];
-      if (!ownerId) continue;
+      if (!ownerId || seenOwnerIds.has(ownerId)) continue;
+      seenOwnerIds.add(ownerId);
 
       const status = randomItem(statuses);
       await prisma.inquiryResponse.create({
@@ -1353,10 +1355,12 @@ async function seedInquiries(): Promise<void> {
     createdIds.inquiries.push(inquiry.id);
     inquiryCount++;
 
+    const seenGuideUserIds = new Set<string>();
     for (const guideId of targetGuideIds) {
       const guideIdx = createdIds.guides.indexOf(guideId);
       const guideUserId = createdIds.guideUserIds[guideIdx];
-      if (!guideUserId) continue;
+      if (!guideUserId || seenGuideUserIds.has(guideUserId)) continue;
+      seenGuideUserIds.add(guideUserId);
 
       const status = randomItem(statuses);
       await prisma.inquiryResponse.create({
@@ -1396,10 +1400,12 @@ async function seedInquiries(): Promise<void> {
     createdIds.inquiries.push(inquiry.id);
     inquiryCount++;
 
+    const seenDriverUserIds = new Set<string>();
     for (const driverId of targetDriverIds) {
       const driverIdx = createdIds.drivers.indexOf(driverId);
       const driverUserId = createdIds.driverUserIds[driverIdx];
-      if (!driverUserId) continue;
+      if (!driverUserId || seenDriverUserIds.has(driverUserId)) continue;
+      seenDriverUserIds.add(driverUserId);
 
       const status = randomItem(statuses);
       await prisma.inquiryResponse.create({
