@@ -3,6 +3,9 @@
  * 6 tour companies with realistic data
  */
 
+import { weightedRandomLanguage, getRandomCompanyDescription, type SeedLanguage } from './multilingual.js';
+import { randomInt, randomPhoneNumber } from '../utils/helpers.js';
+
 export interface CompanySeedData {
   companyName: string;
   description: string;
@@ -87,3 +90,59 @@ export const COMPANIES: CompanySeedData[] = [
     isVerified: false, // Not yet verified
   },
 ];
+
+// EN company name templates
+const EN_COMPANY_NAMES = [
+  'Caucasus Discovery Tours', 'Georgia Explorer', 'Silk Road Adventures',
+  'Black Sea Travel Co.', 'Tbilisi City Tours', 'Svaneti Expeditions',
+  'Kakheti Wine Journeys', 'Kazbegi Peak Adventures', 'Georgian Heritage Tours',
+  'Colchis Travel Agency', 'Trans-Caucasus Trips', 'Golden Fleece Tours',
+  'Panorama Georgia', 'Kartli Explorer', 'Adjara Sun Tours',
+  'Ancient Routes Travel', 'Prometheus Adventures', 'Georgia Unveiled',
+];
+
+const RU_COMPANY_NAMES = [
+  'Открытие Кавказа', 'Грузия Тур', 'Приключения Шёлкового Пути',
+  'Черноморские Путешествия', 'Тбилиси Тур', 'Экспедиции Сванетии',
+  'Винные Туры Кахетии', 'Казбеги Приключения', 'Наследие Грузии',
+  'Колхида Трэвел', 'Транскавказские Туры', 'Золотое Руно Тур',
+  'Панорама Грузия', 'Картли Тур', 'Аджара Солнечные Туры',
+  'Древние Маршруты', 'Прометей Приключения', 'Грузия Без Границ',
+];
+
+/**
+ * Generate additional companies for 4x data volume
+ * Creates ~18 additional companies with EN/RU descriptions
+ */
+export function generateAdditionalCompanies(): CompanySeedData[] {
+  const additional: CompanySeedData[] = [];
+
+  for (let i = 0; i < 18; i++) {
+    const lang = weightedRandomLanguage();
+    // Skip 'ka' since we already have Georgian companies - reassign to EN
+    const effectiveLang: SeedLanguage = lang === 'ka' ? 'en' : lang;
+
+    const companyName = effectiveLang === 'ru' ? RU_COMPANY_NAMES[i % RU_COMPANY_NAMES.length] : EN_COMPANY_NAMES[i % EN_COMPANY_NAMES.length];
+    const regYear = randomInt(2005, 2024);
+    const regNum = `GE-${regYear}-TR-${String(randomInt(100000, 999999))}`;
+
+    const description = getRandomCompanyDescription(effectiveLang, {
+      name: companyName,
+      years: 2025 - regYear,
+      specialty: effectiveLang === 'en'
+        ? ['adventure tours', 'cultural experiences', 'wine tastings', 'mountain expeditions', 'city tours', 'eco-tourism'][i % 6]
+        : ['приключенческие туры', 'культурные экскурсии', 'дегустации вин', 'горные экспедиции', 'городские туры', 'эко-туризм'][i % 6],
+    });
+
+    additional.push({
+      companyName,
+      description,
+      registrationNumber: regNum,
+      websiteUrl: i % 3 === 0 ? undefined : `https://example-tour-${i + 7}.com`,
+      phoneNumber: randomPhoneNumber(),
+      isVerified: Math.random() > 0.2,
+    });
+  }
+
+  return additional;
+}

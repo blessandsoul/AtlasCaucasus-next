@@ -1,5 +1,5 @@
 /**
- * Review templates for seeding (Georgian)
+ * Review templates for seeding (Georgian, English, Russian)
  * Comments for different rating levels and target types
  */
 
@@ -238,27 +238,511 @@ export const COMPANY_REVIEW_COMMENTS: Record<number, string[]> = {
   ],
 };
 
+// ============================================================
+// ENGLISH REVIEW TEMPLATES
+// ============================================================
+
+export const EN_TOUR_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'Absolutely incredible tour! Our guide was so knowledgeable about Georgian history and culture. The scenery was breathtaking and every stop was perfectly timed.',
+    'This was the highlight of our entire trip to Georgia. The hidden gems we discovered were worth every penny. Cannot recommend this tour enough!',
+    'Five stars is not enough! From the ancient churches of Mtskheta to the stunning Caucasus views, everything was flawless. Our guide made it truly special.',
+    'Best tour experience we have ever had. The small group size meant we got personal attention and could ask all the questions we wanted.',
+    'What a magical day! The wine tasting in Kakheti was divine, the food stops were authentic, and our guide was an absolute gem.',
+    'Exceeded all expectations. The itinerary was perfectly balanced between history, nature, and local culture. We felt like insiders, not tourists.',
+    'Unforgettable experience from start to finish. Our guide went above and beyond, even helping us find the best chacha to bring home!',
+    'Perfect in every way. The pickup was on time, the vehicle was comfortable, and the route through the Georgian Military Highway was awe-inspiring.',
+    'Hands down the best way to explore Georgia. Our guide was passionate, funny, and incredibly well-informed. Worth every lari!',
+    'A truly transformative experience. We saw places we never would have found on our own and learned so much about this beautiful country.',
+    'Could not have asked for a better tour. The organization was impeccable and the sights were mind-blowing. Already planning to book again!',
+  ],
+  4: [
+    'Really enjoyed this tour overall. The sights were amazing and our guide was very knowledgeable. A few timing issues but nothing major.',
+    'Great tour with beautiful scenery and interesting stops. Would have liked a bit more free time at Ananuri fortress, but otherwise excellent.',
+    'Very good experience! The guide spoke excellent English and shared fascinating stories. The lunch spot could have been better though.',
+    'Solid tour with a well-planned itinerary. Our guide was friendly and informative. Minor issue with the vehicle AC but handled well.',
+    'Good value for money. We saw all the major highlights and learned a lot about Georgian culture. Recommend with minor reservations.',
+    'Enjoyed the tour quite a bit. Beautiful locations and a knowledgeable guide. The pace was slightly rushed at the last two stops.',
+    'A very pleasant day out. The guide was professional and the sights were stunning. Would give 5 stars if lunch was included.',
+    'Great way to see the countryside around Tbilisi. Guide was friendly and the van was comfortable. Slightly long drive times between stops.',
+    'Really nice tour with excellent commentary. The wine tasting was a highlight. Just wish we had more time at the monastery.',
+    'Good experience overall. Professional guide, beautiful scenery, well-organized logistics. A couple of small hiccups but nothing serious.',
+  ],
+  3: [
+    'Decent tour but nothing extraordinary. The main sights were nice but felt like we were checking boxes rather than truly experiencing them.',
+    'Average experience. The guide was okay but seemed to rush through explanations. Some stops were great, others felt like filler.',
+    'It was fine. Beautiful scenery of course, but the tour itself did not add much beyond what you could do on your own with a car.',
+    'Mixed feelings. The morning was fantastic but the afternoon felt disorganized. The guide seemed tired by the second half.',
+    'Okay for the price. We saw what was advertised but the experience lacked the personal touch that makes a tour special.',
+    'Average tour. The vehicle was comfortable and the guide was polite, but the commentary was basic and guidebook-level.',
+    'Not bad, not great. Some nice moments especially at the viewpoints, but overall a pretty standard tourist experience.',
+    'Satisfactory. Covered the main attractions but did not feel like we got any insider knowledge or unique experiences.',
+    'Middle of the road. The logistics were fine and the guide was friendly enough, but it felt more like transportation than a real tour.',
+    'It was alright. The scenery speaks for itself obviously, but the tour organization could use some improvement.',
+  ],
+  2: [
+    'Disappointing experience. The tour description promised much more than what was delivered. Several advertised stops were skipped.',
+    'Below expectations. The vehicle was old and uncomfortable, and the guide seemed disinterested for most of the day.',
+    'Not great. Communication before the tour was poor and the itinerary kept changing on the day. Felt disorganized.',
+    'Would not recommend. The large group size meant we spent most of our time waiting for others. Very little actual touring.',
+    'Underwhelming. The guide had limited English and could not answer most of our questions about the historical sites.',
+    'Expected much more for the price. The lunch stop was at a tourist trap with overpriced food, and the wine tasting was rushed.',
+    'Disappointing. The pickup was 40 minutes late and we had to skip one of the main stops because of it. No apology offered.',
+    'Not worth it. The tour felt like a cattle drive - herded from one spot to another with barely any time to enjoy the views.',
+  ],
+  1: [
+    'Terrible experience. The guide never showed up and the company stopped responding to our messages. Complete waste of money.',
+    'Avoid at all costs. Nothing was as advertised. The vehicle broke down, the guide was rude, and no refund was offered.',
+    'Worst tour I have ever taken. Felt unsafe the entire time due to reckless driving on mountain roads. Never again.',
+    'Do not book this tour. Total scam. They cancelled last minute and kept our money despite promising a full refund.',
+    'Absolutely horrible. The guide showed up drunk, the van was filthy, and the entire day was a disaster from start to finish.',
+  ],
+};
+
+export const EN_GUIDE_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'An absolutely phenomenal guide! Their passion for Georgian history and culture was infectious. Every story, every explanation brought the places to life.',
+    'The best guide we have ever had anywhere in the world. Warm, knowledgeable, patient, and genuinely cared about giving us an amazing experience.',
+    'Five stars without hesitation! Our guide showed us hidden corners of Tbilisi that no guidebook mentions. Truly a local expert.',
+    'Incredible guide who made our Georgia trip unforgettable. Spoke perfect English and had encyclopedic knowledge of every site we visited.',
+    'Our guide was the highlight of our entire vacation. Flexible, fun, and incredibly well-informed. We learned so much!',
+    'Cannot say enough good things about this guide. They arranged surprise stops at the most beautiful viewpoints and even brought us homemade churchkhela.',
+    'World-class guide! Professional yet personable. Adapted the tour perfectly when we mentioned our interest in architecture.',
+    'We felt like we were exploring Georgia with a friend rather than a hired guide. Authentic, passionate, and incredibly accommodating.',
+    'This guide turned a simple sightseeing trip into a deep cultural immersion. The storytelling was captivating and the local tips invaluable.',
+    'Absolutely outstanding! Our guide anticipated our needs before we even asked. The level of care and professionalism was remarkable.',
+    'A true ambassador for Georgia. Their love for the country shines through in everything they share. Highly recommended!',
+  ],
+  4: [
+    'Very good guide with deep knowledge of Georgian history. A few minor language barriers but overall an excellent experience.',
+    'Enjoyed our time with this guide very much. Professional, punctual, and had great recommendations for restaurants and shops.',
+    'Great guide who really knows Tbilisi inside out. Would have been perfect with a slightly slower pace at some sites.',
+    'Knowledgeable and friendly guide. We had a wonderful day exploring Kakheti wine region. Solid recommendation.',
+    'Really good experience. Our guide was informative and accommodating. Minor issue with timing but handled gracefully.',
+    'A pleasure to tour with. Our guide was enthusiastic and shared fascinating local legends. Would book again.',
+    'Very professional guide with good English. Covered all the highlights and added nice personal touches to the experience.',
+    'Good guide who made our day enjoyable. Friendly and helpful throughout. A couple of historical facts seemed uncertain but mostly spot on.',
+    'Solid experience with a likeable guide. They were flexible with our requests and gave great photo tips at each location.',
+    'Would recommend this guide for visitors to Georgia. Reliable, knowledgeable, and good company for a full day tour.',
+  ],
+  3: [
+    'Average guide. Covered the basics but did not go beyond surface-level explanations. Felt more like reading a Wikipedia article.',
+    'Okay experience. The guide was friendly enough but seemed to follow a strict script without much room for questions.',
+    'Decent guide for a standard city tour. Nothing memorable but nothing terrible either. You get what you pay for.',
+    'Mixed experience. The guide knew the main facts but struggled when we asked deeper questions about Georgian culture.',
+    'Satisfactory. Our guide was punctual and polite but the tour felt somewhat impersonal and rushed.',
+    'Middle of the road experience. The guide did their job but lacked the enthusiasm that makes a tour truly engaging.',
+    'It was fine. The guide got us from point A to point B and shared basic information. Nothing more, nothing less.',
+    'Average. Would consider trying a different guide next time. The experience was functional but not inspiring.',
+    'Not bad but not great either. The guide seemed to have an off day. Some good moments mixed with awkward silences.',
+    'Acceptable for the price point. The guide was competent but the tour felt like a routine rather than an experience.',
+  ],
+  2: [
+    'Disappointing. The guide had poor English and we missed out on a lot of context about the places we visited.',
+    'Below average experience. The guide was distracted by their phone for much of the tour and gave minimal commentary.',
+    'Would not recommend. Our guide was unprepared and could not answer basic questions about the sites on our itinerary.',
+    'Not worth the money. The guide seemed disinterested and kept trying to rush us through each location.',
+    'Underwhelming. Expected a professional guide but got someone who seemed to be doing this as a side job with minimal knowledge.',
+    'Poor experience. The guide showed up late, was not very friendly, and the tour felt thrown together at the last minute.',
+    'Disappointing for the price. The guide mixed up historical dates and facts multiple times. Not confidence-inspiring.',
+    'Would not book again. Communication was difficult and the guide seemed annoyed by our questions.',
+  ],
+  1: [
+    'Terrible guide. Did not show up, did not call, did not respond to messages. Complete no-show with no refund.',
+    'Avoid this guide. Rude, unprofessional, and clearly had no knowledge of the sites. Ruined our day in Tbilisi.',
+    'Worst guide experience ever. They were over an hour late, offered no apology, and then rushed through everything in half the time.',
+    'Do not hire this guide. They took us to shops where they clearly get commissions instead of the attractions we paid for.',
+    'Absolutely awful. The guide was hostile when we asked questions and made us feel unwelcome. Never again.',
+  ],
+};
+
+export const EN_DRIVER_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'Excellent driver! Safe, punctual, and knew all the best routes through the Georgian countryside. The vehicle was spotless and very comfortable.',
+    'Best driver we could have asked for. Made the long drive to Kazbegi feel effortless with smooth driving and great conversation.',
+    'Five star service! Our driver went above and beyond - stopped at scenic overlooks, recommended great lunch spots, and was always smiling.',
+    'Professional and reliable. The vehicle was a modern SUV, perfect for the mountain roads. Felt completely safe the entire time.',
+    'Incredible driver who turned our airport transfer into a mini sightseeing tour. Friendly, helpful, and on time to the minute.',
+    'Outstanding! Our driver navigated the winding roads to Svaneti like a pro. Patient with our many photo stop requests too.',
+    'Could not have been better. Clean car, safe driving, pleasant personality. Our driver made every journey a pleasure.',
+    'Top-notch service from start to finish. Our driver helped with luggage, offered water, and knew every shortcut in Tbilisi.',
+    'Amazing driver for our week-long Georgia road trip. Flexible, professional, and felt more like a friend by the end.',
+    'Perfect experience. Comfortable Mercedes, expert driving, and our driver even spoke three languages. Highly recommended!',
+    'The best transportation experience in Georgia. Punctual, safe, clean vehicle, and genuinely kind person. Will book again without hesitation.',
+  ],
+  4: [
+    'Very good driver. Safe and professional with a clean, comfortable vehicle. Minor language barrier but not a problem.',
+    'Reliable driver who got us everywhere on time. The car was nice and the driving was smooth. Would use again.',
+    'Good experience overall. Our driver was friendly and helpful, knew the roads well. A small delay at pickup but otherwise great.',
+    'Solid driver for our Tbilisi to Kutaisi transfer. Professional, safe driving, and the vehicle was in good condition.',
+    'Pleased with the service. Our driver was courteous and accommodating when we asked for an unplanned stop. Recommend.',
+    'Good driver with a comfortable car. Punctual and safe. Would have appreciated slightly better English but managed fine.',
+    'Nice experience. Our driver was professional and the journey was smooth. The vehicle could have been a bit newer but was clean.',
+    'Very good service for the price. Our driver was reliable and friendly throughout our three-day booking.',
+    'Comfortable ride with a skilled driver. Felt safe on the mountain roads. Good value for money overall.',
+    'Would recommend this driver. Professional, on time, and the vehicle was clean and well-maintained.',
+  ],
+  3: [
+    'Average driver service. Got us where we needed to go but nothing special about the experience.',
+    'Okay experience. The vehicle was decent and the driving was safe, but our driver was very quiet and uncommunicative.',
+    'Standard service. The car was a bit older than expected but functional. Driver was punctual which was appreciated.',
+    'Satisfactory. Our driver did the job but the car smelled of air freshener trying to cover something. Driving was fine though.',
+    'Middle of the road experience. Not bad but I have had better drivers in Georgia. The vehicle was average.',
+    'It was fine for a basic transfer. Our driver was professional enough but the vehicle was not as clean as I would like.',
+    'Decent service. The driver knew the route and drove safely. Nothing to complain about but nothing impressive either.',
+    'Average. The pickup was on time and the drive was uneventful, which I suppose is what you want from a driver.',
+    'Not bad. The car was comfortable enough and the driving was safe. Just a very basic no-frills service.',
+    'Acceptable for the price. Our driver was polite but the vehicle had seen better days.',
+  ],
+  2: [
+    'Below expectations. The vehicle was dirty inside and our driver was 30 minutes late with no explanation.',
+    'Disappointing experience. The driving felt unsafe at times - speeding and tailgating on narrow mountain roads.',
+    'Would not recommend. Our driver was on the phone for most of the journey. Did not feel safe.',
+    'Not great. The vehicle had a check engine light on and strange noises. Not confidence-inspiring for a mountain drive.',
+    'Poor service. The car was not the one pictured in the listing and was significantly less comfortable.',
+    'Underwhelming. Our driver got lost twice and added 45 minutes to what should have been a simple transfer.',
+    'Expected better. The vehicle reeked of cigarette smoke despite requesting a non-smoking car. Driver was unfriendly.',
+    'Would not book again. Multiple delays, poor communication, and the car was not clean.',
+  ],
+  1: [
+    'Dangerous driver! Speeding, overtaking on blind corners, and texting while driving on mountain roads. Feared for our lives.',
+    'Avoid! The driver never showed up and the company ghosted us. Stranded at the airport with no ride and no refund.',
+    'Worst experience ever. The car broke down in the middle of nowhere and the driver had no plan B. Wasted an entire day.',
+    'Do not book. The driver was aggressive on the road and rude to us. We asked to be let out early because we felt unsafe.',
+    'Absolutely terrible. Vehicle was falling apart, driver was chain-smoking with windows closed, and he demanded extra payment at the end.',
+  ],
+};
+
+export const EN_COMPANY_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'Outstanding tour company! Every aspect of our trip was expertly handled. From booking to the final goodbye, pure professionalism.',
+    'The best tour operator in Georgia, hands down. We booked three different tours and each one was absolutely perfect.',
+    'Five stars all the way! This company sets the gold standard for tourism in the Caucasus. Incredible attention to detail.',
+    'Cannot recommend this company enough. Their guides are top-notch, their vehicles are immaculate, and their communication is instant.',
+    'A world-class operation. They customized our entire week in Georgia and every single day exceeded our expectations.',
+    'Simply the best. We have traveled extensively and this company ranks among the top tour operators we have ever used worldwide.',
+    'Exceptional from start to finish. Quick responses, fair prices, amazing guides, and genuine care for customer satisfaction.',
+    'This company made our dream trip to Georgia a reality. Everything was seamless and every recommendation was spot on.',
+    'Truly impressed by the level of service. They handled a last-minute itinerary change without missing a beat. Absolute pros.',
+    'If you are visiting Georgia, book with this company. Period. They will make sure you have the trip of a lifetime.',
+    'Flawless experience. Professional team, excellent guides, comfortable vehicles, and authentic local experiences. Perfection.',
+  ],
+  4: [
+    'Very good tour company with professional staff and well-organized tours. A few minor communication delays but overall excellent.',
+    'Great experience with this operator. Their guides are knowledgeable and the tours are well-planned. Would book again.',
+    'Reliable company with good service. We enjoyed our tours and felt well taken care of. Minor room for improvement on timing.',
+    'Pleased with our choice of tour operator. Good value, professional guides, and responsive customer service.',
+    'Good company for exploring Georgia. They offered flexible options and their guides were friendly and informative.',
+    'Solid tour operator. Everything went smoothly for our group of eight. The booking process was easy and the tours were enjoyable.',
+    'Would recommend this company. Professional operation with knowledgeable guides. Just a small mix-up with pickup times on one occasion.',
+    'Very good service overall. Their website was easy to use and the actual experience matched the descriptions well.',
+    'Good experience. The company was responsive to our questions and the tours were well-organized. Fair prices too.',
+    'A dependable tour company in Georgia. We had a great time and would consider using them again on our next visit.',
+  ],
+  3: [
+    'Average tour company. The tours were okay but nothing that made them stand out from other operators in the area.',
+    'Decent experience. The company delivered what they promised but without any wow factor. Fine for basic sightseeing.',
+    'Mixed results. One tour was great, the other was mediocre. Inconsistent quality across their offerings.',
+    'Okay for the price point. The company is adequate for standard tours but do not expect premium service.',
+    'Satisfactory. Communication was sometimes slow and the tour content was fairly generic. Gets the job done though.',
+    'Average operator. Some things worked well, others did not. Their guides vary significantly in quality.',
+    'It was fine. Nothing wrong per se, but also nothing that would make me choose them over competitors next time.',
+    'Middle of the pack tour company. Standard offerings at standard prices. No complaints but no praise either.',
+    'Decent enough. The logistics were handled adequately but the overall experience felt a bit impersonal and mass-market.',
+    'Average experience. The company is functional but could benefit from more attention to customer experience details.',
+  ],
+  2: [
+    'Disappointing company. Poor communication, mediocre guides, and the tours felt thrown together without much thought.',
+    'Below average operator. Multiple issues with our booking that took days to resolve. The actual tour was underwhelming.',
+    'Would not recommend. The company overcharges for what they deliver. Much better options available in Tbilisi.',
+    'Not impressed. The guide they assigned was clearly inexperienced and the itinerary was poorly planned.',
+    'Frustrating experience. They changed our tour details twice without notice. Felt like they were juggling too many bookings.',
+    'Underwhelming service. The company website promises premium experiences but delivers budget-level tours.',
+    'Not worth it. Slow responses, confusing booking process, and the tour itself was disorganized.',
+    'Poor experience overall. The company seems more interested in selling tours than actually delivering quality experiences.',
+  ],
+  1: [
+    'Worst tour company we have ever dealt with. They took our money and delivered absolutely nothing. Avoid at all costs.',
+    'Complete scam operation. No shows, no refunds, no responses. We had to dispute the charge with our credit card company.',
+    'Do not book with this company under any circumstances. They ruined our vacation with their incompetence and dishonesty.',
+    'Terrible company. Cancelled our tour the morning of, offered no alternative, and refused a refund. Fraudulent business.',
+    'Absolutely disgraceful. Fake reviews on their website, bait-and-switch tactics, and zero customer service. Report them.',
+  ],
+};
+
+// ============================================================
+// RUSSIAN REVIEW TEMPLATES
+// ============================================================
+
+export const RU_TOUR_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'Потрясающий тур! Гид был невероятно осведомлён, пейзажи захватывали дух. Это было лучшее, что мы делали в Грузии!',
+    'Пять звёзд мало! Тур превзошёл все ожидания. Посетили такие места, о которых не пишут в путеводителях. Очень рекомендую!',
+    'Незабываемый опыт от начала и до конца. Гид великолепно рассказывал об истории Грузии, и маршрут был идеально спланирован.',
+    'Это был лучший тур за все наши путешествия. Маленькая группа, внимание к каждому, потрясающие виды Кавказа. Браво!',
+    'Волшебный день! Дегустация вин в Кахетии, аутентичная еда, древние монастыри — всё было на высшем уровне.',
+    'Абсолютно идеальный тур. Организация на высоте, гид — профессионал с большой буквы. Стоит каждого лари!',
+    'Невероятное путешествие! Военно-Грузинская дорога — это нечто. Гид сделал поездку ещё более особенной своими рассказами.',
+    'Лучший способ узнать настоящую Грузию! Гид показал нам скрытые жемчужины, которые мы бы никогда не нашли сами.',
+    'Великолепно! Всё продумано до мелочей. Комфортный транспорт, знающий гид и незабываемые впечатления.',
+    'Сказка, а не тур! Мцхета, Джвари, Ананури — каждая остановка была волшебной. Обязательно забронируйте!',
+    'Превосходный тур! Мы объехали полстраны за один день и каждый момент был наполнен красотой и историей.',
+  ],
+  4: [
+    'Очень хороший тур! Красивые места и знающий гид. Единственное — хотелось бы чуть больше времени на каждой остановке.',
+    'Отличная экскурсия в целом. Гид прекрасно говорил по-русски и рассказал много интересного. Небольшие логистические заминки.',
+    'Хороший тур с красивыми видами. Ещё бы обед был включён — было бы идеально. Рекомендую.',
+    'Понравилось! Маршрут хорошо продуман, гид профессиональный. Немного длинные переезды, но виды того стоят.',
+    'Хороший тур за разумные деньги. Увидели все основные достопримечательности и узнали много нового о грузинской культуре.',
+    'Приятная экскурсия! Гид был дружелюбным и информативным. Машина удобная. Чуть-чуть спешили в конце.',
+    'Очень достойный тур. Организация на уровне, гид знающий. Единственное замечание — места в микроавтобусе могли бы быть удобнее.',
+    'Хорошо провели день. Красивые пейзажи, интересные рассказы. Мелкие недочёты не испортили общего впечатления.',
+    'Рекомендую! Хороший тур с профессиональным гидом. Некоторые временные накладки, но в целом всё отлично.',
+    'Качественный тур. Всё было организовано на хорошем уровне. С нетерпением ждём следующей поездки!',
+  ],
+  3: [
+    'Средний тур. Красивые места, конечно, но организация оставляет желать лучшего. За эти деньги ожидали большего.',
+    'Нормально, но без восторга. Гид был вежливый, но рассказывал довольно поверхностно. Экскурсия на троечку.',
+    'Ничего особенного. Стандартный набор достопримечательностей без каких-либо сюрпризов. Можно организовать самим дешевле.',
+    'Смешанные впечатления. Утро было отличным, а после обеда всё стало скомканным и торопливым.',
+    'Терпимо. Основные места посмотрели, но экскурсия чувствовалась как конвейер — быстро посмотрели и побежали дальше.',
+    'Средне. Гид знал базовую информацию, но на вопросы отвечал с трудом. Транспорт комфортный.',
+    'Нормальный тур для тех, кто не хочет разбираться с логистикой сам. Ничего выдающегося.',
+    'Удовлетворительно. Маршрут стандартный, гид приветливый, но глубины в рассказах не хватало.',
+    'Обычная экскурсия. Не плохая, но и не запоминающаяся. Фотографии красивые получились — и на том спасибо.',
+    'На троечку. Были моменты, которые понравились, но общее впечатление — ничего особенного.',
+  ],
+  2: [
+    'Разочарованы. Тур не соответствовал описанию — несколько остановок пропустили без объяснений.',
+    'Ниже ожиданий. Транспорт старый и неудобный, гид говорил по-русски плохо, многое не поняли.',
+    'Не рекомендую. Группа была слишком большая, на каждой остановке толкучка. Никакого удовольствия.',
+    'Разочарование. Забрали с опозданием на 40 минут, из-за чего пришлось пропустить одну из главных остановок.',
+    'Не стоит своих денег. Обед в туристической ловушке с завышенными ценами, дегустация вина — три глотка на бегу.',
+    'Плохой опыт. Гид был незаинтересован и торопил нас на каждой остановке. Фотографировать было некогда.',
+    'Ожидали намного большего. Машина сломалась в дороге, потеряли два часа. Компенсации не предложили.',
+    'Не советую. Организация на нуле. Путаница с расписанием и маршрутом на протяжении всего дня.',
+  ],
+  1: [
+    'Ужасный тур. Гид не приехал, компания не отвечает на звонки. Потерянные деньги и испорченный день.',
+    'Избегайте! Полный обман — ничего из обещанного не было выполнено. Деньги не вернули.',
+    'Худший тур в моей жизни. Опасное вождение по горным дорогам, грязная машина, хамоватый водитель.',
+    'Не бронируйте! Мошенники. Отменили тур в последний момент и отказались возвращать оплату.',
+    'Кошмар от начала до конца. Гид пришёл пьяным, машина грязная, маршрут — сплошной хаос. Никогда больше!',
+  ],
+};
+
+export const RU_GUIDE_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'Лучший гид, которого мы когда-либо встречали! Энциклопедические знания, прекрасный русский язык и искренняя любовь к Грузии.',
+    'Фантастический гид! Показал нам такую Грузию, о которой мы даже не мечтали. Каждая история была увлекательной.',
+    'Пять звёзд! Наш гид сделал поездку незабываемой. Профессионал, который действительно любит своё дело.',
+    'Потрясающий человек и гид! Терпеливо отвечал на все вопросы и делился невероятными историями о грузинской культуре.',
+    'Идеальный гид для семейного путешествия. Нашёл подход к детям, знал все интересные места и рассказывал захватывающие легенды.',
+    'Невероятный профессионал! Гибкий, внимательный и знающий абсолютно всё о каждом месте, которое мы посетили.',
+    'Лучшее решение нашего путешествия — нанять этого гида. Мы чувствовали себя друзьями, а не туристами.',
+    'Великолепный гид! Его страсть к истории Грузии заразительна. Мы узнали больше за один день, чем из любого путеводителя.',
+    'Абсолютный профессионал. Пунктуальный, вежливый, невероятно эрудированный. Стоит каждого потраченного рубля!',
+    'Замечательный гид! Показал скрытые жемчужины Тбилиси, которых нет ни в одном путеводителе. Горячо рекомендую!',
+    'Наш гид — настоящее сокровище! Благодаря ему мы влюбились в Грузию. Обязательно обратимся снова.',
+  ],
+  4: [
+    'Очень хороший гид с глубокими знаниями грузинской истории. Небольшой языковой барьер, но в целом отлично.',
+    'Приятный и знающий гид. Провёл нас по Кахетии и рассказал много интересного. Рекомендую с небольшими оговорками.',
+    'Хороший гид, который действительно любит свою работу. Немного не хватало времени на некоторых остановках.',
+    'Профессиональный и пунктуальный. Хорошо знает историю и культуру. Был бы идеальным с чуть лучшим русским.',
+    'Понравился наш гид. Дружелюбный, информативный и гибкий к нашим пожеланиям. Мелкие замечания не в счёт.',
+    'Хороший специалист! Рассказывал интересно и показал красивые места. Немного спешил в конце экскурсии.',
+    'Достойный гид. Знающий, вежливый и с хорошим чувством юмора. Рекомендую для осмотра Тбилиси.',
+    'Хорошая экскурсия с этим гидом. Много узнали о виноделии и грузинских традициях. Советую.',
+    'Приятный гид с хорошими знаниями. Маршрут был интересным, а компания приятной. Небольшие накладки по времени.',
+    'Рекомендую этого гида. Ответственный подход, хорошие знания, приятная манера общения.',
+  ],
+  3: [
+    'Средний гид. Базовую информацию рассказал, но на вопросы углублённые ответить не мог. Ничего особенного.',
+    'Нормально, но без изюминки. Гид был вежливый, но чувствовалось, что работает по шаблону.',
+    'Обычная экскурсия. Гид знал основы, но глубоких знаний не продемонстрировал. За эти деньги ожидали большего.',
+    'Средне. Гид был пунктуальным и дружелюбным, но экскурсия была довольно скучной и стандартной.',
+    'Нормальный гид для первого знакомства с городом. Но если хотите глубокого погружения — ищите другого.',
+    'Удовлетворительно. Свою работу сделал, но энтузиазма и страсти к делу не чувствовалось.',
+    'Средняя экскурсия. Гид был приятным в общении, но рассказ был поверхностным.',
+    'Ничего выдающегося. Стандартная экскурсия по стандартным местам. Зато пунктуально.',
+    'На троечку. Гид старался, но видно, что опыта пока маловато. Потенциал есть.',
+    'Средний опыт. Не плохо и не хорошо. Просто обычная экскурсия без особых впечатлений.',
+  ],
+  2: [
+    'Разочарованы гидом. Плохой русский язык, поверхностные знания, чувствовалось отсутствие подготовки.',
+    'Не рекомендую. Гид больше сидел в телефоне, чем рассказывал. Деньги потрачены впустую.',
+    'Ниже ожиданий. Гид опоздал на полчаса и потом торопил нас на каждой остановке. Неприятно.',
+    'Плохой опыт. Гид не смог ответить на элементарные вопросы об истории мест, которые мы посещали.',
+    'Не стоит своих денег. Экскурсия была скомканной и неинтересной. Лучше бы гуляли сами.',
+    'Разочарование. Гид отменил в последний момент и прислал замену, которая была ещё хуже.',
+    'Не впечатлил. Гид был неприветливым и раздражался от наших вопросов. Неприятный осадок.',
+    'Плохо. Гид явно не любит свою работу. Механическое перечисление фактов без души.',
+  ],
+  1: [
+    'Ужасный гид! Не пришёл, не позвонил, не ответил на сообщения. Потеряли целый день и деньги.',
+    'Избегайте! Гид был грубым, непрофессиональным и испортил нам весь день в Тбилиси.',
+    'Худший опыт. Гид опоздал на полтора часа, был нетрезв и нёс какую-то чушь вместо экскурсии.',
+    'Не нанимайте! Вместо экскурсии гид водил нас по магазинам, где получает комиссионные. Обман!',
+    'Кошмар. Гид хамил, игнорировал наши вопросы и сделал всё, чтобы испортить нам отдых.',
+  ],
+};
+
+export const RU_DRIVER_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'Отличный водитель! Безопасная езда, чистая машина и всегда вовремя. Лучший трансфер в Грузии!',
+    'Пять звёзд! Водитель был профессионалом — уверенно вёл по горным серпантинам и знал все лучшие маршруты.',
+    'Идеальный водитель для путешествия по Грузии. Комфортный внедорожник, плавная езда и отличные рекомендации по ресторанам.',
+    'Потрясающий сервис! Водитель помог с багажом, предложил воду и остановился на каждой живописной точке, которую мы просили.',
+    'Лучший водитель! Пунктуальный, аккуратный, с прекрасным чувством юмора. Длинная дорога в Казбеги пролетела незаметно.',
+    'Профессионал высшего класса. Чистый мерседес, безопасное вождение, дружелюбное отношение. Рекомендую всем!',
+    'Великолепный водитель! Гибко подстраивался под наши изменения в плане и всегда был на связи. Супер!',
+    'Замечательный водитель для нашей недельной поездки по Грузии. Стал как член семьи к концу путешествия.',
+    'Безупречный сервис. Машина идеально чистая, водитель вежливый и опытный. Чувствовали себя в полной безопасности.',
+    'Лучший трансфер, который у нас когда-либо был. Водитель говорил по-русски, знал все дороги и был невероятно любезен.',
+    'Превосходно! Водитель сделал наше путешествие по Военно-Грузинской дороге абсолютно незабываемым.',
+  ],
+  4: [
+    'Очень хороший водитель. Безопасная езда, чистая машина. Небольшой языковой барьер, но всё решаемо.',
+    'Хороший опыт. Водитель был пунктуальным и профессиональным. Машина удобная, рекомендую.',
+    'Приятная поездка. Водитель хорошо знал дорогу и ехал аккуратно. Немного опоздал при посадке, но несущественно.',
+    'Хороший водитель для трансфера Тбилиси-Батуми. Комфортная машина, безопасная езда. Советую.',
+    'Понравился сервис. Водитель был дружелюбным и помог с багажом. Машина чистая и удобная.',
+    'Достойный водитель. Пунктуальный, аккуратный, вежливый. Машина могла бы быть чуть поновее, но в целом хорошо.',
+    'Хорошая поездка. Водитель знал все короткие пути и ехал очень уверенно по горным дорогам.',
+    'Рекомендую. Надёжный водитель с комфортной машиной. Хорошее соотношение цены и качества.',
+    'Хороший сервис за свои деньги. Водитель был приветливый и машина была в хорошем состоянии.',
+    'Приятный водитель, безопасная езда, чистый автомобиль. Мелкие замечания не портят общую картину.',
+  ],
+  3: [
+    'Средний водитель. Довёз куда нужно, но без каких-либо дополнительных усилий. Просто транспорт.',
+    'Нормально. Машина была не первой свежести, но чистая. Водитель молчаливый, но ехал аккуратно.',
+    'Обычный трансфер. Ничего плохого, но и ничего примечательного. Машина средняя, водитель обычный.',
+    'Удовлетворительно. Водитель приехал вовремя и довёз без приключений. Большего не ждите за эту цену.',
+    'Средне. Машина была старовата, но ехала нормально. Водитель не разговорчивый, но профессиональный.',
+    'На тройку. Базовый трансфер без изысков. Если нужно просто добраться из точки А в точку Б — сойдёт.',
+    'Нормальный водитель для простых переездов. Не ждите от него экскурсионных навыков.',
+    'Приемлемо. Водитель ехал безопасно, машина была в рабочем состоянии. Не более того.',
+    'Средний сервис. Всё было нормально, но за эти деньги можно было бы ожидать чуть больше комфорта.',
+    'Обычный водитель. Свою работу сделал, но никаких дополнительных бонусов. Стандартно.',
+  ],
+  2: [
+    'Разочарованы. Машина была грязной внутри, водитель опоздал на полчаса без предупреждения.',
+    'Не рекомендую. Водитель ехал слишком быстро по горным дорогам. Было реально страшно.',
+    'Плохой опыт. Водитель всю дорогу разговаривал по телефону. Чувствовали себя небезопасно.',
+    'Ниже ожиданий. Машина не соответствовала фотографиям — старая и неудобная. Водитель неприветливый.',
+    'Не стоит денег. Машина воняла сигаретами, хотя заказывали некурящий салон. Водитель был хмурый.',
+    'Плохо. Водитель два раза заблудился и наша поездка заняла на час больше, чем должна была.',
+    'Разочарование. Машина с неисправным кондиционером в жару — это пытка. Водитель не извинился.',
+    'Не советую. Несколько задержек, плохая коммуникация и грязная машина.',
+  ],
+  1: [
+    'Опасный водитель! Обгоны на слепых поворотах, превышение скорости и SMS за рулём. Чудом остались живы!',
+    'Избегайте! Водитель не приехал, компания не отвечает. Застряли в аэропорту без трансфера и без возврата денег.',
+    'Худший опыт. Машина сломалась посреди дороги в горах, водитель не знал что делать. Потеряли целый день.',
+    'Не бронируйте! Водитель был агрессивным на дороге и хамил нам. Попросили остановить и вышли раньше.',
+    'Кошмар! Машина разваливалась, водитель курил в закрытом салоне, а в конце потребовал доплату. Мошенничество!',
+  ],
+};
+
+export const RU_COMPANY_REVIEW_COMMENTS: Record<number, string[]> = {
+  5: [
+    'Лучшая туристическая компания в Грузии! Бронировали у них три тура — каждый был безупречным. Высший класс!',
+    'Потрясающий сервис от начала и до конца. Быстрые ответы, отличные гиды, комфортный транспорт. Рекомендуем всем!',
+    'Пять звёзд! Эта компания знает, как создать незабываемое путешествие. Каждая деталь продумана.',
+    'Лучший оператор на Кавказе. Профессиональная команда, отличные маршруты и индивидуальный подход к каждому клиенту.',
+    'Идеальная компания для знакомства с Грузией. Организовали нам целую неделю — каждый день превосходил ожидания.',
+    'Просто лучшие! Мы много путешествуем, и эта компания входит в топ операторов, с которыми мы работали во всём мире.',
+    'Великолепный сервис! Справились с нашим изменением маршрута в последний момент без единой заминки. Настоящие профи.',
+    'Эта компания воплотила нашу мечту о поездке в Грузию. Всё было безупречно, каждая рекомендация — в точку.',
+    'Безупречная работа. Профессиональная команда, знающие гиды, комфортные машины и настоящие местные впечатления.',
+    'Если едете в Грузию — бронируйте только у них. Они обеспечат вам путешествие всей жизни. Без преувеличений!',
+    'Превосходная компания! Внимание к деталям, качество обслуживания и искреннее желание сделать ваш отдых идеальным.',
+  ],
+  4: [
+    'Очень хорошая компания с профессиональным подходом. Небольшие задержки в коммуникации, но в целом отлично.',
+    'Хороший тур-оператор. Гиды знающие, туры продуманные. Бронировали бы снова.',
+    'Надёжная компания с хорошим сервисом. Нам понравились туры и мы чувствовали себя в хороших руках.',
+    'Довольны выбором. Хорошее соотношение цены и качества, профессиональные гиды и отзывчивая служба поддержки.',
+    'Хорошая компания для знакомства с Грузией. Предлагали гибкие варианты и гиды были дружелюбными.',
+    'Профессиональный оператор. Всё прошло гладко для нашей группы из восьми человек. Бронирование было простым.',
+    'Рекомендуем. Небольшая путаница со временем подбора один раз, но в целом очень достойный сервис.',
+    'Хорошая работа. Сайт удобный, а реальный опыт соответствовал описаниям. Честная компания.',
+    'Приятный опыт. Компания оперативно отвечала на вопросы, туры были хорошо организованы. Справедливые цены.',
+    'Надёжный тур-оператор. Мы отлично провели время и обратились бы к ним снова при следующем визите.',
+  ],
+  3: [
+    'Средняя компания. Туры нормальные, но ничего такого, что выделяло бы их среди конкурентов.',
+    'Обычный опыт. Компания выполнила обещанное, но без какого-либо вау-фактора. Сойдёт для базовых экскурсий.',
+    'Неоднозначно. Один тур был отличный, другой — посредственный. Качество нестабильное.',
+    'Нормально для этой ценовой категории. Не ждите премиум-сервиса, но базовые туры делают неплохо.',
+    'Удовлетворительно. Коммуникация иногда медленная, содержание туров довольно стандартное. Свою задачу выполняют.',
+    'Средний оператор. Что-то работало хорошо, что-то нет. Гиды сильно различаются по качеству.',
+    'Ничего выдающегося. Стандартные предложения по стандартным ценам. Ни жалоб, ни восторга.',
+    'Обычный тур-оператор. Всё функционально, но опыт чувствовался безличным и массовым.',
+    'Средне. Логистику организовали нормально, но впечатления от туров были довольно средними.',
+    'На троечку. Компания работает, но могла бы уделять больше внимания деталям клиентского опыта.',
+  ],
+  2: [
+    'Разочарованы. Плохая коммуникация, посредственные гиды, туры выглядели собранными на коленке.',
+    'Ниже среднего. Несколько проблем с бронированием, которые решались днями. Сам тур был невпечатляющим.',
+    'Не рекомендую. Компания берёт завышенные цены за то, что предоставляет. Есть варианты намного лучше в Тбилиси.',
+    'Не впечатлены. Гид, которого прислали, был явно неопытным, а маршрут плохо спланирован.',
+    'Неприятный опыт. Дважды меняли детали тура без предупреждения. Ощущение, что набирают слишком много заказов.',
+    'Посредственный сервис. Сайт обещает премиум-впечатления, а по факту бюджетный уровень туров.',
+    'Не стоит. Медленные ответы, запутанный процесс бронирования и сам тур был дезорганизован.',
+    'Плохой опыт. Компания больше заинтересована в продажах, чем в качестве предоставляемых услуг.',
+  ],
+  1: [
+    'Худшая компания, с которой мы сталкивались. Взяли деньги и не предоставили ничего. Избегайте!',
+    'Мошенники! Не приехали, не вернули деньги, не отвечают. Пришлось оспаривать платёж через банк.',
+    'Не бронируйте у них ни при каких обстоятельствах. Испортили нам отпуск своей некомпетентностью.',
+    'Ужасная компания. Отменили тур утром, не предложили альтернативу и отказались возвращать деньги.',
+    'Позор! Фейковые отзывы на сайте, обман при бронировании и полное отсутствие клиентского сервиса.',
+  ],
+};
+
+// ============================================================
+// LANGUAGE-AWARE COMMENT SELECTOR
+// ============================================================
+
+type ReviewLanguage = 'ka' | 'en' | 'ru';
+
+const COMMENTS_BY_LANGUAGE: Record<
+  ReviewLanguage,
+  Record<ReviewTargetType, Record<number, string[]>>
+> = {
+  ka: {
+    [ReviewTargetType.TOUR]: TOUR_REVIEW_COMMENTS,
+    [ReviewTargetType.GUIDE]: GUIDE_REVIEW_COMMENTS,
+    [ReviewTargetType.DRIVER]: DRIVER_REVIEW_COMMENTS,
+    [ReviewTargetType.COMPANY]: COMPANY_REVIEW_COMMENTS,
+  },
+  en: {
+    [ReviewTargetType.TOUR]: EN_TOUR_REVIEW_COMMENTS,
+    [ReviewTargetType.GUIDE]: EN_GUIDE_REVIEW_COMMENTS,
+    [ReviewTargetType.DRIVER]: EN_DRIVER_REVIEW_COMMENTS,
+    [ReviewTargetType.COMPANY]: EN_COMPANY_REVIEW_COMMENTS,
+  },
+  ru: {
+    [ReviewTargetType.TOUR]: RU_TOUR_REVIEW_COMMENTS,
+    [ReviewTargetType.GUIDE]: RU_GUIDE_REVIEW_COMMENTS,
+    [ReviewTargetType.DRIVER]: RU_DRIVER_REVIEW_COMMENTS,
+    [ReviewTargetType.COMPANY]: RU_COMPANY_REVIEW_COMMENTS,
+  },
+};
+
+const ALL_LANGUAGES: ReviewLanguage[] = ['ka', 'en', 'ru'];
+
 // Function to get a random comment for a rating
-export function getRandomComment(targetType: ReviewTargetType, rating: number): string {
-  let comments: Record<number, string[]>;
-
-  switch (targetType) {
-    case ReviewTargetType.TOUR:
-      comments = TOUR_REVIEW_COMMENTS;
-      break;
-    case ReviewTargetType.GUIDE:
-      comments = GUIDE_REVIEW_COMMENTS;
-      break;
-    case ReviewTargetType.DRIVER:
-      comments = DRIVER_REVIEW_COMMENTS;
-      break;
-    case ReviewTargetType.COMPANY:
-      comments = COMPANY_REVIEW_COMMENTS;
-      break;
-    default:
-      comments = TOUR_REVIEW_COMMENTS;
-  }
-
-  const ratingComments = comments[rating] || comments[3];
+export function getRandomComment(
+  targetType: ReviewTargetType,
+  rating: number,
+  language?: ReviewLanguage,
+): string {
+  const lang = language ?? ALL_LANGUAGES[Math.floor(Math.random() * ALL_LANGUAGES.length)];
+  const commentsForLang = COMMENTS_BY_LANGUAGE[lang] ?? COMMENTS_BY_LANGUAGE.ka;
+  const commentsForType = commentsForLang[targetType] ?? commentsForLang[ReviewTargetType.TOUR];
+  const ratingComments = commentsForType[rating] || commentsForType[3];
   return ratingComments[Math.floor(Math.random() * ratingComments.length)];
 }

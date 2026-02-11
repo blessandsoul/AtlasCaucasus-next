@@ -41,7 +41,11 @@ enum NotificationType {
   CHAT_MENTION // User was mentioned with @
   INQUIRY_RECEIVED // Company/guide/driver received inquiry
   INQUIRY_RESPONSE // Recipient responded to inquiry
-  BOOKING_REQUEST // Tour booking request (future)
+  BOOKING_REQUEST // Tour booking request
+  BOOKING_CONFIRMED // Provider confirmed the booking
+  BOOKING_DECLINED // Provider declined the booking
+  BOOKING_CANCELLED // Customer cancelled the booking
+  BOOKING_COMPLETED // Booking marked as completed
   PROFILE_VERIFIED // Profile approved by admin (future)
   SYSTEM // System announcements
 }
@@ -69,7 +73,9 @@ enum ReviewTargetType {
 }
 
 enum BookingStatus {
+  PENDING // Customer submitted, awaiting provider confirmation
   CONFIRMED
+  DECLINED // Provider declined the booking
   COMPLETED
   CANCELLED
 }
@@ -251,6 +257,9 @@ model Company {
   averageRating Decimal? @map("average_rating") @db.Decimal(3, 2)
   reviewCount   Int      @default(0) @map("review_count")
 
+  // View tracking
+  viewCount Int @default(0) @map("view_count")
+
   // Response time tracking
   avgResponseTimeMinutes Int? @map("avg_response_time_minutes")
   responseCount          Int  @default(0) @map("response_count")
@@ -292,6 +301,9 @@ model Guide {
   averageRating Decimal? @map("average_rating") @db.Decimal(3, 2)
   reviewCount   Int      @default(0) @map("review_count")
 
+  // View tracking
+  viewCount Int @default(0) @map("view_count")
+
   // Response time tracking
   avgResponseTimeMinutes Int? @map("avg_response_time_minutes")
   responseCount          Int  @default(0) @map("response_count")
@@ -332,6 +344,9 @@ model Driver {
   // Rating fields
   averageRating Decimal? @map("average_rating") @db.Decimal(3, 2)
   reviewCount   Int      @default(0) @map("review_count")
+
+  // View tracking
+  viewCount Int @default(0) @map("view_count")
 
   // Response time tracking
   avgResponseTimeMinutes Int? @map("avg_response_time_minutes")
@@ -420,6 +435,9 @@ model Tour {
   // Rating fields
   averageRating Decimal? @map("average_rating") @db.Decimal(3, 2)
   reviewCount   Int      @default(0) @map("review_count")
+
+  // View tracking
+  viewCount Int @default(0) @map("view_count")
 
   @@index([ownerId])
   @@index([companyId])
@@ -753,11 +771,33 @@ model Booking {
   updatedAt   DateTime      @updatedAt @map("updated_at")
   cancelledAt DateTime?     @map("cancelled_at")
 
+  // Provider-facing fields
+  providerNotes  String?   @map("provider_notes") @db.Text
+  confirmedAt    DateTime? @map("confirmed_at")
+  declinedAt     DateTime? @map("declined_at")
+  declinedReason String?   @map("declined_reason") @db.Text
+  completedAt    DateTime? @map("completed_at")
+
+  // Denormalized entity info (so cards show tour name, not "Tour Booking")
+  entityName     String? @map("entity_name") @db.VarChar(255)
+  entityImage    String? @map("entity_image") @db.VarChar(512)
+  providerUserId String? @map("provider_user_id")
+  providerName   String? @map("provider_name") @db.VarChar(255)
+
+  // Contact info
+  contactPhone String? @map("contact_phone") @db.VarChar(20)
+  contactEmail String? @map("contact_email") @db.VarChar(255)
+
+  // Human-readable reference (e.g., "BK-260210-A3F2")
+  referenceNumber String? @unique @map("reference_number") @db.VarChar(20)
+
   user    User     @relation("UserBookings", fields: [userId], references: [id])
   inquiry Inquiry? @relation(fields: [inquiryId], references: [id])
 
   @@index([userId, status])
   @@index([entityType, entityId])
+  @@index([providerUserId, status])
+  @@index([referenceNumber])
   @@map("bookings")
 }
 

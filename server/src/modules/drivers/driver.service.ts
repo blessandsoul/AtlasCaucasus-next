@@ -4,6 +4,7 @@ import * as driverRepo from "./driver.repo.js";
 import type { DriverResponse, UpdateDriverData, DriverFilters } from "./driver.types.js";
 import type { UserRole } from "../users/user.types.js";
 import { deleteDriverPhotos } from "../media/media.helpers.js";
+import { cacheGet, cacheSet, cacheDeletePattern } from "../../libs/cache.js";
 
 export async function getDrivers(
     filters: DriverFilters,
@@ -17,7 +18,16 @@ export async function getDrivers(
         isAvailable: filters.isAvailable ?? true,
     };
 
-    return driverRepo.findAll(effectiveFilters, page, limit);
+    const cacheKey = `drivers:list:${JSON.stringify(effectiveFilters)}:p${page}:l${limit}`;
+    const cached = await cacheGet<{ drivers: DriverResponse[]; total: number }>(cacheKey);
+    if (cached) {
+        return cached;
+    }
+
+    const result = await driverRepo.findAll(effectiveFilters, page, limit);
+    await cacheSet(cacheKey, result, 300);
+
+    return result;
 }
 
 export async function getDriverById(id: string): Promise<DriverResponse> {
@@ -67,6 +77,9 @@ export async function updateDriver(
         await driverRepo.setLocations(id, data.locationIds);
     }
 
+    cacheDeletePattern("drivers:list:*").catch(() => {});
+    cacheDeletePattern("search:*").catch(() => {});
+
     return getDriverById(id);
 }
 
@@ -89,4 +102,7 @@ export async function deleteDriver(
     await deleteDriverPhotos(id);
 
     await driverRepo.deleteDriver(id);
+
+    cacheDeletePattern("drivers:list:*").catch(() => {});
+    cacheDeletePattern("search:*").catch(() => {});
 }

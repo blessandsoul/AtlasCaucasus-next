@@ -8,6 +8,8 @@ import { startSessionCleanup, stopSessionCleanup } from "./jobs/sessionCleanup.j
 import { startTypingCleanup, stopTypingCleanup } from "./jobs/typingCleanup.js";
 import { startNotificationCleanup, stopNotificationCleanup } from "./jobs/notificationCleanup.js";
 import { startInquiryExpiration, stopInquiryExpiration } from "./jobs/inquiryExpiration.js";
+import { startBookingExpiration, stopBookingExpiration } from "./jobs/bookingExpiration.js";
+import { startViewPersistence, stopViewPersistence } from "./jobs/viewPersistence.js";
 import { startWebSocketKeepalive } from "./modules/websocket/websocket.handler.js";
 import { refreshFromDb as refreshTemplateRegistry } from "./modules/ai/templates/index.js";
 
@@ -60,6 +62,8 @@ async function start(): Promise<void> {
       startTypingCleanup(); // Typing indicator cleanup every minute
       startNotificationCleanup(); // Notification cleanup daily at 3 AM
       startInquiryExpiration(); // Inquiry expiration daily at 4 AM
+      startBookingExpiration(); // Auto-decline expired PENDING bookings every hour
+      startViewPersistence(); // Persist Redis view counts to DB daily at 5 AM
       stopKeepalive = startWebSocketKeepalive(); // WebSocket keepalive every 30s
       logger.info("All background jobs started");
     } else {
@@ -80,6 +84,8 @@ async function shutdown(): Promise<void> {
       stopTypingCleanup();
       stopNotificationCleanup();
       stopInquiryExpiration();
+      stopBookingExpiration();
+      stopViewPersistence();
       if (stopKeepalive) {
         stopKeepalive();
       }

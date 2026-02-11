@@ -1,3 +1,6 @@
+import { weightedRandomLanguage, getRandomDriverBio, type SeedLanguage } from './multilingual.js';
+import { randomItem, randomInt, randomLicensePlate } from '../utils/helpers.js';
+
 /**
  * Driver profile data for seeding (Georgian)
  * Linked to DRIVER_USERS and MULTI_ROLE_USERS with DRIVER role
@@ -215,3 +218,65 @@ export const MULTI_ROLE_DRIVER_PROFILES: DriverSeedData[] = [
 
 // Combine all driver profiles
 export const ALL_DRIVER_PROFILES = [...DRIVER_PROFILES, ...MULTI_ROLE_DRIVER_PROFILES];
+
+// Vehicle options for generation
+const VEHICLE_OPTIONS = [
+  { type: VEHICLE_TYPES.SEDAN, capacity: 3, makes: [['Toyota', 'Camry'], ['Hyundai', 'Sonata'], ['Kia', 'K5'], ['Volkswagen', 'Passat']] },
+  { type: VEHICLE_TYPES.SUV, capacity: 4, makes: [['Hyundai', 'Santa Fe'], ['Toyota', 'RAV4'], ['Nissan', 'X-Trail'], ['Kia', 'Sportage']] },
+  { type: VEHICLE_TYPES.FOURX4, capacity: 4, makes: [['Toyota', 'Land Cruiser Prado'], ['Mitsubishi', 'Pajero'], ['Toyota', 'Hilux'], ['Nissan', 'Patrol']] },
+  { type: VEHICLE_TYPES.MINIVAN, capacity: 7, makes: [['Mercedes-Benz', 'Vito'], ['Mercedes-Benz', 'V-Class'], ['Volkswagen', 'Transporter'], ['Toyota', 'HiAce']] },
+  { type: VEHICLE_TYPES.MINIBUS, capacity: 15, makes: [['Mercedes-Benz', 'Sprinter'], ['Ford', 'Transit'], ['Iveco', 'Daily']] },
+  { type: VEHICLE_TYPES.LUXURY, capacity: 3, makes: [['Mercedes-Benz', 'E-Class'], ['BMW', '5 Series'], ['Mercedes-Benz', 'S-Class']] },
+];
+
+const LOCATION_CLUSTERS: number[][] = [
+  [0, 1, 5, 8],       // Tbilisi area
+  [6, 7, 9, 10],      // Kakheti
+  [0, 2, 11, 12],     // Mountain routes
+  [0, 3, 4],          // Svaneti routes
+  [13, 18, 19, 20, 5], // Coast/West
+  [0, 14, 15],        // South routes
+  [0, 1, 2, 6, 13],   // Major routes
+];
+
+/**
+ * Generate additional driver profiles for 4x data volume
+ * Creates ~22 additional drivers with multilingual bios
+ */
+export function generateAdditionalDriverProfiles(startUserIndex: number): DriverSeedData[] {
+  const additional: DriverSeedData[] = [];
+
+  for (let i = 0; i < 22; i++) {
+    const lang = weightedRandomLanguage();
+    const vehicleOpt = randomItem(VEHICLE_OPTIONS);
+    const make = randomItem(vehicleOpt.makes);
+    const year = randomInt(2016, 2024);
+    const cluster = randomItem(LOCATION_CLUSTERS);
+    const locationIndices = cluster.length > 5 ? cluster.slice(0, randomInt(3, 5)) : cluster;
+    const primaryLocationIndex = locationIndices[0];
+
+    const bio = getRandomDriverBio(lang, {
+      name: '',
+      years: randomInt(2, 15),
+      vehicleType: `${make[0]} ${make[1]}`,
+      city: ['Tbilisi', 'Batumi', 'Kutaisi', 'Mestia'][primaryLocationIndex % 4] || 'Tbilisi',
+    });
+
+    additional.push({
+      userIndex: startUserIndex + i,
+      bio,
+      vehicleType: vehicleOpt.type,
+      vehicleCapacity: vehicleOpt.capacity,
+      vehicleMake: make[0],
+      vehicleModel: make[1],
+      vehicleYear: year,
+      licenseNumber: randomLicensePlate(),
+      isVerified: Math.random() > 0.15,
+      isAvailable: Math.random() > 0.1,
+      locationIndices,
+      primaryLocationIndex,
+    });
+  }
+
+  return additional;
+}

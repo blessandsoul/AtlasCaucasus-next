@@ -17,7 +17,12 @@ export const ROUTES = {
   BECOME_PARTNER: '/dashboard/become-partner',
   REVIEWS: '/dashboard/reviews',
   FAVORITES: '/dashboard/favorites',
-  BOOKINGS: '/dashboard/bookings',
+  BOOKINGS: {
+    ROOT: '/dashboard/bookings',
+    RECEIVED: '/dashboard/bookings/received',
+    DETAIL: (id: string) => `/dashboard/bookings/${id}`,
+    CONFIRMATION: (id: string) => `/dashboard/bookings/${id}/confirmation`,
+  },
   ANALYTICS: '/dashboard/analytics',
   AI_STUDIO: '/dashboard/ai-studio',
   OPERATIONS: {

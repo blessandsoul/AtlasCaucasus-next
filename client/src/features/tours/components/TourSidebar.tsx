@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Zap, ShieldCheck, Send, Calendar, Clock } from 'lucide-react';
+import { Zap, ShieldCheck, Send, Calendar, Clock, MessageCircle } from 'lucide-react';
 import type { Tour } from '@/features/tours/types/tour.types';
 import type { AvailabilityType } from '@/features/tours/types/tour.types';
 import { cn } from '@/lib/utils';
@@ -67,9 +67,10 @@ interface TourSidebarProps {
   tour: Tour;
   className?: string;
   onBook?: () => void;
+  onAskQuestion?: () => void;
 }
 
-export const TourSidebar = ({ tour, className, onBook }: TourSidebarProps) => {
+export const TourSidebar = ({ tour, className, onBook, onAskQuestion }: TourSidebarProps) => {
   const { t } = useTranslation();
   const { formatPrice } = useCurrency();
   const price = parseFloat(tour.price);
@@ -131,8 +132,21 @@ export const TourSidebar = ({ tour, className, onBook }: TourSidebarProps) => {
           onClick={onBook}
         >
           <Send className="mr-2 h-4 w-4" />
-          {t('inquiry_dialog.request_tour')}
+          {tour.availabilityType === 'BY_REQUEST'
+            ? t('bookings.request_booking', 'Request Booking')
+            : t('bookings.book_now', 'Book Now')}
         </Button>
+        {onAskQuestion && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full text-muted-foreground hover:text-foreground"
+            onClick={onAskQuestion}
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            {t('bookings.ask_question', 'Ask a Question')}
+          </Button>
+        )}
         <ChatButton
           otherUserId={tour.ownerId}
           variant="outline"

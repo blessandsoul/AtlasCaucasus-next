@@ -4,6 +4,10 @@ export type NotificationType =
   | 'INQUIRY_RECEIVED'
   | 'INQUIRY_RESPONSE'
   | 'BOOKING_REQUEST'
+  | 'BOOKING_CONFIRMED'
+  | 'BOOKING_DECLINED'
+  | 'BOOKING_CANCELLED'
+  | 'BOOKING_COMPLETED'
   | 'PROFILE_VERIFIED'
   | 'SYSTEM';
 
@@ -13,6 +17,7 @@ export interface INotificationData {
   senderId?: string;
   senderName?: string;
   inquiryId?: string;
+  bookingId?: string;
   [key: string]: unknown;
 }
 

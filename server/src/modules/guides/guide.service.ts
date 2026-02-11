@@ -4,6 +4,7 @@ import * as guideRepo from "./guide.repo.js";
 import type { GuideResponse, UpdateGuideData, GuideFilters } from "./guide.types.js";
 import type { UserRole } from "../users/user.types.js";
 import { deleteGuidePhotos } from "../media/media.helpers.js";
+import { cacheGet, cacheSet, cacheDeletePattern } from "../../libs/cache.js";
 
 export async function getGuides(
     filters: GuideFilters,
@@ -18,7 +19,15 @@ export async function getGuides(
         isAvailable: filters.isAvailable ?? true,
     };
 
-    return guideRepo.findAll(effectiveFilters, page, limit);
+    const cacheKey = `guides:list:${JSON.stringify(effectiveFilters)}:p${page}:l${limit}`;
+    const cached = await cacheGet<{ guides: GuideResponse[]; total: number }>(cacheKey);
+    if (cached) {
+        return cached;
+    }
+
+    const result = await guideRepo.findAll(effectiveFilters, page, limit);
+    await cacheSet(cacheKey, result, 300);
+    return result;
 }
 
 export async function getGuideById(id: string): Promise<GuideResponse> {
@@ -72,6 +81,10 @@ export async function updateGuide(
         await guideRepo.setLocations(id, data.locationIds);
     }
 
+    // Invalidate list cache
+    cacheDeletePattern("guides:list:*").catch(() => {});
+    cacheDeletePattern("search:*").catch(() => {});
+
     // Return updated guide
     return getGuideById(id);
 }
@@ -97,4 +110,8 @@ export async function deleteGuide(
     await deleteGuidePhotos(id);
 
     await guideRepo.deleteGuide(id);
+
+    // Invalidate list cache
+    cacheDeletePattern("guides:list:*").catch(() => {});
+    cacheDeletePattern("search:*").catch(() => {});
 }

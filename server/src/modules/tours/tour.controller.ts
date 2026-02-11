@@ -135,6 +135,8 @@ export async function listAllToursHandler(
     maxDuration,
     maxPeople,
     isFeatured,
+    dateFrom,
+    dateTo,
     sortBy,
   } = parsed.data;
 
@@ -151,6 +153,8 @@ export async function listAllToursHandler(
     maxDuration,
     maxPeople,
     isFeatured,
+    dateFrom,
+    dateTo,
     sortBy,
   };
 

@@ -15,6 +15,7 @@ import {
 } from "./blog.repo.js";
 import { NotFoundError, ForbiddenError } from "../../libs/errors.js";
 import { deleteAllMediaForEntity } from "../media/media.service.js";
+import { cacheGet, cacheSet, cacheDelete, cacheDeletePattern } from "../../libs/cache.js";
 
 function assertAdminRole(currentUser: JwtUser): void {
   if (!currentUser.roles.includes("ADMIN")) {
@@ -34,7 +35,12 @@ export async function createBlogForAdmin(
   data: CreateBlogData
 ): Promise<SafeBlogPost> {
   assertAdminRole(currentUser);
-  return createBlogPost(currentUser.id, data);
+  const post = await createBlogPost(currentUser.id, data);
+
+  // Invalidate list caches
+  cacheDeletePattern("blog:list:*").catch(() => {});
+
+  return post;
 }
 
 export async function updateBlogForAdmin(
@@ -57,6 +63,11 @@ export async function updateBlogForAdmin(
     throw new NotFoundError("Blog post not found", "BLOG_NOT_FOUND");
   }
 
+  // Invalidate caches
+  cacheDelete(`blog:detail:${id}`).catch(() => {});
+  if (existing.slug) cacheDelete(`blog:detail:${existing.slug}`).catch(() => {});
+  cacheDeletePattern("blog:list:*").catch(() => {});
+
   return updated;
 }
 
@@ -78,6 +89,11 @@ export async function deleteBlogForAdmin(
   if (!deleted) {
     throw new NotFoundError("Blog post not found", "BLOG_NOT_FOUND");
   }
+
+  // Invalidate caches
+  cacheDelete(`blog:detail:${id}`).catch(() => {});
+  if (existing.slug) cacheDelete(`blog:detail:${existing.slug}`).catch(() => {});
+  cacheDeletePattern("blog:list:*").catch(() => {});
 
   return deleted;
 }
@@ -107,6 +123,16 @@ export async function listMyBlogs(
 export async function getBlogByIdOrSlugPublic(
   idOrSlug: string
 ): Promise<SafeBlogPost | null> {
+  const cacheKey = `blog:detail:${idOrSlug}`;
+
+  // Try cache first
+  const cached = await cacheGet<SafeBlogPost>(cacheKey);
+  if (cached) {
+    // Still increment view count even on cache hit
+    incrementViewCount(cached.id);
+    return cached;
+  }
+
   // Try slug first (more common for public access)
   let post = await getBlogPostBySlug(idOrSlug);
 
@@ -119,6 +145,9 @@ export async function getBlogByIdOrSlugPublic(
     return null;
   }
 
+  // Cache the result (10 min TTL — content rarely changes)
+  await cacheSet(cacheKey, post, 600);
+
   // Increment view count (fire and forget)
   incrementViewCount(post.id);
 
@@ -130,11 +159,24 @@ export async function listPublishedBlogs(
   limit: number,
   filters?: BlogFilters
 ): Promise<{ items: SafeBlogPost[]; totalItems: number }> {
+  const cacheKey = `blog:list:${JSON.stringify(filters || {})}:p${page}:l${limit}`;
+
+  // Try cache first
+  const cached = await cacheGet<{ items: SafeBlogPost[]; totalItems: number }>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const offset = (page - 1) * limit;
   const items = await listPublishedBlogPosts(offset, limit, filters);
   const totalItems = await countPublishedBlogPosts(filters);
 
-  return { items, totalItems };
+  const result = { items, totalItems };
+
+  // Cache the result
+  await cacheSet(cacheKey, result, 300);
+
+  return result;
 }
 
 export async function getRelatedBlogs(

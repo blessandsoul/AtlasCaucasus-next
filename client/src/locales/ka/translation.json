@@ -51,7 +51,9 @@
     "guide": "გიდი",
     "driver": "მძღოლი",
     "company": "კომპანია",
-    "tour": "ტური"
+    "tour": "ტური",
+    "next": "შემდეგი",
+    "go_back": "უკან დაბრუნება"
   },
   "header": {
     "nav": {
@@ -332,14 +334,14 @@
       "guides_subtitle": "აღმოაჩინე საქართველო ადგილობრივებთან ერთად"
     },
     "filters": {
-      "title": "ტურის ფილტრები",
+      "title": "ფილტრები",
       "sorting": "სორტირება",
       "select_order": "აირჩიეთ თანმიმდევრობა",
       "sort_price_low_high": "ფასი: დაბალიდან მაღლამდე",
       "sort_price_high_low": "ფასი: მაღლიდან დაბლამდე",
       "sort_rating": "რეიტინგი",
       "search": "ძიება",
-      "search_placeholder": "მოძებნეთ ტურები...",
+      "search_placeholder": "მოძებნეთ...",
       "category": "კატეგორია",
       "category_placeholder": "მაგ., თავგადასავალი, კულტურული",
       "location": "ლოკაცია",
@@ -383,7 +385,9 @@
       "vehicle_type": "ტრანსპორტის ტიპი",
       "any_vehicle": "ნებისმიერი",
       "min_capacity": "მინ. ტევადობა",
-      "min_seats": "მინ. ადგილები"
+      "min_seats": "მინ. ადგილები",
+      "clear_all": "გასუფთავება",
+      "active_filters": "აქტიური ფილტრები"
     },
     "tabs": {
       "select_category": "აირჩიეთ კატეგორია",
@@ -1360,7 +1364,20 @@
     "add_to_calendar": "კალენდარში დამატება",
     "google_calendar": "Google Calendar",
     "outlook_calendar": "Outlook Calendar",
-    "download_ics": ".ics ფაილის ჩამოტვირთვა"
+    "download_ics": ".ics ფაილის ჩამოტვირთვა",
+    "book_tour": "ტურის დაჯავშნა",
+    "step_date": "თარიღის არჩევა",
+    "step_guests": "სტუმრები",
+    "step_confirm": "დადასტურება",
+    "date_label": "თარიღი",
+    "guests_label": "სტუმრები",
+    "price_per_person": "ფასი ადამიანზე",
+    "total": "ჯამი",
+    "notes_label": "სპეციალური მოთხოვნები ან შენიშვნები (არასავალდებულო)",
+    "notes_placeholder": "ნებისმიერი სპეციალური მოთხოვნა პროვაიდერისთვის...",
+    "phone_optional": "საკონტაქტო ტელეფონი (არასავალდებულო)",
+    "confirm_info": "დადასტურების შემდეგ, ტურის პროვაიდერი განიხილავს თქვენს ჯავშნის მოთხოვნას. შეტყობინებას მიიღებთ მათი პასუხის შესახებ.",
+    "confirm_booking": "ჯავშნის დადასტურება"
   },
   "tour_card": {
     "new": "ახალი",

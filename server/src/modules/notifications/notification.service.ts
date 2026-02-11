@@ -218,6 +218,95 @@ export class NotificationService {
             message: `Your ${profileType} profile has been verified and is now live.`,
         });
     }
+
+    /**
+     * Helper: Notify provider of a new pending booking
+     */
+    async notifyBookingPending(
+        providerUserId: string,
+        bookingId: string,
+        customerName: string,
+        entityName: string
+    ) {
+        return this.createNotification({
+            userId: providerUserId,
+            type: NotificationType.BOOKING_REQUEST,
+            title: "New Booking Request",
+            message: `${customerName} has requested to book ${entityName}`,
+            data: { bookingId },
+        });
+    }
+
+    /**
+     * Helper: Notify customer that their booking was confirmed
+     */
+    async notifyBookingConfirmed(
+        customerUserId: string,
+        bookingId: string,
+        providerName: string,
+        entityName: string
+    ) {
+        return this.createNotification({
+            userId: customerUserId,
+            type: NotificationType.BOOKING_CONFIRMED,
+            title: "Booking Confirmed",
+            message: `${providerName} has confirmed your booking for ${entityName}`,
+            data: { bookingId },
+        });
+    }
+
+    /**
+     * Helper: Notify customer that their booking was declined
+     */
+    async notifyBookingDeclined(
+        customerUserId: string,
+        bookingId: string,
+        providerName: string,
+        entityName: string
+    ) {
+        return this.createNotification({
+            userId: customerUserId,
+            type: NotificationType.BOOKING_DECLINED,
+            title: "Booking Declined",
+            message: `${providerName} was unable to accept your booking for ${entityName}`,
+            data: { bookingId },
+        });
+    }
+
+    /**
+     * Helper: Notify provider that customer cancelled a booking
+     */
+    async notifyBookingCancelled(
+        providerUserId: string,
+        bookingId: string,
+        customerName: string,
+        entityName: string
+    ) {
+        return this.createNotification({
+            userId: providerUserId,
+            type: NotificationType.BOOKING_CANCELLED,
+            title: "Booking Cancelled",
+            message: `${customerName} has cancelled their booking for ${entityName}`,
+            data: { bookingId },
+        });
+    }
+
+    /**
+     * Helper: Notify customer that their booking is complete
+     */
+    async notifyBookingCompleted(
+        customerUserId: string,
+        bookingId: string,
+        entityName: string
+    ) {
+        return this.createNotification({
+            userId: customerUserId,
+            type: NotificationType.BOOKING_COMPLETED,
+            title: "Booking Complete",
+            message: `Your booking for ${entityName} is now complete`,
+            data: { bookingId },
+        });
+    }
 }
 
 export const notificationService = new NotificationService();

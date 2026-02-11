@@ -6,7 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { bookingService } from '../services/booking.service';
 import { getErrorMessage } from '@/lib/utils/error';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import type { BookingFilters } from '../types/booking.types';
+import type {
+    BookingFilters,
+    CreateDirectBookingInput,
+    ConfirmBookingInput,
+    DeclineBookingInput,
+} from '../types/booking.types';
 
 // Query key factory
 export const bookingKeys = {
@@ -15,6 +20,8 @@ export const bookingKeys = {
     list: (filters?: BookingFilters) => [...bookingKeys.lists(), filters] as const,
     received: () => [...bookingKeys.all, 'received'] as const,
     receivedList: (filters?: BookingFilters) => [...bookingKeys.received(), filters] as const,
+    details: () => [...bookingKeys.all, 'detail'] as const,
+    detail: (id: string) => [...bookingKeys.details(), id] as const,
 };
 
 /**
@@ -42,6 +49,79 @@ export const useReceivedBookings = (params: BookingFilters = {}) => {
         queryFn: () => bookingService.getReceivedBookings(params),
         enabled: isAuthenticated,
         staleTime: 2 * 60 * 1000,
+    });
+};
+
+/**
+ * Hook to fetch a single booking detail
+ */
+export const useBooking = (id: string) => {
+    const { isAuthenticated } = useAuth();
+
+    return useQuery({
+        queryKey: bookingKeys.detail(id),
+        queryFn: () => bookingService.getBooking(id),
+        enabled: isAuthenticated && !!id,
+        staleTime: 2 * 60 * 1000,
+    });
+};
+
+/**
+ * Hook to create a direct booking
+ */
+export const useCreateBooking = () => {
+    const { t } = useTranslation();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (data: CreateDirectBookingInput) => bookingService.createBooking(data),
+        onSuccess: () => {
+            toast.success(t('bookings.create_success', 'Booking submitted successfully'));
+            queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+        },
+        onError: (error) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+};
+
+/**
+ * Hook to confirm a booking (provider)
+ */
+export const useConfirmBooking = () => {
+    const { t } = useTranslation();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ bookingId, data }: { bookingId: string; data: ConfirmBookingInput }) =>
+            bookingService.confirmBooking(bookingId, data),
+        onSuccess: () => {
+            toast.success(t('bookings.confirm_success', 'Booking confirmed successfully'));
+            queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+        },
+        onError: (error) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+};
+
+/**
+ * Hook to decline a booking (provider)
+ */
+export const useDeclineBooking = () => {
+    const { t } = useTranslation();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ bookingId, data }: { bookingId: string; data: DeclineBookingInput }) =>
+            bookingService.declineBooking(bookingId, data),
+        onSuccess: () => {
+            toast.success(t('bookings.decline_success', 'Booking declined'));
+            queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+        },
+        onError: (error) => {
+            toast.error(getErrorMessage(error));
+        },
     });
 };
 
@@ -80,5 +160,21 @@ export const useCompleteBooking = () => {
         onError: (error) => {
             toast.error(getErrorMessage(error));
         },
+    });
+};
+
+/**
+ * Hook to check tour availability for a specific date and guest count
+ */
+export const useTourAvailability = (
+    tourId: string,
+    date: string | null,
+    guests: number,
+) => {
+    return useQuery({
+        queryKey: ['tours', 'availability', tourId, date, guests] as const,
+        queryFn: () => bookingService.checkTourAvailability(tourId, date!, guests),
+        enabled: !!tourId && !!date && guests > 0,
+        staleTime: 30 * 1000,
     });
 };

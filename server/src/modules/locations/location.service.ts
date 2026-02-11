@@ -2,6 +2,7 @@ import { ConflictError, NotFoundError } from "../../libs/errors.js";
 import * as locationRepo from "./location.repo.js";
 import type { Location } from "@prisma/client";
 import type { CreateLocationData, UpdateLocationData, LocationFilters } from "./location.types.js";
+import { cacheGet, cacheSet, cacheDeletePattern } from "../../libs/cache.js";
 
 export async function createLocation(data: CreateLocationData): Promise<Location> {
     // Check if location with same name and country already exists
@@ -17,7 +18,13 @@ export async function createLocation(data: CreateLocationData): Promise<Location
         );
     }
 
-    return locationRepo.create(data);
+    const location = await locationRepo.create(data);
+
+    // Invalidate list caches
+    cacheDeletePattern("locations:list:*").catch(() => {});
+    cacheDeletePattern("location_stats:*").catch(() => {});
+
+    return location;
 }
 
 export async function getLocations(
@@ -26,11 +33,25 @@ export async function getLocations(
     limit: number
 ): Promise<{ locations: Location[]; total: number }> {
     // For public access, only return active locations unless explicitly filtering
-    if (filters.isActive === undefined) {
-        filters.isActive = true;
+    const effectiveFilters: LocationFilters = {
+        ...filters,
+        isActive: filters.isActive ?? true,
+    };
+
+    const cacheKey = `locations:list:${JSON.stringify(effectiveFilters)}:p${page}:l${limit}`;
+
+    // Try cache first
+    const cached = await cacheGet<{ locations: Location[]; total: number }>(cacheKey);
+    if (cached) {
+        return cached;
     }
 
-    return locationRepo.findAll(filters, page, limit);
+    const result = await locationRepo.findAll(effectiveFilters, page, limit);
+
+    // Cache the result (10 min TTL — locations rarely change)
+    await cacheSet(cacheKey, result, 600);
+
+    return result;
 }
 
 export async function getLocationById(id: string): Promise<Location> {
@@ -61,7 +82,13 @@ export async function updateLocation(
         }
     }
 
-    return locationRepo.update(id, data);
+    const location = await locationRepo.update(id, data);
+
+    // Invalidate caches
+    cacheDeletePattern("locations:list:*").catch(() => {});
+    cacheDeletePattern("location_stats:*").catch(() => {});
+
+    return location;
 }
 
 export async function deleteLocation(id: string): Promise<void> {
@@ -70,4 +97,8 @@ export async function deleteLocation(id: string): Promise<void> {
 
     // Soft delete
     await locationRepo.deleteLocation(id);
+
+    // Invalidate caches
+    cacheDeletePattern("locations:list:*").catch(() => {});
+    cacheDeletePattern("location_stats:*").catch(() => {});
 }

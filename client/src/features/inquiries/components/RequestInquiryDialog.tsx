@@ -57,6 +57,8 @@ export const RequestInquiryDialog = ({
 
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [preferredDate, setPreferredDate] = useState('');
+  const [guestCount, setGuestCount] = useState('');
   const [errors, setErrors] = useState<{ subject?: string; message?: string }>(
     {}
   );
@@ -66,6 +68,8 @@ export const RequestInquiryDialog = ({
     if (open) {
       setSubject(defaultSubject);
       setMessage('');
+      setPreferredDate('');
+      setGuestCount('');
       setErrors({});
     }
   }, [open, defaultSubject]);
@@ -94,13 +98,30 @@ export const RequestInquiryDialog = ({
       return;
     }
     setErrors({});
+
+    // Append optional date/guests as structured data
+    let finalMessage = result.data.message;
+    const extras: string[] = [];
+    if (preferredDate) {
+      const formatted = new Intl.DateTimeFormat('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      }).format(new Date(preferredDate));
+      extras.push(`Preferred date: ${formatted}`);
+    }
+    if (guestCount && parseInt(guestCount, 10) > 0) {
+      extras.push(`Guests: ${guestCount}`);
+    }
+    if (extras.length > 0) {
+      finalMessage += `\n---\n${extras.join('\n')}`;
+    }
+
     mutation.mutate({
       targetType,
       targetIds: [targetId],
       subject: result.data.subject,
-      message: result.data.message,
+      message: finalMessage,
     });
-  }, [subject, message, targetType, targetId, mutation]);
+  }, [subject, message, preferredDate, guestCount, targetType, targetId, mutation]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -162,6 +183,36 @@ export const RequestInquiryDialog = ({
               <p className="text-xs text-muted-foreground">
                 {message.length}/2000
               </p>
+            </div>
+          </div>
+
+          {/* Optional date and guests fields */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="inquiry-date" className="text-sm">
+                {t('inquiry_dialog.preferred_date', 'Preferred date (optional)')}
+              </Label>
+              <Input
+                id="inquiry-date"
+                type="date"
+                value={preferredDate}
+                onChange={(e) => setPreferredDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="inquiry-guests" className="text-sm">
+                {t('inquiry_dialog.guest_count', 'Number of guests (optional)')}
+              </Label>
+              <Input
+                id="inquiry-guests"
+                type="number"
+                value={guestCount}
+                onChange={(e) => setGuestCount(e.target.value)}
+                min={1}
+                max={100}
+                placeholder="0"
+              />
             </div>
           </div>
         </div>

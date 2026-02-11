@@ -4,6 +4,8 @@
  */
 
 import { TourDifficulty } from '@prisma/client';
+import { weightedRandomLanguage, getRandomTourTitle, getRandomTourSummary, getRandomTourDescription, type SeedLanguage } from './multilingual.js';
+import { randomItem, randomInt, randomBool } from '../utils/helpers.js';
 
 export interface TourSeedData {
   title: string;
@@ -1954,3 +1956,113 @@ Duration 4 hours including 2 hours riding. Full day with wine tasting available.
 
 // Combine all tours
 export const ALL_TOURS: TourSeedData[] = [...COMPANY_TOURS, ...INDIVIDUAL_TOURS];
+
+// Location clusters for tour generation
+const TOUR_LOCATION_CLUSTERS: Record<string, number[]> = {
+  'Adventure': [2, 3, 4, 11, 12],    // Kazbegi, Mestia, Ushguli, Gudauri, Bakuriani
+  'Cultural': [0, 1, 5, 8, 15],      // Tbilisi, Mtskheta, Kutaisi, Gori, Vardzia
+  'Wine & Food': [0, 6, 7, 9, 10],   // Tbilisi, Signagi, Telavi, Kvareli, Tsinandali
+  'Nature': [14, 17, 19, 3, 4],      // Borjomi, Lagodekhi, Martvili, Mestia, Ushguli
+  'Historical': [0, 1, 5, 8, 15, 16], // Tbilisi, Mtskheta, Kutaisi, Gori, Vardzia, David Gareja
+  'City Tour': [0, 13, 5],           // Tbilisi, Batumi, Kutaisi
+  'Photography': [0, 2, 3, 6, 13],   // Tbilisi, Kazbegi, Mestia, Signagi, Batumi
+  'Hiking': [2, 3, 4, 11, 14, 17],   // Kazbegi, Mestia, Ushguli, Gudauri, Borjomi, Lagodekhi
+  'Ski & Snow': [11, 12, 2],         // Gudauri, Bakuriani, Kazbegi
+  'Beach & Coast': [13, 18, 20],     // Batumi, Kobuleti, Zugdidi
+};
+
+const CITY_BY_LOCATION: Record<number, string> = {
+  0: 'Tbilisi', 1: 'Mtskheta', 2: 'Kazbegi', 3: 'Mestia', 4: 'Ushguli',
+  5: 'Kutaisi', 6: 'Signagi', 7: 'Telavi', 8: 'Gori', 9: 'Kvareli',
+  10: 'Tsinandali', 11: 'Gudauri', 12: 'Bakuriani', 13: 'Batumi',
+  14: 'Borjomi', 15: 'Vardzia', 16: 'David Gareja', 17: 'Lagodekhi',
+  18: 'Kobuleti', 19: 'Martvili', 20: 'Zugdidi',
+};
+
+const DIFFICULTY_BY_CATEGORY: Record<string, TourDifficulty[]> = {
+  'Adventure': [TourDifficulty.moderate, TourDifficulty.challenging],
+  'Cultural': [TourDifficulty.easy, TourDifficulty.moderate],
+  'Wine & Food': [TourDifficulty.easy],
+  'Nature': [TourDifficulty.easy, TourDifficulty.moderate],
+  'Historical': [TourDifficulty.easy, TourDifficulty.moderate],
+  'City Tour': [TourDifficulty.easy],
+  'Photography': [TourDifficulty.easy, TourDifficulty.moderate],
+  'Hiking': [TourDifficulty.moderate, TourDifficulty.challenging],
+  'Ski & Snow': [TourDifficulty.moderate, TourDifficulty.challenging],
+  'Beach & Coast': [TourDifficulty.easy],
+};
+
+/**
+ * Generate additional tours for 4x data volume
+ * Creates ~150 additional tours with mixed language titles/descriptions
+ *
+ * @param totalCompanies - Total number of companies (original + generated)
+ * @param totalGuideUsers - Total number of guide-role users
+ * @param totalAgentUsers - Total number of tour-agent users
+ */
+export function generateAdditionalTours(
+  totalCompanies: number,
+  totalGuideUsers: number,
+  totalAgentUsers: number,
+): TourSeedData[] {
+  const additional: TourSeedData[] = [];
+
+  for (let i = 0; i < 150; i++) {
+    const lang = weightedRandomLanguage();
+    const category = randomItem(CATEGORIES);
+    const locationCluster = TOUR_LOCATION_CLUSTERS[category] || [0, 1, 2];
+    const numLocations = randomInt(1, Math.min(3, locationCluster.length));
+    const locationIndices = locationCluster.slice(0, numLocations);
+    const primaryLocation = locationIndices[0];
+    const city = CITY_BY_LOCATION[primaryLocation] || 'Tbilisi';
+    const difficulty = randomItem(DIFFICULTY_BY_CATEGORY[category] || [TourDifficulty.easy]);
+
+    const basePrice = randomInt(30, 500);
+    const hasDiscount = Math.random() > 0.7;
+
+    const title = getRandomTourTitle(category, lang);
+    const summary = getRandomTourSummary(lang);
+    const description = getRandomTourDescription(lang);
+
+    // 60% company tours, 25% guide tours, 15% agent tours
+    const ownerRoll = Math.random();
+    let companyIndex: number | null = null;
+    let ownerType: 'guide' | 'agent' | undefined = undefined;
+    let ownerIndex: number | undefined = undefined;
+
+    if (ownerRoll < 0.6) {
+      companyIndex = randomInt(0, totalCompanies - 1);
+    } else if (ownerRoll < 0.85) {
+      ownerType = 'guide';
+      ownerIndex = randomInt(0, totalGuideUsers - 1);
+    } else {
+      ownerType = 'agent';
+      ownerIndex = randomInt(0, totalAgentUsers - 1);
+    }
+
+    additional.push({
+      title,
+      summary,
+      description,
+      price: basePrice,
+      originalPrice: hasDiscount ? Math.round(basePrice * 1.3) : undefined,
+      currency: 'GEL',
+      city,
+      startLocation: city === 'Tbilisi' ? randomItem(['Freedom Square', 'Hotel pickup', 'Rustaveli Avenue', 'Tbilisi Central']) : 'Hotel pickup',
+      durationMinutes: randomItem([120, 180, 240, 300, 360, 480, 600, 720, 1440]),
+      maxPeople: randomItem([4, 6, 8, 10, 12, 15, 20, 25]),
+      difficulty,
+      category,
+      isActive: Math.random() > 0.08,
+      isInstantBooking: Math.random() > 0.4,
+      hasFreeCancellation: Math.random() > 0.3,
+      isFeatured: Math.random() > 0.85,
+      locationIndices,
+      companyIndex,
+      ownerType,
+      ownerIndex,
+    });
+  }
+
+  return additional;
+}

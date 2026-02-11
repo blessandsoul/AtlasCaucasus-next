@@ -45,6 +45,7 @@ export const API_ENDPOINTS = {
     RELATED: (id: string) => `/tours/${id}/related`,
     UPLOAD_IMAGE: (id: string) => `/tours/${id}/images`,
     DELETE_IMAGE: (imageId: string) => `/media/${imageId}`,
+    AVAILABILITY: (id: string) => `/tours/${id}/availability`,
   },
   COMPANIES: {
     LIST: '/companies',
@@ -98,6 +99,8 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/bookings/${id}`,
     CANCEL: (id: string) => `/bookings/${id}/cancel`,
     COMPLETE: (id: string) => `/bookings/${id}/complete`,
+    CONFIRM: (id: string) => `/bookings/${id}/confirm`,
+    DECLINE: (id: string) => `/bookings/${id}/decline`,
   },
   INQUIRIES: {
     LIST: '/inquiries',

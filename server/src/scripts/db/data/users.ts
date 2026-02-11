@@ -5,6 +5,9 @@
 
 import { UserRole } from '@prisma/client';
 
+import { weightedRandomLanguage, getRandomFullName, type SeedLanguage } from './multilingual.js';
+import { randomItem, randomPhoneNumber } from '../utils/helpers.js';
+
 export interface UserSeedData {
   email: string;
   firstName: string;
@@ -506,6 +509,129 @@ export const MULTI_ROLE_USERS: UserSeedData[] = [
     isActive: true,
   },
 ];
+
+/**
+ * Generate additional users for 4x data volume
+ * Creates ~144 additional users with EN/RU/KA names
+ */
+export function generateAdditionalUsers(): UserSeedData[] {
+  const additional: UserSeedData[] = [];
+  let counter = 0;
+
+  // 18 more COMPANY owners
+  for (let i = 0; i < 18; i++) {
+    const lang = weightedRandomLanguage();
+    const isMale = Math.random() > 0.5;
+    const { firstName, lastName } = getRandomFullName(lang, isMale);
+    additional.push({
+      email: `company${i + 7}@example.com`,
+      firstName,
+      lastName,
+      phoneNumber: randomPhoneNumber(),
+      roles: [UserRole.COMPANY],
+      emailVerified: Math.random() > 0.15,
+      isActive: Math.random() > 0.1,
+    });
+    counter++;
+  }
+
+  // 24 more TOUR_AGENT users (3 per new company roughly)
+  for (let i = 0; i < 24; i++) {
+    const lang = weightedRandomLanguage();
+    const isMale = Math.random() > 0.5;
+    const { firstName, lastName } = getRandomFullName(lang, isMale);
+    additional.push({
+      email: `agent.gen${i + 1}@example.com`,
+      firstName,
+      lastName,
+      phoneNumber: randomPhoneNumber(),
+      roles: [UserRole.TOUR_AGENT],
+      emailVerified: true,
+      isActive: true,
+      parentCompanyIndex: 6 + Math.floor(i / 3), // Spread across new companies (indices 6+)
+    });
+    counter++;
+  }
+
+  // 32 more GUIDE users
+  for (let i = 0; i < 32; i++) {
+    const lang = weightedRandomLanguage();
+    const isMale = Math.random() > 0.5;
+    const { firstName, lastName } = getRandomFullName(lang, isMale);
+    additional.push({
+      email: `guide.gen${i + 1}@example.com`,
+      firstName,
+      lastName,
+      phoneNumber: randomPhoneNumber(),
+      roles: [UserRole.GUIDE],
+      emailVerified: Math.random() > 0.1,
+      isActive: Math.random() > 0.08,
+    });
+    counter++;
+  }
+
+  // 22 more DRIVER users
+  for (let i = 0; i < 22; i++) {
+    const lang = weightedRandomLanguage();
+    const isMale = Math.random() > 0.5;
+    const { firstName, lastName } = getRandomFullName(lang, isMale);
+    additional.push({
+      email: `driver.gen${i + 1}@example.com`,
+      firstName,
+      lastName,
+      phoneNumber: randomPhoneNumber(),
+      roles: [UserRole.DRIVER],
+      emailVerified: Math.random() > 0.1,
+      isActive: Math.random() > 0.08,
+    });
+    counter++;
+  }
+
+  // 30 more TRAVELER users
+  for (let i = 0; i < 30; i++) {
+    const lang = weightedRandomLanguage();
+    const isMale = Math.random() > 0.5;
+    const { firstName, lastName } = getRandomFullName(lang, isMale);
+    additional.push({
+      email: `traveler.gen${i + 1}@example.com`,
+      firstName,
+      lastName,
+      roles: [UserRole.USER],
+      emailVerified: Math.random() > 0.15,
+      isActive: Math.random() > 0.05,
+    });
+    counter++;
+  }
+
+  // 8 more MULTI_ROLE users
+  const multiRoleCombos: [UserRole, UserRole][] = [
+    [UserRole.GUIDE, UserRole.DRIVER],
+    [UserRole.GUIDE, UserRole.DRIVER],
+    [UserRole.GUIDE, UserRole.DRIVER],
+    [UserRole.GUIDE, UserRole.DRIVER],
+    [UserRole.COMPANY, UserRole.GUIDE],
+    [UserRole.COMPANY, UserRole.GUIDE],
+    [UserRole.COMPANY, UserRole.GUIDE],
+    [UserRole.COMPANY, UserRole.GUIDE],
+  ];
+  for (let i = 0; i < multiRoleCombos.length; i++) {
+    const lang = weightedRandomLanguage();
+    const isMale = Math.random() > 0.5;
+    const { firstName, lastName } = getRandomFullName(lang, isMale);
+    additional.push({
+      email: `multi.gen${i + 1}@example.com`,
+      firstName,
+      lastName,
+      phoneNumber: randomPhoneNumber(),
+      roles: multiRoleCombos[i],
+      emailVerified: true,
+      isActive: true,
+    });
+    counter++;
+  }
+
+  return additional;
+}
 
 // Combine all users
 export const ALL_USERS: UserSeedData[] = [

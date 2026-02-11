@@ -9,6 +9,7 @@ import { prisma } from "../../libs/prisma.js";
 import { notificationService } from "../notifications/notification.service.js";
 import { logger } from "../../libs/logger.js";
 import { CreateReviewData, UpdateReviewData } from "./review.types.js";
+import { cacheGet, cacheSet, cacheDelete, cacheDeletePattern } from "../../libs/cache.js";
 
 export class ReviewService {
     /**
@@ -53,6 +54,9 @@ export class ReviewService {
             data.rating
         );
 
+        // Invalidate review caches + entity detail cache (rating changed)
+        this.invalidateReviewCaches(data.targetType, data.targetId);
+
         logger.info(
             { reviewId: review.id, targetType: data.targetType, targetId: data.targetId },
             "Review created"
@@ -74,7 +78,15 @@ export class ReviewService {
         // Verify target exists
         await this.verifyTargetExists(targetType, targetId);
 
-        return reviewRepo.findByTarget(targetType, targetId, page, limit, rating);
+        const cacheKey = `reviews:list:${targetType}:${targetId}:r${rating || "all"}:p${page}:l${limit}`;
+        const cached = await cacheGet(cacheKey);
+        if (cached) return cached;
+
+        const result = await reviewRepo.findByTarget(targetType, targetId, page, limit, rating);
+
+        await cacheSet(cacheKey, result, 300);
+
+        return result;
     }
 
     /**
@@ -84,7 +96,15 @@ export class ReviewService {
         // Verify target exists
         await this.verifyTargetExists(targetType, targetId);
 
-        return reviewRepo.getStats(targetType, targetId);
+        const cacheKey = `reviews:stats:${targetType}:${targetId}`;
+        const cached = await cacheGet(cacheKey);
+        if (cached) return cached;
+
+        const stats = await reviewRepo.getStats(targetType, targetId);
+
+        await cacheSet(cacheKey, stats, 300);
+
+        return stats;
     }
 
     /**
@@ -130,6 +150,9 @@ export class ReviewService {
             await this.recalculateRating(review.targetType, review.targetId);
         }
 
+        // Invalidate review caches + entity detail cache
+        this.invalidateReviewCaches(review.targetType, review.targetId);
+
         logger.info({ reviewId }, "Review updated");
 
         return updated;
@@ -159,6 +182,9 @@ export class ReviewService {
 
         // Recalculate rating
         await this.recalculateRating(targetType, targetId);
+
+        // Invalidate review caches + entity detail cache
+        this.invalidateReviewCaches(targetType, targetId);
 
         logger.info({ reviewId }, "Review deleted");
     }
@@ -212,6 +238,25 @@ export class ReviewService {
             { targetType, targetId, averageRating: stats.averageRating, reviewCount: stats.reviewCount },
             "Rating recalculated"
         );
+    }
+
+    /**
+     * Invalidate all caches affected by a review change.
+     */
+    private invalidateReviewCaches(targetType: ReviewTargetType, targetId: string): void {
+        // Review list and stats for this target
+        cacheDeletePattern(`reviews:list:${targetType}:${targetId}:*`).catch(() => {});
+        cacheDelete(`reviews:stats:${targetType}:${targetId}`).catch(() => {});
+
+        // Entity detail cache (rating changed)
+        const entityPrefix = targetType === "TOUR" ? "tours" : targetType === "GUIDE" ? "guides" : targetType === "DRIVER" ? "drivers" : "companies";
+        cacheDelete(`${entityPrefix}:detail:${targetId}`).catch(() => {});
+
+        // List caches for affected entity type (rating sort may change ordering)
+        cacheDeletePattern(`${entityPrefix}:list:*`).catch(() => {});
+
+        // Search results may be sorted by rating
+        cacheDeletePattern("search:*").catch(() => {});
     }
 
     /**

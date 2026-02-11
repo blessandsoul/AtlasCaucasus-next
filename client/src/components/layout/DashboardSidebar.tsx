@@ -96,8 +96,8 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                             <SidebarItem
                                 icon={CalendarCheck}
                                 label={t('dashboard.menu.bookings')}
-                                href={ROUTES.BOOKINGS}
-                                isActive={pathname === ROUTES.BOOKINGS}
+                                href={ROUTES.BOOKINGS.ROOT}
+                                isActive={pathname === ROUTES.BOOKINGS.ROOT}
                                 onClick={onItemClick}
                             />
                             <SidebarItem

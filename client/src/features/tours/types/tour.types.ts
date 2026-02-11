@@ -61,6 +61,8 @@ export interface TourFilters {
     maxDuration?: number;
     maxPeople?: number;
     isFeatured?: boolean;
+    dateFrom?: string;
+    dateTo?: string;
     sortBy?: 'newest' | 'rating' | 'price' | 'price_desc';
     page?: number;
     limit?: number;

@@ -7,6 +7,7 @@ import { ExploreHero } from '@/features/explore/components/ExploreHero';
 import { EntityTypeTabs, type EntityType } from '@/features/explore/components/EntityTypeTabs';
 import { ExploreFilters } from '@/features/explore/components/ExploreFilters';
 import { ExploreMobileFilters } from '@/features/explore/components/ExploreMobileFilters';
+import { ActiveFilterChips } from '@/features/explore/components/ActiveFilterChips';
 
 /**
  * ExploreLayoutContent - Inner component that uses useSearchParams
@@ -52,6 +53,11 @@ function ExploreLayoutContent({
                 {/* Mobile Filters Trigger (Visible below XL) */}
                 <div className="xl:hidden mb-6">
                     <ExploreMobileFilters type={currentType} />
+                </div>
+
+                {/* Active Filter Chips */}
+                <div className="mb-4">
+                    <ActiveFilterChips type={currentType} />
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 items-start">

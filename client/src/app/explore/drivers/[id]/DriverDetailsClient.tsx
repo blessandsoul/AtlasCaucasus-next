@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
@@ -13,6 +13,7 @@ import { RequestInquiryDialog } from '@/features/inquiries/components/RequestInq
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useTrackView } from '@/features/analytics/hooks/useAnalytics';
 import { isValidUuid } from '@/lib/utils/validation';
 import { getMediaUrl } from '@/lib/utils/media';
 
@@ -23,10 +24,19 @@ export function DriverDetailsClient(): React.ReactElement {
   const id = params.id as string;
   const { isAuthenticated } = useAuth();
   const [inquiryOpen, setInquiryOpen] = useState(false);
+  const trackView = useTrackView();
+  const viewTracked = useRef(false);
 
   // Validate UUID format before making API call
   const isValidId = isValidUuid(id);
   const { data: driver, isLoading, error } = useDriver(isValidId ? id : '');
+
+  useEffect(() => {
+    if (driver && !viewTracked.current) {
+      viewTracked.current = true;
+      trackView.mutate({ entityType: 'DRIVER', entityId: driver.id });
+    }
+  }, [driver]);
 
   if (isLoading) {
     return (

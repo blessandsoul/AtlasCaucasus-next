@@ -7,6 +7,7 @@ import { logger } from "../../libs/logger.js";
 import { sendInquiryReceivedEmail, sendInquiryResponseEmail, sendBookingConfirmedEmail } from "../../libs/email.js";
 import { CreateInquiryData, InquiryFilters, InquiryWithResponses } from "./inquiry.types.js";
 import { bookingService } from "../bookings/booking.service.js";
+import { bookingRepo, lookupEntityInfo } from "../bookings/booking.repo.js";
 
 export class InquiryService {
     /**
@@ -405,6 +406,7 @@ export class InquiryService {
 
     /**
      * Auto-create a booking when an inquiry is accepted
+     * Now populates entityName, entityImage, providerUserId, providerName, and referenceNumber
      */
     private async createBookingFromInquiry(
         inquiry: { id: string; userId: string; targetType: InquiryTargetType; targetIds: string },
@@ -431,13 +433,19 @@ export class InquiryService {
             return; // COMPANY inquiries don't auto-create bookings
         }
 
-        // Create a booking for each target entity
+        // Create a booking for each target entity with full entity info
         for (const entityId of parsedTargetIds) {
-            await bookingService.createBooking({
+            const entityInfo = await lookupEntityInfo(bookingEntityType, entityId);
+
+            await bookingRepo.createFromInquiry({
                 userId: inquiry.userId,
                 entityType: bookingEntityType as "TOUR" | "GUIDE" | "DRIVER",
                 entityId,
                 inquiryId: inquiry.id,
+                entityName: entityInfo.entityName,
+                entityImage: entityInfo.entityImage,
+                providerUserId: entityInfo.providerUserId,
+                providerName: entityInfo.providerName,
             });
         }
 
@@ -465,7 +473,7 @@ export class InquiryService {
         // Send notification
         await notificationService.createNotification({
             userId: inquiry.userId,
-            type: NotificationType.BOOKING_REQUEST,
+            type: NotificationType.BOOKING_CONFIRMED,
             title: "Booking Confirmed",
             message: `Your booking with ${recipientName} has been confirmed!`,
             data: { inquiryId: inquiry.id, entityType: bookingEntityType },

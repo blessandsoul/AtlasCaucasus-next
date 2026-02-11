@@ -222,14 +222,14 @@
       "viewing": "просматривают"
     },
     "filters": {
-      "title": "Фильтры туров",
+      "title": "Фильтры",
       "sorting": "СОРТИРОВКА",
       "select_order": "Выберите порядок",
       "sort_price_low_high": "Цена: от низкой к высокой",
       "sort_price_high_low": "Цена: от высокой к низкой",
       "sort_rating": "Рейтинг",
       "search": "Поиск",
-      "search_placeholder": "Поиск туров...",
+      "search_placeholder": "Поиск...",
       "category": "Категория",
       "category_placeholder": "напр., Приключения, Культурные",
       "location": "Локация",
@@ -244,7 +244,9 @@
       "hotel_class": "Класс отеля",
       "meals": "Питание",
       "amenities": "Удобства",
-      "coming_soon": "Скоро..."
+      "coming_soon": "Скоро...",
+      "clear_all": "Очистить все",
+      "active_filters": "Активные фильтры"
     },
     "tabs": {
       "tours": "Туры",

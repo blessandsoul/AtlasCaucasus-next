@@ -2,6 +2,7 @@ import { favoriteRepo } from "./favorite.repo.js";
 import { ConflictError, NotFoundError } from "../../libs/errors.js";
 import { logger } from "../../libs/logger.js";
 import type { FavoriteEntityType, FavoriteFilters } from "./favorite.types.js";
+import { cacheGet, cacheSet, cacheDelete } from "../../libs/cache.js";
 
 export class FavoriteService {
     /**
@@ -15,6 +16,10 @@ export class FavoriteService {
         }
 
         const favorite = await favoriteRepo.create({ userId, entityType, entityId });
+
+        // Invalidate check cache
+        cacheDelete(`favorites:check:${userId}:${entityType}:${entityId}`).catch(() => {});
+
         logger.info({ userId, entityType, entityId }, "Favorite added");
         return favorite;
     }
@@ -29,6 +34,10 @@ export class FavoriteService {
         }
 
         await favoriteRepo.remove(userId, entityType, entityId);
+
+        // Invalidate check cache
+        cacheDelete(`favorites:check:${userId}:${entityType}:${entityId}`).catch(() => {});
+
         logger.info({ userId, entityType, entityId }, "Favorite removed");
     }
 
@@ -44,7 +53,15 @@ export class FavoriteService {
      * Check if a specific entity is favorited
      */
     async checkFavorite(userId: string, entityType: FavoriteEntityType, entityId: string): Promise<boolean> {
-        return favoriteRepo.exists(userId, entityType, entityId);
+        const cacheKey = `favorites:check:${userId}:${entityType}:${entityId}`;
+        const cached = await cacheGet<boolean>(cacheKey);
+        if (cached !== null) return cached;
+
+        const result = await favoriteRepo.exists(userId, entityType, entityId);
+
+        await cacheSet(cacheKey, result, 300);
+
+        return result;
     }
 
     /**

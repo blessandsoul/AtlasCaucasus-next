@@ -14,6 +14,25 @@ export interface CreateBookingData {
     notes?: string;
 }
 
+export interface CreateDirectBookingData {
+    userId: string;
+    entityType: BookingEntityType;
+    entityId: string;
+    date: Date;
+    guests: number;
+    notes?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+}
+
+export interface ConfirmBookingData {
+    providerNotes?: string;
+}
+
+export interface DeclineBookingData {
+    declinedReason: string;
+}
+
 export interface BookingFilters {
     status?: BookingStatus;
     entityType?: BookingEntityType;
@@ -34,10 +53,28 @@ export interface BookingWithUser {
     createdAt: Date;
     updatedAt: Date;
     cancelledAt: Date | null;
+    providerNotes: string | null;
+    confirmedAt: Date | null;
+    declinedAt: Date | null;
+    declinedReason: string | null;
+    completedAt: Date | null;
+    entityName: string | null;
+    entityImage: string | null;
+    providerUserId: string | null;
+    providerName: string | null;
+    contactPhone: string | null;
+    contactEmail: string | null;
+    referenceNumber: string | null;
     user: {
         id: string;
         firstName: string;
         lastName: string;
         email: string;
     };
+}
+
+export interface AvailabilityResult {
+    available: boolean;
+    remainingSpots: number;
+    reason?: string;
 }

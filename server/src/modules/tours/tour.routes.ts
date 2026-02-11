@@ -9,6 +9,7 @@ import {
   listAllToursHandler,
   getRelatedToursHandler,
 } from "./tour.controller.js";
+import { bookingController } from "../bookings/booking.controller.js";
 
 interface IdParams {
   id: string;
@@ -35,4 +36,18 @@ export async function tourRoutes(fastify: FastifyInstance): Promise<void> {
 
   // Auth required: soft delete a tour (owner or admin)
   fastify.delete<{ Params: IdParams }>("/tours/:id", { preHandler: [authGuard] }, deleteTourHandler);
+
+  // Public: check tour availability for a date and guest count
+  fastify.get<{ Params: IdParams }>(
+    "/tours/:id/availability",
+    {
+      config: {
+        rateLimit: {
+          max: 60,
+          timeWindow: "1 minute",
+        },
+      },
+    },
+    bookingController.checkAvailability.bind(bookingController)
+  );
 }

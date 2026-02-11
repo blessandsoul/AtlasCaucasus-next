@@ -14,6 +14,7 @@
     "db:logs": "docker compose logs -f",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:reset": "prisma migrate reset --force",
     "prisma:seed": "tsx src/scripts/db/seed.ts",
@@ -35,7 +36,9 @@
     "db:seed:prod": "node dist/scripts/db/seed.js",
     "db:clear:prod": "node dist/scripts/db/clear-data.js",
     "db:seed:realistic:prod": "node dist/scripts/db/seed-realistic.js",
-    "db:seed:bookings": "tsx src/scripts/db/seed-bookings.ts"
+    "db:seed:bookings": "tsx src/scripts/db/seed-bookings.ts",
+    "db:seed:all": "tsx src/scripts/db/seed-all.ts",
+    "db:reset:all": "npm run db:clear:all && npm run db:seed:all"
   },
   "prisma": {
     "seed": "tsx src/scripts/db/seed.ts"

@@ -17,7 +17,7 @@ import {
 import { NotFoundError, ForbiddenError, BadRequestError } from "../../libs/errors.js";
 import { deleteTourImages } from "../media/media.helpers.js";
 import { findById as getCompanyById } from "../companies/company.repo.js";
-import { redisClient, isRedisConnected } from "../../libs/redis.js";
+import { cacheGet, cacheSet, cacheDelete, cacheDeletePattern } from "../../libs/cache.js";
 import { logger } from "../../libs/logger.js";
 
 function assertOwnerOrAdmin(tour: SafeTour, currentUser: JwtUser): void {
@@ -53,15 +53,32 @@ export async function createTourForUser(
     }
   }
 
-  return createTour(currentUser.id, data);
+  const tour = await createTour(currentUser.id, data);
+
+  // Invalidate list caches
+  cacheDeletePattern("tours:list:*").catch(() => {});
+  cacheDeletePattern("search:*").catch(() => {});
+
+  return tour;
 }
 
 export async function getTourByIdPublic(id: string): Promise<SafeTour | null> {
+  const cacheKey = `tours:detail:${id}`;
+
+  // Try cache first
+  const cached = await cacheGet<SafeTour>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const tour = await getTourById(id);
 
   if (!tour || !tour.isActive) {
     return null;
   }
+
+  // Cache active tour
+  await cacheSet(cacheKey, tour, 300);
 
   return tour;
 }
@@ -120,6 +137,11 @@ export async function updateTourForUser(
     throw new NotFoundError("Tour not found", "TOUR_NOT_FOUND");
   }
 
+  // Invalidate caches
+  cacheDelete(`tours:detail:${id}`).catch(() => {});
+  cacheDeletePattern("tours:list:*").catch(() => {});
+  cacheDeletePattern("search:*").catch(() => {});
+
   return updated;
 }
 
@@ -144,6 +166,11 @@ export async function softDeleteTourForUser(
     throw new NotFoundError("Tour not found", "TOUR_NOT_FOUND");
   }
 
+  // Invalidate caches
+  cacheDelete(`tours:detail:${id}`).catch(() => {});
+  cacheDeletePattern("tours:list:*").catch(() => {});
+  cacheDeletePattern("search:*").catch(() => {});
+
   return deleted;
 }
 
@@ -152,12 +179,25 @@ export async function listAllToursPublic(
   limit: number,
   filters?: TourFilters
 ): Promise<{ items: SafeTour[]; totalItems: number }> {
+  const cacheKey = `tours:list:${JSON.stringify(filters || {})}:p${page}:l${limit}`;
+
+  // Try cache first
+  const cached = await cacheGet<{ items: SafeTour[]; totalItems: number }>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const offset = (page - 1) * limit;
 
   const items = await listAllActiveTours(offset, limit, filters);
   const totalItems = await countAllActiveTours(filters);
 
-  return { items, totalItems };
+  const result = { items, totalItems };
+
+  // Cache the result
+  await cacheSet(cacheKey, result, 300);
+
+  return result;
 }
 
 export async function listCompanyToursPublic(
@@ -181,15 +221,9 @@ export async function getRelatedTours(
   const CACHE_TTL = 600; // 10 minutes
 
   // Try cache first
-  if (isRedisConnected()) {
-    try {
-      const cached = await redisClient.get(CACHE_KEY);
-      if (cached) {
-        return JSON.parse(cached);
-      }
-    } catch (err) {
-      logger.warn({ err }, "Redis cache read failed for related tours");
-    }
+  const cached = await cacheGet<SafeTour[]>(CACHE_KEY);
+  if (cached) {
+    return cached;
   }
 
   // Fetch the current tour to get its category and city
@@ -201,13 +235,7 @@ export async function getRelatedTours(
   const items = await listRelatedTours(tourId, tour.category, tour.city, limit);
 
   // Cache the result
-  if (isRedisConnected()) {
-    try {
-      await redisClient.set(CACHE_KEY, JSON.stringify(items), { EX: CACHE_TTL });
-    } catch (err) {
-      logger.warn({ err }, "Redis cache write failed for related tours");
-    }
-  }
+  await cacheSet(CACHE_KEY, items, CACHE_TTL);
 
   return items;
 }

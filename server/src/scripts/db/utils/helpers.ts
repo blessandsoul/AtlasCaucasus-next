@@ -189,6 +189,30 @@ export function formatDate(date: Date): string {
 }
 
 /**
+ * Generate a booking reference number (e.g., BK-260210-A3F2)
+ */
+export function generateBookingRef(): string {
+  const date = new Date();
+  const yy = date.getFullYear().toString().slice(-2);
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const suffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `BK-${yy}${mm}${dd}-${suffix}`;
+}
+
+/**
+ * Fill a template string with variable values
+ * e.g. fillTemplate("Hello {name}!", { name: "World" }) => "Hello World!"
+ */
+export function fillTemplate(template: string, vars: Record<string, string>): string {
+  let result = template;
+  for (const [key, value] of Object.entries(vars)) {
+    result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+  }
+  return result;
+}
+
+/**
  * Create a progress logger
  */
 export function createProgressLogger(total: number, label: string) {

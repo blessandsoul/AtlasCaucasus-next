@@ -525,6 +525,325 @@ export async function sendBookingConfirmedEmail(
 }
 
 /**
+ * Send email to provider when a customer creates a direct booking
+ */
+export async function sendNewBookingRequestEmail(
+  providerEmail: string,
+  providerFirstName: string,
+  customerName: string,
+  entityName: string,
+  bookingDate: string | null,
+  guests: number | null,
+  referenceNumber: string | null
+): Promise<boolean> {
+  const dashboardUrl = `${env.FRONTEND_URL}/dashboard/bookings/received`;
+  const formattedDate = bookingDate
+    ? new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(new Date(bookingDate))
+    : "Not specified";
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Booking Request</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">New Booking Request</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${providerFirstName}!</h2>
+        <p><strong>${customerName}</strong> has requested to book <strong>${entityName}</strong>.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #667eea;">
+          ${referenceNumber ? `<p style="margin: 5px 0;"><strong>Reference:</strong> ${referenceNumber}</p>` : ""}
+          <p style="margin: 5px 0;"><strong>Date:</strong> ${formattedDate}</p>
+          ${guests ? `<p style="margin: 5px 0;"><strong>Guests:</strong> ${guests}</p>` : ""}
+        </div>
+
+        <p>Please review and respond to this booking request from your dashboard.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${dashboardUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            View Booking Request
+          </a>
+        </div>
+
+        <p style="color: #666; font-size: 14px;">
+          Responding quickly helps build trust with customers.
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${dashboardUrl}" style="color: #667eea;">${dashboardUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: providerEmail,
+    subject: `New booking request for ${entityName}`,
+    html,
+    text: `Hello ${providerFirstName}! ${customerName} has requested to book ${entityName}. Date: ${formattedDate}. ${guests ? `Guests: ${guests}.` : ""} View and respond: ${dashboardUrl}`,
+  });
+}
+
+/**
+ * Send email to customer when provider confirms a booking
+ */
+export async function sendBookingConfirmedNotificationEmail(
+  customerEmail: string,
+  customerFirstName: string,
+  providerName: string,
+  entityName: string,
+  bookingId: string,
+  referenceNumber: string | null,
+  bookingDate: string | null,
+  guests: number | null,
+  providerNotes: string | null
+): Promise<boolean> {
+  const bookingUrl = `${env.FRONTEND_URL}/dashboard/bookings/${bookingId}`;
+  const formattedDate = bookingDate
+    ? new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(new Date(bookingDate))
+    : null;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Booking Confirmed</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Booking Confirmed!</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${customerFirstName}!</h2>
+        <p>Great news! Your booking for <strong>${entityName}</strong> has been confirmed by <strong>${providerName}</strong>.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #22c55e;">
+          ${referenceNumber ? `<p style="margin: 5px 0;"><strong>Reference:</strong> ${referenceNumber}</p>` : ""}
+          ${formattedDate ? `<p style="margin: 5px 0;"><strong>Date:</strong> ${formattedDate}</p>` : ""}
+          ${guests ? `<p style="margin: 5px 0;"><strong>Guests:</strong> ${guests}</p>` : ""}
+          ${providerNotes ? `<p style="margin: 10px 0 0 0;"><strong>Note from provider:</strong></p><p style="color: #555; margin: 5px 0;">${providerNotes}</p>` : ""}
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${bookingUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            View Booking
+          </a>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${bookingUrl}" style="color: #667eea;">${bookingUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: customerEmail,
+    subject: `Booking Confirmed - ${entityName}`,
+    html,
+    text: `Hello ${customerFirstName}! Your booking for ${entityName} has been confirmed by ${providerName}. ${referenceNumber ? `Reference: ${referenceNumber}.` : ""} View booking: ${bookingUrl}`,
+  });
+}
+
+/**
+ * Send email to customer when provider declines a booking
+ */
+export async function sendBookingDeclinedEmail(
+  customerEmail: string,
+  customerFirstName: string,
+  providerName: string,
+  entityName: string,
+  declinedReason: string
+): Promise<boolean> {
+  const exploreUrl = `${env.FRONTEND_URL}/explore/tours`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Booking Update</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: #6b7280; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Booking Update</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${customerFirstName},</h2>
+        <p><strong>${providerName}</strong> was unable to accept your booking for <strong>${entityName}</strong>.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #6b7280;">
+          <p style="margin: 0; color: #555;"><strong>Reason:</strong> ${declinedReason}</p>
+        </div>
+
+        <p>Don't worry — there are many other great options available!</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${exploreUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Browse Other Tours
+          </a>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${exploreUrl}" style="color: #667eea;">${exploreUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: customerEmail,
+    subject: `Booking Update - ${entityName}`,
+    html,
+    text: `Hello ${customerFirstName}! ${providerName} was unable to accept your booking for ${entityName}. Reason: ${declinedReason}. Browse other tours: ${exploreUrl}`,
+  });
+}
+
+/**
+ * Send email to provider when customer cancels a booking
+ */
+export async function sendBookingCancelledEmail(
+  providerEmail: string,
+  providerFirstName: string,
+  customerName: string,
+  entityName: string,
+  referenceNumber: string | null,
+  bookingDate: string | null
+): Promise<boolean> {
+  const dashboardUrl = `${env.FRONTEND_URL}/dashboard/bookings/received`;
+  const formattedDate = bookingDate
+    ? new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(new Date(bookingDate))
+    : null;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Booking Cancelled</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: #ef4444; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Booking Cancelled</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${providerFirstName},</h2>
+        <p><strong>${customerName}</strong> has cancelled their booking for <strong>${entityName}</strong>.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ef4444;">
+          ${referenceNumber ? `<p style="margin: 5px 0;"><strong>Reference:</strong> ${referenceNumber}</p>` : ""}
+          ${formattedDate ? `<p style="margin: 5px 0;"><strong>Date:</strong> ${formattedDate}</p>` : ""}
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${dashboardUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            View Bookings
+          </a>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${dashboardUrl}" style="color: #667eea;">${dashboardUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: providerEmail,
+    subject: `Booking Cancelled - ${entityName}`,
+    html,
+    text: `Hello ${providerFirstName}! ${customerName} has cancelled their booking for ${entityName}. ${referenceNumber ? `Reference: ${referenceNumber}.` : ""} View bookings: ${dashboardUrl}`,
+  });
+}
+
+/**
+ * Send email to customer when provider marks booking as completed
+ */
+export async function sendBookingCompletedEmail(
+  customerEmail: string,
+  customerFirstName: string,
+  entityName: string,
+  referenceNumber: string | null,
+  entityType: string,
+  entityId: string
+): Promise<boolean> {
+  const entityPath = entityType === "TOUR" ? "tours" : entityType === "GUIDE" ? "guides" : "drivers";
+  const reviewUrl = `${env.FRONTEND_URL}/explore/${entityPath}/${entityId}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Booking Complete</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Booking Complete!</h1>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333;">Hello ${customerFirstName}!</h2>
+        <p>Your booking for <strong>${entityName}</strong> is now complete.</p>
+
+        <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #22c55e;">
+          ${referenceNumber ? `<p style="margin: 5px 0;"><strong>Reference:</strong> ${referenceNumber}</p>` : ""}
+          <p style="margin: 5px 0;">We hope you had a great experience!</p>
+        </div>
+
+        <p>Your feedback helps other travelers. Consider leaving a review!</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${reviewUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Leave a Review
+          </a>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          If the button doesn't work, copy and paste this link into your browser:<br>
+          <a href="${reviewUrl}" style="color: #667eea;">${reviewUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 11px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+          You are receiving this email because you have an account on Tourism Georgia.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: customerEmail,
+    subject: `Booking Complete - ${entityName}`,
+    html,
+    text: `Hello ${customerFirstName}! Your booking for ${entityName} is complete. ${referenceNumber ? `Reference: ${referenceNumber}.` : ""} Leave a review: ${reviewUrl}`,
+  });
+}
+
+/**
  * Send contact form submission email to admin
  */
 export async function sendContactFormEmail(

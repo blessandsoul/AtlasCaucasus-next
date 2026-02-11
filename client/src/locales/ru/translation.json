@@ -46,7 +46,9 @@
     "close": "Закрыть",
     "pagination": {
       "page_of": "Страница {{page}} из {{total}}"
-    }
+    },
+    "next": "Далее",
+    "go_back": "Назад"
   },
   "header": {
     "nav": {
@@ -335,14 +337,14 @@
       "guides_subtitle": "Открой Грузию с местными жителями"
     },
     "filters": {
-      "title": "Фильтры туров",
+      "title": "Фильтры",
       "sorting": "СОРТИРОВКА",
       "select_order": "Выберите порядок",
       "sort_price_low_high": "Цена: от низкой к высокой",
       "sort_price_high_low": "Цена: от высокой к низкой",
       "sort_rating": "Рейтинг",
       "search": "Поиск",
-      "search_placeholder": "Поиск туров...",
+      "search_placeholder": "Поиск...",
       "category": "Категория",
       "category_placeholder": "напр., Приключения, Культурные",
       "location": "Локация",
@@ -362,7 +364,9 @@
       "language_placeholder": "Английский, Грузинский...",
       "experience": "Опыт",
       "min_years": "Мин. лет",
-      "coming_soon": "Скоро..."
+      "coming_soon": "Скоро...",
+      "clear_all": "Очистить все",
+      "active_filters": "Активные фильтры"
     },
     "tabs": {
       "tours": "Туры",
@@ -568,7 +572,20 @@
     "add_to_calendar": "Добавить в календарь",
     "google_calendar": "Google Calendar",
     "outlook_calendar": "Outlook Calendar",
-    "download_ics": "Скачать .ics файл"
+    "download_ics": "Скачать .ics файл",
+    "book_tour": "Забронировать тур",
+    "step_date": "Выбор даты",
+    "step_guests": "Гости",
+    "step_confirm": "Подтверждение",
+    "date_label": "Дата",
+    "guests_label": "Гости",
+    "price_per_person": "Цена за человека",
+    "total": "Итого",
+    "notes_label": "Особые пожелания или примечания (необязательно)",
+    "notes_placeholder": "Любые особые пожелания для провайдера...",
+    "phone_optional": "Контактный телефон (необязательно)",
+    "confirm_info": "После подтверждения провайдер тура рассмотрит ваш запрос на бронирование. Вы получите уведомление, когда он ответит.",
+    "confirm_booking": "Подтвердить бронирование"
   },
   "tour_card": {
     "new": "Новый",

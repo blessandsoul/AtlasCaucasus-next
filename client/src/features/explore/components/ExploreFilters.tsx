@@ -16,6 +16,7 @@ import {
     Languages,
     Car,
     Building2,
+    Calendar as CalendarIcon,
     X
 } from 'lucide-react';
 import {
@@ -34,6 +35,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import type { DateRange } from "react-day-picker";
 import { cn } from '@/lib/utils';
 import { useLocations } from '@/features/locations/hooks/useLocations';
 import type { EntityType } from './EntityTypeTabs';
@@ -75,6 +78,7 @@ export const ExploreFilters = ({ type, className }: ExploreFiltersProps) => {
     const searchParams = useSearchParams();
     const [locationOpen, setLocationOpen] = useState(false);
     const [locationSearchQuery, setLocationSearchQuery] = useState('');
+    const [datePickerOpen, setDatePickerOpen] = useState(false);
 
     // Local state for debounced inputs
     const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
@@ -165,6 +169,8 @@ export const ExploreFilters = ({ type, className }: ExploreFiltersProps) => {
     const locationId = searchParams.get('locationId') || '';
     const sortBy = searchParams.get('sortBy') || '';
     const minRating = searchParams.get('minRating') || '';
+    const dateFrom = searchParams.get('dateFrom') || '';
+    const dateTo = searchParams.get('dateTo') || '';
 
     // Tour-specific
     const difficulty = searchParams.get('difficulty') || '';
@@ -182,10 +188,10 @@ export const ExploreFilters = ({ type, className }: ExploreFiltersProps) => {
     const hasActiveFilters = useMemo(() => {
         return locationId || sortBy || minRating || localMinPrice || localMaxPrice || localSearch ||
             difficulty || localMinDuration || localMaxDuration || localMaxPeople ||
-            language || localMinExperience || vehicleType || localMinCapacity || hasActiveTours;
+            language || localMinExperience || vehicleType || localMinCapacity || hasActiveTours || dateFrom || dateTo;
     }, [locationId, sortBy, minRating, localMinPrice, localMaxPrice, localSearch, difficulty,
         localMinDuration, localMaxDuration, localMaxPeople, language, localMinExperience, vehicleType,
-        localMinCapacity, hasActiveTours]);
+        localMinCapacity, hasActiveTours, dateFrom, dateTo]);
 
     // Get locations and filter by search query
     const locations = locationsData?.items || [];
@@ -304,7 +310,7 @@ export const ExploreFilters = ({ type, className }: ExploreFiltersProps) => {
                         className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     >
                         <X className="h-3 w-3 mr-1" />
-                        Clear
+                        {t('explore_page.filters.clear_all', 'Clear all')}
                     </Button>
                 )}
             </div>
@@ -443,6 +449,82 @@ export const ExploreFilters = ({ type, className }: ExploreFiltersProps) => {
                                 min="0"
                             />
                         </div>
+                    </FilterSection>
+                )}
+
+                {/* Date Range Filter - Tours only */}
+                {type === 'tours' && (
+                    <FilterSection icon={CalendarIcon} label={t('explore_page.filters.date', 'Date')}>
+                        <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                            <PopoverTrigger asChild>
+                                <button
+                                    type="button"
+                                    className={cn(
+                                        inputStyles,
+                                        "flex items-center justify-between",
+                                        !dateFrom && !dateTo && "text-gray-500 dark:text-muted-foreground"
+                                    )}
+                                >
+                                    <span className="truncate">
+                                        {dateFrom || dateTo
+                                            ? (() => {
+                                                const fmt = (d: string): string => new Date(d + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                                if (dateFrom && dateTo) return `${fmt(dateFrom)} – ${fmt(dateTo)}`;
+                                                if (dateFrom) return `${fmt(dateFrom)} –`;
+                                                return `– ${fmt(dateTo)}`;
+                                            })()
+                                            : t('explore_page.filters.any_date', 'Any date')}
+                                    </span>
+                                    {(dateFrom || dateTo) ? (
+                                        <X
+                                            className="h-4 w-4 shrink-0 opacity-50 hover:opacity-100 transition-opacity"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const qs = createQueryString({ dateFrom: null, dateTo: null });
+                                                router.push(`${pathname}?${qs}`, { scroll: false });
+                                            }}
+                                        />
+                                    ) : (
+                                        <CalendarIcon className="h-4 w-4 shrink-0 opacity-50" />
+                                    )}
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="range"
+                                    selected={
+                                        dateFrom || dateTo
+                                            ? {
+                                                from: dateFrom ? new Date(dateFrom + 'T00:00:00') : undefined,
+                                                to: dateTo ? new Date(dateTo + 'T00:00:00') : undefined,
+                                            }
+                                            : undefined
+                                    }
+                                    onSelect={(range: DateRange | undefined) => {
+                                        const toDateStr = (d: Date): string => {
+                                            const yyyy = d.getFullYear();
+                                            const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                            const dd = String(d.getDate()).padStart(2, '0');
+                                            return `${yyyy}-${mm}-${dd}`;
+                                        };
+
+                                        const newFrom = range?.from ? toDateStr(range.from) : null;
+                                        const newTo = range?.to ? toDateStr(range.to) : null;
+
+                                        const qs = createQueryString({ dateFrom: newFrom, dateTo: newTo });
+                                        router.push(`${pathname}?${qs}`, { scroll: false });
+
+                                        // Close picker once both dates are selected
+                                        if (range?.from && range?.to) {
+                                            setDatePickerOpen(false);
+                                        }
+                                    }}
+                                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                                    numberOfMonths={1}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
                     </FilterSection>
                 )}
 

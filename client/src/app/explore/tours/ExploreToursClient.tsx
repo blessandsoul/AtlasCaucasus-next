@@ -32,6 +32,8 @@ function ExploreToursContent(): React.ReactElement {
     const maxDuration = searchParams.get('maxDuration') ? Number(searchParams.get('maxDuration')) : undefined;
     const maxPeople = searchParams.get('maxPeople') ? Number(searchParams.get('maxPeople')) : undefined;
     const isFeatured = searchParams.get('isFeatured') === 'true' ? true : undefined;
+    const dateFrom = searchParams.get('dateFrom') || undefined;
+    const dateTo = searchParams.get('dateTo') || undefined;
 
     // Handler to update page in URL
     const handlePageChange = useCallback((newPage: number) => {
@@ -55,7 +57,9 @@ function ExploreToursContent(): React.ReactElement {
         minDuration,
         maxDuration,
         maxPeople,
-        isFeatured
+        isFeatured,
+        dateFrom,
+        dateTo
     });
 
     // Batch check favorites for all visible tours

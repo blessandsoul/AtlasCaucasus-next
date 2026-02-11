@@ -1,4 +1,4 @@
-export type BookingStatus = 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'DECLINED';
 export type BookingEntityType = 'TOUR' | 'GUIDE' | 'DRIVER';
 
 export interface Booking {
@@ -16,6 +16,27 @@ export interface Booking {
     createdAt: string;
     updatedAt: string;
     cancelledAt: string | null;
+
+    // Provider-facing fields
+    providerNotes: string | null;
+    confirmedAt: string | null;
+    declinedAt: string | null;
+    declinedReason: string | null;
+    completedAt: string | null;
+
+    // Denormalized entity info
+    entityName: string | null;
+    entityImage: string | null;
+    providerUserId: string | null;
+    providerName: string | null;
+
+    // Contact info
+    contactPhone: string | null;
+    contactEmail: string | null;
+
+    // Human-readable reference
+    referenceNumber: string | null;
+
     user: {
         id: string;
         firstName: string;
@@ -41,4 +62,28 @@ export interface BookingFilters {
     limit?: number;
     status?: BookingStatus;
     entityType?: BookingEntityType;
+}
+
+export interface CreateDirectBookingInput {
+    entityType: BookingEntityType;
+    entityId: string;
+    date: string;
+    guests: number;
+    notes?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+}
+
+export interface ConfirmBookingInput {
+    providerNotes?: string;
+}
+
+export interface DeclineBookingInput {
+    declinedReason: string;
+}
+
+export interface AvailabilityResult {
+    available: boolean;
+    remainingSpots: number;
+    reason?: string;
 }

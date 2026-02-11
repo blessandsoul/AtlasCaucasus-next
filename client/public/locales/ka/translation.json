@@ -315,14 +315,14 @@
       "guides_subtitle": "აღმოაჩინე საქართველო ადგილობრივებთან ერთად"
     },
     "filters": {
-      "title": "ტურის ფილტრები",
+      "title": "ფილტრები",
       "sorting": "სორტირება",
       "select_order": "აირჩიეთ თანმიმდევრობა",
       "sort_price_low_high": "ფასი: დაბალიდან მაღლამდე",
       "sort_price_high_low": "ფასი: მაღლიდან დაბლამდე",
       "sort_rating": "რეიტინგი",
       "search": "ძიება",
-      "search_placeholder": "მოძებნეთ ტურები...",
+      "search_placeholder": "მოძებნეთ...",
       "category": "კატეგორია",
       "category_placeholder": "მაგ., თავგადასავალი, კულტურული",
       "location": "ლოკაცია",
@@ -366,7 +366,9 @@
       "vehicle_type": "ტრანსპორტის ტიპი",
       "any_vehicle": "ნებისმიერი",
       "min_capacity": "მინ. ტევადობა",
-      "min_seats": "მინ. ადგილები"
+      "min_seats": "მინ. ადგილები",
+      "clear_all": "გასუფთავება",
+      "active_filters": "აქტიური ფილტრები"
     },
     "tabs": {
       "select_category": "აირჩიეთ კატეგორია",

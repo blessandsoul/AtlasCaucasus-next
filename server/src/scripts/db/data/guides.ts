@@ -1,3 +1,6 @@
+import { weightedRandomLanguage, getRandomGuideBio, type SeedLanguage } from './multilingual.js';
+import { randomItem, randomItems, randomInt, randomBool } from '../utils/helpers.js';
+
 /**
  * Guide profile data for seeding (Georgian)
  * Linked to GUIDE_USERS and MULTI_ROLE_USERS with GUIDE role
@@ -251,3 +254,63 @@ export const MULTI_ROLE_GUIDE_PROFILES: GuideSeedData[] = [
 
 // Combine all guide profiles
 export const ALL_GUIDE_PROFILES = [...GUIDE_PROFILES, ...MULTI_ROLE_GUIDE_PROFILES];
+
+// Language pools by specialty
+const LANGUAGE_POOLS: Record<string, string[][]> = {
+  en: [['en', 'ka'], ['en', 'ka', 'ru'], ['en', 'ka', 'de'], ['en', 'ka', 'fr'], ['en', 'ka', 'es']],
+  ru: [['ru', 'ka'], ['ru', 'en', 'ka'], ['ru', 'ka', 'de'], ['ru', 'en']],
+  ka: [['ka', 'en'], ['ka', 'en', 'ru'], ['ka', 'en', 'de'], ['ka', 'ru']],
+};
+
+const LOCATION_CLUSTERS: number[][] = [
+  [0, 1, 5, 8],       // Tbilisi area: Tbilisi, Mtskheta, Kutaisi, Gori
+  [6, 7, 9, 10],      // Kakheti: Signagi, Telavi, Kvareli, Tsinandali
+  [2, 11, 12],         // Mountain: Kazbegi, Gudauri, Bakuriani
+  [3, 4],              // Svaneti: Mestia, Ushguli
+  [13, 18, 19, 20],   // Coast: Batumi, Kobuleti, Martvili, Zugdidi
+  [14, 15, 16, 17],   // South: Borjomi, Vardzia, David Gareja, Lagodekhi
+  [0, 6, 13],         // Major cities
+  [0, 2, 3, 13],      // Tourist hubs
+];
+
+/**
+ * Generate additional guide profiles for 4x data volume
+ * Creates ~32 additional guides with multilingual bios
+ * userIndex starts at 48 (after all existing hardcoded users, before generated users)
+ */
+export function generateAdditionalGuideProfiles(startUserIndex: number): GuideSeedData[] {
+  const additional: GuideSeedData[] = [];
+
+  for (let i = 0; i < 32; i++) {
+    const lang = weightedRandomLanguage();
+    const years = randomInt(1, 18);
+    const cluster = randomItem(LOCATION_CLUSTERS);
+    const locationIndices = cluster.length > 4 ? cluster.slice(0, randomInt(2, 4)) : cluster;
+    const primaryLocationIndex = locationIndices[0];
+    const languages = randomItem(LANGUAGE_POOLS[lang] || LANGUAGE_POOLS.en);
+    const price = randomInt(60, 350);
+
+    const bio = getRandomGuideBio(lang, {
+      name: '',
+      years,
+      city: ['Tbilisi', 'Batumi', 'Kutaisi', 'Mestia', 'Signagi', 'Kazbegi'][primaryLocationIndex % 6] || 'Tbilisi',
+      specialty: ['cultural tours', 'wine tours', 'mountain hiking', 'photography', 'adventure sports', 'eco-tourism', 'food tours', 'historical tours'][i % 8],
+      languages: languages.join(', '),
+    });
+
+    additional.push({
+      userIndex: startUserIndex + i,
+      bio,
+      languages,
+      yearsOfExperience: years,
+      isVerified: Math.random() > 0.15,
+      isAvailable: Math.random() > 0.1,
+      pricePerDay: price,
+      currency: 'GEL',
+      locationIndices,
+      primaryLocationIndex,
+    });
+  }
+
+  return additional;
+}

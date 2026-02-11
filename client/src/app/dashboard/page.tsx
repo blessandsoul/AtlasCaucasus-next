@@ -1,6 +1,7 @@
-import { redirect } from 'next/navigation';
-import { ROUTES } from '@/lib/constants/routes';
+'use client';
 
-export default function DashboardPage() {
-    redirect(ROUTES.REVIEWS);
+import { DashboardOverview } from '@/features/dashboard/components/DashboardOverview';
+
+export default function DashboardPage(): React.ReactNode {
+    return <DashboardOverview />;
 }

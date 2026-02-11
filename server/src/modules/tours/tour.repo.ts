@@ -290,6 +290,8 @@ export interface TourFilters {
   maxDuration?: number;
   maxPeople?: number;
   isFeatured?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
   sortBy?: 'newest' | 'rating' | 'price' | 'price_desc';
 }
 
@@ -364,6 +366,92 @@ function buildTourFilters(filters?: TourFilters): Record<string, unknown> {
   // Featured filter
   if (filters?.isFeatured !== undefined) {
     where.isFeatured = filters.isFeatured;
+  }
+
+  // Date availability filter (range: dateFrom to dateTo)
+  if (filters?.dateFrom || filters?.dateTo) {
+    const rangeStart = new Date((filters.dateFrom ?? filters.dateTo!) + "T00:00:00.000Z");
+    const rangeEnd = new Date((filters.dateTo ?? filters.dateFrom!) + "T23:59:59.999Z");
+
+    // Check which days of week fall in the range to decide WEEKDAYS/WEEKENDS inclusion
+    const hasWeekday = (() => {
+      const d = new Date(rangeStart);
+      while (d <= rangeEnd) {
+        const day = d.getUTCDay();
+        if (day !== 0 && day !== 6) return true;
+        d.setUTCDate(d.getUTCDate() + 1);
+      }
+      return false;
+    })();
+    const hasWeekend = (() => {
+      const d = new Date(rangeStart);
+      while (d <= rangeEnd) {
+        const day = d.getUTCDay();
+        if (day === 0 || day === 6) return true;
+        d.setUTCDate(d.getUTCDate() + 1);
+      }
+      return false;
+    })();
+
+    const dateConditions: Record<string, unknown>[] = [
+      // Tours with nextAvailableDate within the range
+      { nextAvailableDate: { gte: rangeStart, lte: rangeEnd } },
+      // Tours available DAILY — always match
+      { availabilityType: "DAILY" },
+      // Tours BY_REQUEST — always shown (user can request any date)
+      { availabilityType: "BY_REQUEST" },
+    ];
+
+    // SPECIFIC_DATES: check if any date in the JSON array falls within the range
+    // We check each date in the range against the JSON string with contains
+    if (filters.dateFrom && filters.dateTo) {
+      const specificDateConditions: Record<string, unknown>[] = [];
+      const cursor = new Date(rangeStart);
+      // Cap iteration at 90 days to avoid excessive conditions
+      let iterations = 0;
+      while (cursor <= rangeEnd && iterations < 90) {
+        const dateStr = cursor.toISOString().split("T")[0];
+        specificDateConditions.push({ availableDates: { contains: dateStr } });
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+        iterations++;
+      }
+      if (specificDateConditions.length > 0) {
+        dateConditions.push({
+          AND: [
+            { availabilityType: "SPECIFIC_DATES" },
+            { OR: specificDateConditions },
+          ],
+        });
+      }
+    } else {
+      // Single date (only dateFrom or only dateTo)
+      const singleDate = filters.dateFrom ?? filters.dateTo!;
+      dateConditions.push({
+        AND: [
+          { availabilityType: "SPECIFIC_DATES" },
+          { availableDates: { contains: singleDate } },
+        ],
+      });
+    }
+
+    if (hasWeekend) {
+      dateConditions.push({ availabilityType: "WEEKENDS" });
+    }
+    if (hasWeekday) {
+      dateConditions.push({ availabilityType: "WEEKDAYS" });
+    }
+
+    // If we already have an OR condition (from search), combine with AND
+    if (where.OR) {
+      const existingOR = where.OR;
+      delete where.OR;
+      where.AND = [
+        { OR: existingOR as Record<string, unknown>[] },
+        { OR: dateConditions },
+      ];
+    } else {
+      where.OR = dateConditions;
+    }
   }
 
   return where;

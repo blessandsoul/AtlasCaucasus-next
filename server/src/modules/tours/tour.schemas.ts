@@ -67,6 +67,8 @@ export const listAllToursQuerySchema = z.object({
   maxDuration: z.coerce.number().int().min(0).optional(),
   maxPeople: z.coerce.number().int().min(1).optional(),
   isFeatured: z.coerce.boolean().optional(),
+  dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "dateFrom must be in YYYY-MM-DD format").optional(),
+  dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "dateTo must be in YYYY-MM-DD format").optional(),
   sortBy: z.enum(['newest', 'rating', 'price', 'price_desc']).optional(),
 });
 

@@ -7,6 +7,7 @@ import fastifyCors from "@fastify/cors";
 import fastifyCookie from "@fastify/cookie";
 import fastifyCsrf from "@fastify/csrf-protection";
 import fastifyMultipart from "@fastify/multipart";
+import { ZodError } from "zod";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { logger } from "./libs/logger.js";
@@ -226,6 +227,16 @@ function buildApp() {
         logger.warn({ err: error, requestId: request.id }, mappedError.message);
         return reply.status(mappedError.statusCode).send(errorResponse(error.code, mappedError.message));
       }
+    }
+
+    // Handle Zod validation errors (thrown by schema.parse() in controllers)
+    if (error instanceof ZodError) {
+      const firstIssue = error.issues[0];
+      const message = firstIssue
+        ? `${firstIssue.path.join(".")}: ${firstIssue.message}`
+        : "Validation failed";
+      logger.warn({ err: error, requestId: request.id }, "Validation error");
+      return reply.status(422).send(errorResponse("VALIDATION_FAILED", message));
     }
 
     // Unexpected errors - log full details, return generic message

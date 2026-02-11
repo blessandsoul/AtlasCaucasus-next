@@ -75,10 +75,10 @@ export const HeroSection = () => {
             params.set('locationId', selectedLocation.id);
         }
         if (selectedDate) {
-            params.set('date', selectedDate.toISOString().split('T')[0]);
+            params.set('dateFrom', selectedDate.toISOString().split('T')[0]);
         }
         if (guests) {
-            params.set('guests', guests);
+            params.set('maxPeople', guests);
         }
         router.push(`/explore/tours?${params.toString()}`);
     }, [router, selectedLocation, selectedDate, guests]);

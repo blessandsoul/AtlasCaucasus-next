@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
@@ -13,9 +13,12 @@ import { TourInfo } from '@/features/tours/components/TourInfo';
 import { ReviewsSection } from '@/features/reviews';
 import { RelatedTours } from '@/features/tours/components/RelatedTours';
 import { RequestInquiryDialog } from '@/features/inquiries/components/RequestInquiryDialog';
+import { DirectBookingDialog } from '@/features/bookings/components/DirectBookingDialog';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useTrackView } from '@/features/analytics/hooks/useAnalytics';
+import { getMediaUrl } from '@/lib/utils/media';
 import { isValidUuid } from '@/lib/utils/validation';
 import { useCurrency } from '@/context/CurrencyContext';
 
@@ -26,10 +29,20 @@ export function TourDetailsClient(): React.ReactElement {
   const id = params.id as string;
   const { isAuthenticated } = useAuth();
   const { formatPrice } = useCurrency();
+  const [bookingOpen, setBookingOpen] = useState(false);
   const [inquiryOpen, setInquiryOpen] = useState(false);
+  const trackView = useTrackView();
+  const viewTracked = useRef(false);
 
   const isValidId = isValidUuid(id);
   const { data: tour, isLoading, error } = useTour(isValidId ? id : '');
+
+  useEffect(() => {
+    if (tour && !viewTracked.current) {
+      viewTracked.current = true;
+      trackView.mutate({ entityType: 'TOUR', entityId: tour.id });
+    }
+  }, [tour]);
 
   if (isLoading) {
     return (
@@ -54,6 +67,15 @@ export function TourDetailsClient(): React.ReactElement {
   }
 
   const handleBook = (): void => {
+    if (!isAuthenticated) {
+      toast.error(t('inquiry_dialog.login_required'));
+      router.push(`/login?redirect=${encodeURIComponent(`/explore/tours/${id}`)}`);
+      return;
+    }
+    setBookingOpen(true);
+  };
+
+  const handleAskQuestion = (): void => {
     if (!isAuthenticated) {
       toast.error(t('inquiry_dialog.login_required'));
       router.push(`/login?redirect=${encodeURIComponent(`/explore/tours/${id}`)}`);
@@ -86,7 +108,7 @@ export function TourDetailsClient(): React.ReactElement {
         </div>
 
         <div className="lg:col-span-1">
-          <TourSidebar tour={tour} onBook={handleBook} />
+          <TourSidebar tour={tour} onBook={handleBook} onAskQuestion={handleAskQuestion} />
         </div>
       </div>
 
@@ -97,6 +119,21 @@ export function TourDetailsClient(): React.ReactElement {
       />
 
       <RelatedTours tourId={tour.id} />
+
+      <DirectBookingDialog
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+        tour={{
+          tourId: tour.id,
+          tourName: tour.title,
+          tourImage: tour.images?.[0]?.url ? getMediaUrl(tour.images[0].url) : null,
+          price: parseFloat(tour.price),
+          currency: tour.currency,
+          maxPeople: tour.maxPeople,
+          availabilityType: tour.availabilityType,
+          availableDates: tour.availableDates,
+        }}
+      />
 
       <RequestInquiryDialog
         open={inquiryOpen}

@@ -93,6 +93,13 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
             onClose();
             router.push(ROUTES.INQUIRIES.DETAILS(notification.data.inquiryId as string));
         }
+
+        // Handle redirection for BOOKING notifications
+        if (notification.data?.bookingId) {
+            const bookingId = notification.data.bookingId as string;
+            onClose();
+            router.push(ROUTES.BOOKINGS.DETAIL(bookingId));
+        }
     }, [handleMarkAsRead, onClose, dispatch, router]);
 
     const hasNotifications = groupedNotifications.length > 0;

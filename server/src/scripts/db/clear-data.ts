@@ -18,9 +18,19 @@ const prisma = new PrismaClient();
 
 // Tables in reverse dependency order (delete children before parents)
 const TABLES_TO_CLEAR = [
+  // AI & Credits (no FK deps on other seeded data)
+  'ai_generations',
+  'credit_transactions',
+  'credit_balances',
+  'ai_template_configs',
+
   // No dependencies - can delete anytime
   'audit_logs',
   'notifications',
+  'favorites',
+
+  // Blog posts
+  'blog_posts',
 
   // Bookings (depends on users, inquiries)
   'bookings',

@@ -304,14 +304,14 @@
       "drivers_subtitle": "Reliable transportation services for your journey across Georgia."
     },
     "filters": {
-      "title": "Tour Filters",
+      "title": "Filters",
       "sorting": "SORTING",
       "select_order": "Select order",
       "sort_price_low_high": "Price: Low to High",
       "sort_price_high_low": "Price: High to Low",
       "sort_rating": "Rating",
       "search": "Search",
-      "search_placeholder": "Search tours...",
+      "search_placeholder": "Search...",
       "category": "Category",
       "category_placeholder": "e.g., Adventure, Cultural",
       "location": "Location",
@@ -330,7 +330,9 @@
       "language_placeholder": "English, Georgian...",
       "experience": "Experience",
       "min_years": "Min years",
-      "coming_soon": "Coming soon..."
+      "coming_soon": "Coming soon...",
+      "clear_all": "Clear all",
+      "active_filters": "Active filters"
     },
     "tabs": {
       "tours": "Tours",

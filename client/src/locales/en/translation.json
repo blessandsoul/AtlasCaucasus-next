@@ -46,7 +46,9 @@
     "optional": "Optional",
     "create": "Create",
     "refresh": "Refresh",
-    "clear_filters": "Clear Filters"
+    "clear_filters": "Clear Filters",
+    "next": "Next",
+    "go_back": "Go Back"
   },
   "header": {
     "nav": {
@@ -332,14 +334,14 @@
       "drivers_subtitle": "Reliable transportation services for your journey across Georgia."
     },
     "filters": {
-      "title": "Tour Filters",
+      "title": "Filters",
       "sorting": "SORTING",
       "select_order": "Select order",
       "sort_price_low_high": "Price: Low to High",
       "sort_price_high_low": "Price: High to Low",
       "sort_rating": "Rating",
       "search": "Search",
-      "search_placeholder": "Search tours...",
+      "search_placeholder": "Search...",
       "category": "Category",
       "category_placeholder": "e.g., Adventure, Cultural",
       "location": "Location",
@@ -358,7 +360,9 @@
       "language_placeholder": "English, Georgian...",
       "experience": "Experience",
       "min_years": "Min years",
-      "coming_soon": "Coming soon..."
+      "coming_soon": "Coming soon...",
+      "clear_all": "Clear all",
+      "active_filters": "Active filters"
     },
     "tabs": {
       "tours": "Tours",
@@ -1247,7 +1251,20 @@
     "add_to_calendar": "Add to Calendar",
     "google_calendar": "Google Calendar",
     "outlook_calendar": "Outlook Calendar",
-    "download_ics": "Download .ics file"
+    "download_ics": "Download .ics file",
+    "book_tour": "Book Tour",
+    "step_date": "Choose Date",
+    "step_guests": "Guests",
+    "step_confirm": "Confirm",
+    "date_label": "Date",
+    "guests_label": "Guests",
+    "price_per_person": "Price per person",
+    "total": "Total",
+    "notes_label": "Special requests or notes (optional)",
+    "notes_placeholder": "Any special requests for the provider...",
+    "phone_optional": "Contact phone (optional)",
+    "confirm_info": "After you confirm, the tour provider will review your booking request. You'll be notified when they respond.",
+    "confirm_booking": "Confirm Booking"
   },
   "tour_card": {
     "new": "New",

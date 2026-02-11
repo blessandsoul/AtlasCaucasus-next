@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
     CalendarCheck, Clock, Users, XCircle, CheckCircle2,
-    Globe, Car, Compass, Sparkles,
+    Globe, Car, Compass, Sparkles, User,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,9 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { useBookings, useCancelBooking } from '@/features/bookings/hooks/useBookings';
+import { ROUTES } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
+import { getMediaUrl } from '@/lib/utils/media';
 
 import type { BookingStatus, BookingEntityType, Booking } from '@/features/bookings/types/booking.types';
 
@@ -73,6 +76,13 @@ function getStatusConfig(status: BookingStatus): {
     className: string;
 } {
     switch (status) {
+        case 'PENDING':
+            return {
+                label: 'Pending',
+                variant: 'outline',
+                icon: Clock,
+                className: 'bg-warning/10 text-warning border-warning/20',
+            };
         case 'CONFIRMED':
             return {
                 label: 'Confirmed',
@@ -93,6 +103,13 @@ function getStatusConfig(status: BookingStatus): {
                 variant: 'destructive',
                 icon: XCircle,
                 className: 'bg-destructive/10 text-destructive border-destructive/20',
+            };
+        case 'DECLINED':
+            return {
+                label: 'Declined',
+                variant: 'outline',
+                icon: XCircle,
+                className: 'bg-muted text-muted-foreground border-border',
             };
     }
 }
@@ -122,30 +139,60 @@ function BookingCard({
     isCancelling: boolean;
 }): React.ReactNode {
     const { t } = useTranslation();
+    const router = useRouter();
     const EntityIcon = getEntityIcon(booking.entityType as BookingEntityType);
+    const entityLabel = booking.entityName
+        ?? `${booking.entityType.charAt(0) + booking.entityType.slice(1).toLowerCase()} Booking`;
+
+    const handleCardClick = useCallback((): void => {
+        router.push(ROUTES.BOOKINGS.DETAIL(booking.id));
+    }, [router, booking.id]);
 
     return (
-        <div className="rounded-xl border border-border/50 bg-card p-4 sm:p-5 transition-all duration-200 hover:shadow-sm">
+        <div
+            role="button"
+            tabIndex={0}
+            onClick={handleCardClick}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCardClick(); }}
+            className="rounded-xl border border-border/50 bg-card p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
             <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                {/* Icon */}
-                <div className="p-2.5 rounded-xl bg-primary/5 shrink-0 self-start">
-                    <EntityIcon className="h-5 w-5 text-primary" />
-                </div>
+                {/* Entity image or icon */}
+                {booking.entityImage ? (
+                    <div className="h-12 w-12 rounded-xl overflow-hidden shrink-0 self-start">
+                        <img
+                            src={getMediaUrl(booking.entityImage)}
+                            alt={entityLabel}
+                            className="h-full w-full object-cover"
+                        />
+                    </div>
+                ) : (
+                    <div className="p-2.5 rounded-xl bg-primary/5 shrink-0 self-start">
+                        <EntityIcon className="h-5 w-5 text-primary" />
+                    </div>
+                )}
 
                 {/* Content */}
                 <div className="flex-1 min-w-0 space-y-3">
                     {/* Header row */}
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                         <div className="flex items-center gap-2 min-w-0">
-                            <h3 className="font-semibold truncate">
-                                {booking.entityType.charAt(0) + booking.entityType.slice(1).toLowerCase()} Booking
+                            <h3 className="font-semibold truncate text-base">
+                                {entityLabel}
                             </h3>
                             <StatusBadge status={booking.status} />
                         </div>
                     </div>
 
+                    {/* Reference number */}
+                    {booking.referenceNumber && (
+                        <p className="text-xs text-muted-foreground font-mono">
+                            {booking.referenceNumber}
+                        </p>
+                    )}
+
                     {/* Details row */}
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-base text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5">
                             <Clock className="h-3.5 w-3.5" />
                             {timeAgo(booking.createdAt)}
@@ -166,8 +213,15 @@ function BookingCard({
                         )}
 
                         {booking.totalPrice && (
-                            <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                            <span className="inline-flex items-center gap-1.5 font-bold text-foreground text-lg">
                                 {fmtPrice(booking.totalPrice, booking.currency)}
+                            </span>
+                        )}
+
+                        {booking.providerName && (
+                            <span className="inline-flex items-center gap-1.5">
+                                <User className="h-3.5 w-3.5" />
+                                {booking.providerName}
                             </span>
                         )}
                     </div>
@@ -179,12 +233,16 @@ function BookingCard({
                 </div>
 
                 {/* Actions */}
-                {(booking.status === 'CONFIRMED' || (booking.status === 'COMPLETED' && booking.date)) && (
-                    <div className="shrink-0 self-start flex flex-col gap-2">
-                        {booking.date && (
+                {(booking.status === 'CONFIRMED' || booking.status === 'PENDING' || (booking.status === 'COMPLETED' && booking.date)) && (
+                    <div
+                        className="shrink-0 self-start flex flex-col gap-2"
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                    >
+                        {booking.date && (booking.status === 'CONFIRMED' || booking.status === 'COMPLETED') && (
                             <AddToCalendar
                                 event={{
-                                    title: `${booking.entityType.charAt(0) + booking.entityType.slice(1).toLowerCase()} Booking`,
+                                    title: entityLabel,
                                     date: booking.date,
                                     description: [
                                         booking.notes,
@@ -195,7 +253,7 @@ function BookingCard({
                             />
                         )}
 
-                        {booking.status === 'CONFIRMED' && (
+                        {(booking.status === 'CONFIRMED' || booking.status === 'PENDING') && (
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button
@@ -212,14 +270,14 @@ function BookingCard({
                                     <AlertDialogHeader>
                                         <AlertDialogTitle>{t('bookings.cancel_confirm_title', 'Cancel booking?')}</AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            {t('bookings.cancel_confirm_description', 'This action cannot be undone. The provider will be notified about the cancellation.')}
+                                            {t('bookings.cancel_confirm_description', 'This will cancel your booking. The provider will be notified. You cannot undo this.')}
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>{t('common.go_back', 'Go back')}</AlertDialogCancel>
                                         <AlertDialogAction
                                             onClick={() => onCancel(booking.id)}
-                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 h-12"
                                         >
                                             {t('bookings.cancel_confirm', 'Yes, cancel booking')}
                                         </AlertDialogAction>
@@ -268,6 +326,10 @@ function EmptyState({ tab }: { tab: TabValue }): React.ReactNode {
             title: t('bookings.empty_title', 'No bookings yet'),
             description: t('bookings.empty_description', 'When a provider accepts your inquiry, a booking will be created automatically.'),
         },
+        PENDING: {
+            title: t('bookings.empty_pending', 'No pending bookings'),
+            description: t('bookings.empty_pending_desc', 'Your new booking requests will appear here.'),
+        },
         CONFIRMED: {
             title: t('bookings.empty_confirmed', 'No upcoming bookings'),
             description: t('bookings.empty_confirmed_desc', 'Your confirmed bookings will appear here.'),
@@ -280,6 +342,10 @@ function EmptyState({ tab }: { tab: TabValue }): React.ReactNode {
             title: t('bookings.empty_cancelled', 'No cancelled bookings'),
             description: t('bookings.empty_cancelled_desc', 'Any cancelled bookings will appear here.'),
         },
+        DECLINED: {
+            title: t('bookings.empty_declined', 'No declined bookings'),
+            description: t('bookings.empty_declined_desc', 'Bookings declined by providers will appear here.'),
+        },
     };
 
     const msg = messages[tab];
@@ -290,7 +356,7 @@ function EmptyState({ tab }: { tab: TabValue }): React.ReactNode {
                 <Sparkles className="h-10 w-10 text-muted-foreground/30" />
             </div>
             <h3 className="text-lg font-semibold mb-1">{msg.title}</h3>
-            <p className="text-muted-foreground text-sm max-w-sm text-center mb-6">
+            <p className="text-muted-foreground text-base max-w-sm text-center mb-6">
                 {msg.description}
             </p>
             <Link href="/explore/tours">
@@ -307,16 +373,39 @@ function EmptyState({ tab }: { tab: TabValue }): React.ReactNode {
 
 const TABS: { value: TabValue; labelKey: string; fallback: string }[] = [
     { value: 'ALL', labelKey: 'bookings.tabs.all', fallback: 'All' },
+    { value: 'PENDING', labelKey: 'bookings.tabs.pending', fallback: 'Pending' },
     { value: 'CONFIRMED', labelKey: 'bookings.tabs.confirmed', fallback: 'Upcoming' },
     { value: 'COMPLETED', labelKey: 'bookings.tabs.completed', fallback: 'Completed' },
+    { value: 'DECLINED', labelKey: 'bookings.tabs.declined', fallback: 'Declined' },
     { value: 'CANCELLED', labelKey: 'bookings.tabs.cancelled', fallback: 'Cancelled' },
 ];
 
 /* ── Page ───────────────────────────────────── */
 
+const VALID_TABS: TabValue[] = ['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'DECLINED', 'CANCELLED'];
+
+function isValidTab(value: string | null): value is TabValue {
+    return value !== null && VALID_TABS.includes(value as TabValue);
+}
+
 export default function BookingsPage(): React.ReactNode {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState<TabValue>('ALL');
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const tabParam = searchParams.get('tab');
+    const activeTab: TabValue = isValidTab(tabParam) ? tabParam : 'ALL';
+
+    const setActiveTab = useCallback((tab: TabValue): void => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (tab === 'ALL') {
+            params.delete('tab');
+        } else {
+            params.set('tab', tab);
+        }
+        const qs = params.toString();
+        router.replace(`/dashboard/bookings${qs ? `?${qs}` : ''}`, { scroll: false });
+    }, [router, searchParams]);
 
     const statusFilter = activeTab === 'ALL' ? undefined : activeTab;
     const { data, isLoading } = useBookings({
@@ -346,8 +435,9 @@ export default function BookingsPage(): React.ReactNode {
             </div>
 
             {/* Stat cards */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {([
+                    { status: 'PENDING' as const, icon: Clock, label: t('bookings.tabs.pending', 'Pending'), color: 'text-warning' },
                     { status: 'CONFIRMED' as const, icon: CalendarCheck, label: t('bookings.tabs.confirmed', 'Upcoming'), color: 'text-primary' },
                     { status: 'COMPLETED' as const, icon: CheckCircle2, label: t('bookings.tabs.completed', 'Completed'), color: 'text-success' },
                     { status: 'CANCELLED' as const, icon: XCircle, label: t('bookings.tabs.cancelled', 'Cancelled'), color: 'text-destructive' },
@@ -373,13 +463,19 @@ export default function BookingsPage(): React.ReactNode {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 border-b border-border pb-px overflow-x-auto">
+            <div
+                className="flex gap-1 border-b border-border pb-px overflow-x-auto"
+                role="tablist"
+                aria-label="Filter bookings by status"
+            >
                 {TABS.map(tab => (
                     <button
                         key={tab.value}
+                        role="tab"
+                        aria-selected={activeTab === tab.value}
                         onClick={() => setActiveTab(tab.value)}
                         className={cn(
-                            'px-4 py-2 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap',
+                            'px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap',
                             activeTab === tab.value
                                 ? 'bg-primary/10 text-primary border-b-2 border-primary -mb-px'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
@@ -391,34 +487,36 @@ export default function BookingsPage(): React.ReactNode {
             </div>
 
             {/* Content */}
-            {isLoading ? (
-                <div className="space-y-3">
-                    <BookingCardSkeleton />
-                    <BookingCardSkeleton />
-                    <BookingCardSkeleton />
-                </div>
-            ) : bookings.length === 0 ? (
-                <EmptyState tab={activeTab} />
-            ) : (
-                <div className="space-y-3">
-                    {bookings.map(booking => (
-                        <BookingCard
-                            key={booking.id}
-                            booking={booking}
-                            onCancel={handleCancel}
-                            isCancelling={cancelMutation.isPending}
-                        />
-                    ))}
-                    {totalItems > bookings.length && (
-                        <p className="text-center text-sm text-muted-foreground pt-4">
-                            {t('bookings.showing', 'Showing {{count}} of {{total}} bookings', {
-                                count: bookings.length,
-                                total: totalItems,
-                            })}
-                        </p>
-                    )}
-                </div>
-            )}
+            <div role="tabpanel">
+                {isLoading ? (
+                    <div className="space-y-3">
+                        <BookingCardSkeleton />
+                        <BookingCardSkeleton />
+                        <BookingCardSkeleton />
+                    </div>
+                ) : bookings.length === 0 ? (
+                    <EmptyState tab={activeTab} />
+                ) : (
+                    <div className="space-y-3">
+                        {bookings.map(booking => (
+                            <BookingCard
+                                key={booking.id}
+                                booking={booking}
+                                onCancel={handleCancel}
+                                isCancelling={cancelMutation.isPending}
+                            />
+                        ))}
+                        {totalItems > bookings.length && (
+                            <p className="text-center text-sm text-muted-foreground pt-4">
+                                {t('bookings.showing', 'Showing {{count}} of {{total}} bookings', {
+                                    count: bookings.length,
+                                    total: totalItems,
+                                })}
+                            </p>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

@@ -27,11 +27,12 @@ import {
 import { formatDate, formatResponseTime } from '@/lib/utils/format';
 import { cn } from '@/lib/utils';
 import { getMediaUrl } from '@/lib/utils/media';
-import { useState, useCallback, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { toast } from 'sonner';
 import { ChatButton } from '@/features/chat/components/ChatButton';
 import { RequestInquiryDialog } from '@/features/inquiries/components/RequestInquiryDialog';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useTrackView } from '@/features/analytics/hooks/useAnalytics';
 import { ShareButton } from '@/components/common/ShareButton';
 import { ImageGallery } from '@/components/common/ImageGallery';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -45,6 +46,8 @@ function CompanyDetailsContent(): React.ReactElement {
   const id = params.id as string;
   const { isAuthenticated } = useAuth();
   const [inquiryOpen, setInquiryOpen] = useState(false);
+  const trackView = useTrackView();
+  const viewTracked = useRef(false);
 
   // Validate UUID format before making API calls
   const isValidId = isValidUuid(id);
@@ -63,6 +66,13 @@ function CompanyDetailsContent(): React.ReactElement {
     }
   );
   const { data: reviewStats } = useReviewStats('COMPANY', isValidId ? id : '');
+
+  useEffect(() => {
+    if (company && !viewTracked.current) {
+      viewTracked.current = true;
+      trackView.mutate({ entityType: 'COMPANY', entityId: company.id });
+    }
+  }, [company]);
 
   const handleTabChange = useCallback(
     (tab: string) => {

@@ -1,5 +1,6 @@
 import { NotFoundError, ForbiddenError, ValidationError } from "../../libs/errors.js";
 import { verifyCompanyOwnership } from "../../libs/authorization.js";
+import { cacheGet, cacheSet, cacheDeletePattern } from "../../libs/cache.js";
 import * as companyRepo from "./company.repo.js";
 import type { CompanyResponse, UpdateCompanyData, CompanyFilters } from "./company.types.js";
 import type { UserRole } from "../users/user.types.js";
@@ -29,7 +30,19 @@ export async function getCompanies(
         isVerified: filters.isVerified ?? true,
     };
 
-    return companyRepo.findAll(effectiveFilters, page, limit);
+    // Check cache first
+    const cacheKey = `companies:list:${JSON.stringify(effectiveFilters)}:p${page}:l${limit}`;
+    const cached = await cacheGet<{ companies: CompanyResponse[]; total: number }>(cacheKey);
+    if (cached) {
+        return cached;
+    }
+
+    const result = await companyRepo.findAll(effectiveFilters, page, limit);
+
+    // Cache for 5 minutes
+    await cacheSet(cacheKey, result, 300);
+
+    return result;
 }
 
 export async function getCompanyById(id: string): Promise<CompanyResponse> {
@@ -77,6 +90,10 @@ export async function updateCompany(
 
     await companyRepo.update(id, updateData);
 
+    // Invalidate company list cache
+    cacheDeletePattern("companies:list:*").catch(() => {});
+    cacheDeletePattern("search:*").catch(() => {});
+
     // Return updated company
     return getCompanyById(id);
 }
@@ -102,6 +119,10 @@ export async function deleteCompany(
     await deleteCompanyMedia(id);
 
     await companyRepo.deleteCompany(id);
+
+    // Invalidate company list cache
+    cacheDeletePattern("companies:list:*").catch(() => {});
+    cacheDeletePattern("search:*").catch(() => {});
 }
 
 export async function getTourAgents(
