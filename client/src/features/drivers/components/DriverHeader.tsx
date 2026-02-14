@@ -18,7 +18,7 @@ import { ShareButton } from '@/components/common/ShareButton';
 import { cn } from '@/lib/utils';
 import { getMediaUrl } from '@/lib/utils/media';
 import { formatResponseTime } from '@/lib/utils/format';
-import type { Driver } from '../types/driver.types';
+import type { Driver, Location as DriverLocation } from '../types/driver.types';
 import { useCreateDirectChat } from '@/features/chat/hooks/useChats';
 import { selectChat } from '@/features/chat/store/chatSlice';
 import { useAppDispatch } from '@/store/hooks';
@@ -48,17 +48,17 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
   const photoUrl = getMediaUrl(driver.avatarUrl || driver.photoUrl);
   const rating = driver.averageRating ? parseFloat(driver.averageRating) : null;
 
-  const getLocations = (): Location[] => {
+  const getLocations = (): DriverLocation[] => {
     if (!driver.locations || driver.locations.length === 0) return [];
 
     const firstItem = driver.locations[0];
     if ('location' in firstItem && (firstItem as any).location) {
       return (driver.locations as any[])
         .filter((dl) => dl.location)
-        .map((dl) => dl.location as Location);
+        .map((dl) => dl.location as DriverLocation);
     }
 
-    return driver.locations as Location[];
+    return driver.locations as DriverLocation[];
   };
 
   const locations = getLocations();
@@ -152,7 +152,7 @@ export const DriverHeader = ({ driver, className }: DriverHeaderProps) => {
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                       <MapPin className="h-3.5 w-3.5 text-cyan-500" />
                       <span>
-                        {primaryLocation.name || primaryLocation.city}
+                        {primaryLocation.name}
                         {primaryLocation.country && `, ${primaryLocation.country}`}
                       </span>
                     </div>

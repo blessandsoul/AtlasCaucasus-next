@@ -145,7 +145,7 @@ export const DriverCard = ({ driver, className, isFavorited, onFavorite, isCompa
 
             <MapPin className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">
-              {primaryLocation?.city || 'Georgia'}
+              {primaryLocation?.name || 'Georgia'}
               {otherLocationsCount > 0 && ` +${otherLocationsCount} more`}
             </span>
           </div>

@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import {
-    CalendarCheck, Users, CheckCircle2, ArrowLeft, ArrowRight, Loader2, Info,
+    CheckCircle2, ArrowLeft, ArrowRight, Loader2, Info,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';

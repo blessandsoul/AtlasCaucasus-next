@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { Suspense, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,44 @@ function formatTagLabel(tag: string): string {
 }
 
 export default function BlogPage(): React.ReactElement {
+  return (
+    <Suspense fallback={<BlogPageSkeleton />}>
+      <BlogPageContent />
+    </Suspense>
+  );
+}
+
+function BlogPageSkeleton(): React.ReactElement {
+  return (
+    <div className="min-h-screen">
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
+        <div className="container mx-auto px-4 py-24 md:py-32 relative">
+          <div className="max-w-3xl mx-auto text-center space-y-4">
+            <Skeleton className="h-12 w-64 mx-auto" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+        </div>
+      </section>
+      <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-xl border bg-card overflow-hidden">
+              <Skeleton className="aspect-[16/10] w-full" />
+              <div className="p-5 space-y-3">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BlogPageContent(): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();

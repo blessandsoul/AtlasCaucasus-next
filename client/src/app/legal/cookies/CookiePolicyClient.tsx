@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useTranslation, Trans } from 'react-i18next';
-import React from 'react';
 
 export default function CookiePolicyClient() {
     const { t } = useTranslation();

@@ -206,7 +206,7 @@ export const DriverInfo = ({ driver, className }: DriverInfoProps) => {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted rounded-full text-sm text-muted-foreground"
                   >
                     <MapPin className="h-3.5 w-3.5" />
-                    {loc.city}
+                    {loc.name}
                   </span>
                 ))}
               </div>

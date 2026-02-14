@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import React from 'react';
 
 export default function TermsOfServiceClient() {
     const { t } = useTranslation();
