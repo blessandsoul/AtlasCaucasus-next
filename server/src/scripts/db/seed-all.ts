@@ -1,7 +1,7 @@
 /**
  * Unified Database Seeder (seed-all)
  *
- * Seeds ALL 35 database tables with ~4x the data of seed-realistic.ts.
+ * Seeds ALL 35 database tables with ~20x the data of seed-realistic.ts (5x multiplied).
  * Covers every entity: users, companies, guides, drivers, tours, itineraries,
  * reviews, chats, inquiries, bookings, favorites, media, blogs, notifications,
  * audit logs, AI credits/generations, user sessions, response times, view counts.
@@ -846,7 +846,7 @@ async function seedDrivers(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 6: TOURS (~200 total: 50 existing + ~150 generated)
+// PHASE 6: TOURS (~800 total: 50 existing + ~750 generated)
 // ============================================================================
 
 async function seedTours(): Promise<void> {
@@ -929,7 +929,7 @@ async function seedTours(): Promise<void> {
   ];
 
   let genCount = 0;
-  const targetGen = 150;
+  const targetGen = 750;
 
   for (let i = 0; i < targetGen; i++) {
     const lang = weightedRandomLanguage();
@@ -999,7 +999,7 @@ async function seedTours(): Promise<void> {
     genCount++;
   }
 
-  console.log(`  ✓ Created ${createdIds.tours.length} tours (50 hardcoded + ${genCount} generated)`);
+  console.log(`  ✓ Created ${createdIds.tours.length} tours (${createdIds.tours.length - genCount} hardcoded + ${genCount} generated)`);
 }
 
 // ============================================================================
@@ -1034,7 +1034,7 @@ async function seedItineraries(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 8: REVIEWS (~580+)
+// PHASE 8: REVIEWS (~2900+)
 // ============================================================================
 
 async function seedReviews(): Promise<void> {
@@ -1069,42 +1069,42 @@ async function seedReviews(): Promise<void> {
     reviewCount++;
   };
 
-  // Tour reviews (2-4 per tour)
+  // Tour reviews (10-20 per tour)
   for (const tourId of createdIds.tours) {
-    const numReviews = randomInt(2, 4);
+    const numReviews = randomInt(10, 20);
     const reviewers = randomItems(reviewerPool, numReviews);
     for (const userId of reviewers) {
       await createReview(userId, ReviewTargetType.TOUR, tourId);
     }
   }
 
-  // Guide reviews (2-4 per guide)
+  // Guide reviews (10-20 per guide)
   for (let i = 0; i < createdIds.guides.length; i++) {
     const guideId = createdIds.guides[i];
     const guideUserId = createdIds.guideUserIds[i];
-    const numReviews = randomInt(2, 4);
+    const numReviews = randomInt(10, 20);
     const reviewers = randomItems(reviewerPool.filter(id => id !== guideUserId), numReviews);
     for (const userId of reviewers) {
       await createReview(userId, ReviewTargetType.GUIDE, guideId);
     }
   }
 
-  // Driver reviews (1-3 per driver)
+  // Driver reviews (5-15 per driver)
   for (let i = 0; i < createdIds.drivers.length; i++) {
     const driverId = createdIds.drivers[i];
     const driverUserId = createdIds.driverUserIds[i];
-    const numReviews = randomInt(1, 3);
+    const numReviews = randomInt(5, 15);
     const reviewers = randomItems(reviewerPool.filter(id => id !== driverUserId), numReviews);
     for (const userId of reviewers) {
       await createReview(userId, ReviewTargetType.DRIVER, driverId);
     }
   }
 
-  // Company reviews (2-4 per company)
+  // Company reviews (10-20 per company)
   for (let i = 0; i < createdIds.companies.length; i++) {
     const companyId = createdIds.companies[i];
     const companyUserId = createdIds.companyUserIds[i];
-    const numReviews = randomInt(2, 4);
+    const numReviews = randomInt(10, 20);
     const reviewers = randomItems(reviewerPool.filter(id => id !== companyUserId), numReviews);
     for (const userId of reviewers) {
       await createReview(userId, ReviewTargetType.COMPANY, companyId);
@@ -1151,7 +1151,7 @@ async function updateAverageRatings(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 10: CHATS & MESSAGES (~80 chats)
+// PHASE 10: CHATS & MESSAGES (~400 chats)
 // ============================================================================
 
 async function seedChats(): Promise<void> {
@@ -1218,8 +1218,8 @@ async function seedChats(): Promise<void> {
     await createDirectChat(travelerId, companyUserId, 'company');
   }
 
-  // Additional random direct chats to fill volume (30 more)
-  for (let i = 0; i < 30; i++) {
+  // Additional random direct chats to fill volume (150 more)
+  for (let i = 0; i < 150; i++) {
     const travelerId = randomItem(travelerIds);
     const providerId = randomItem(providerIds);
     if (travelerId === providerId) continue;
@@ -1228,8 +1228,8 @@ async function seedChats(): Promise<void> {
     await createDirectChat(travelerId, providerId, isGuide ? 'guide' : 'company');
   }
 
-  // Group chats (20 chats)
-  for (let i = 0; i < 20; i++) {
+  // Group chats (100 chats)
+  for (let i = 0; i < 100; i++) {
     const memberCount = randomInt(3, 6);
     const members = randomItems(travelerIds, memberCount);
     const creatorId = members[0];
@@ -1310,7 +1310,7 @@ async function seedReadReceipts(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 12: INQUIRIES (~60)
+// PHASE 12: INQUIRIES (~300+)
 // ============================================================================
 
 async function seedInquiries(): Promise<void> {
@@ -1322,8 +1322,8 @@ async function seedInquiries(): Promise<void> {
   const travelerIds = createdIds.travelerUserIds;
   const statuses = [InquiryStatus.PENDING, InquiryStatus.RESPONDED, InquiryStatus.ACCEPTED, InquiryStatus.DECLINED];
 
-  // Tour inquiries (25)
-  for (let i = 0; i < 25; i++) {
+  // Tour inquiries (125)
+  for (let i = 0; i < 125; i++) {
     const userId = randomItem(travelerIds);
     const numTargets = randomInt(1, 3);
     const targetTourIds = randomItems(createdIds.tours, numTargets);
@@ -1407,7 +1407,7 @@ async function seedInquiries(): Promise<void> {
   }
 
   // Extra random guide inquiries for volume
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 50; i++) {
     const userId = randomItem(travelerIds);
     const targetGuideIds = randomItems(createdIds.guides, 1);
 
@@ -1487,7 +1487,7 @@ async function seedInquiries(): Promise<void> {
   }
 
   // Extra random driver inquiries for volume
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 50; i++) {
     const userId = randomItem(travelerIds);
     const targetDriverIds = randomItems(createdIds.drivers, 1);
 
@@ -1532,7 +1532,7 @@ async function seedInquiries(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 13: BOOKINGS (~100)
+// PHASE 13: BOOKINGS (~500+)
 // ============================================================================
 
 async function seedBookings(): Promise<void> {
@@ -1635,7 +1635,7 @@ async function seedBookings(): Promise<void> {
   }
 
   // Additional random tour bookings to fill volume
-  const extraTourCount = Math.max(0, 60 - ownerToTour.size);
+  const extraTourCount = Math.max(0, 300 - ownerToTour.size);
   const extraTourSample = randomItems(createdIds.tours, Math.min(extraTourCount, createdIds.tours.length));
   for (const tourId of extraTourSample) {
     const tourIdx = createdIds.tours.indexOf(tourId);
@@ -1664,11 +1664,11 @@ async function seedBookings(): Promise<void> {
     );
   }
 
-  // --- Guarantee every guide gets at least 2 bookings + extras ---
+  // --- Guarantee every guide gets at least 10 bookings + extras ---
   for (let i = 0; i < createdIds.guides.length; i++) {
     const guideId = createdIds.guides[i];
     const guideUserId = createdIds.guideUserIds[i];
-    const numBookings = randomInt(2, 4);
+    const numBookings = randomInt(10, 20);
 
     const guide = await prisma.guide.findUnique({
       where: { id: guideId },
@@ -1697,11 +1697,11 @@ async function seedBookings(): Promise<void> {
     }
   }
 
-  // --- Guarantee every driver gets at least 2 bookings + extras ---
+  // --- Guarantee every driver gets at least 10 bookings + extras ---
   for (let i = 0; i < createdIds.drivers.length; i++) {
     const driverId = createdIds.drivers[i];
     const driverUserId = createdIds.driverUserIds[i];
-    const numBookings = randomInt(2, 4);
+    const numBookings = randomInt(10, 20);
 
     const driver = await prisma.driver.findUnique({
       where: { id: driverId },
@@ -1734,7 +1734,7 @@ async function seedBookings(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 14: FAVORITES (~200+)
+// PHASE 14: FAVORITES (~1000+)
 // ============================================================================
 
 async function seedFavorites(): Promise<void> {
@@ -1767,22 +1767,22 @@ async function seedFavorites(): Promise<void> {
   }
 
   // Tour favorites
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 600; i++) {
     await addFav(randomItem(allFavUserIds), 'TOUR', randomItem(createdIds.tours));
   }
 
   // Guide favorites
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 250; i++) {
     await addFav(randomItem(allFavUserIds), 'GUIDE', randomItem(createdIds.guides));
   }
 
   // Driver favorites
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 150; i++) {
     await addFav(randomItem(allFavUserIds), 'DRIVER', randomItem(createdIds.drivers));
   }
 
   // Company favorites
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 200; i++) {
     await addFav(randomItem(allFavUserIds), 'COMPANY', randomItem(createdIds.companies));
   }
 
@@ -1790,7 +1790,7 @@ async function seedFavorites(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 15: MEDIA (~500+)
+// PHASE 15: MEDIA (~2500+)
 // ============================================================================
 
 async function seedMedia(): Promise<void> {
@@ -1973,7 +1973,7 @@ async function seedBlogPosts(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 17: NOTIFICATIONS (~800+)
+// PHASE 17: NOTIFICATIONS (~4000+)
 // ============================================================================
 
 async function seedNotifications(): Promise<void> {
@@ -1999,7 +1999,7 @@ async function seedNotifications(): Promise<void> {
 
   // Chat message notifications (from recent messages)
   const recentMessages = await prisma.chatMessage.findMany({
-    take: 80,
+    take: 400,
     orderBy: { createdAt: 'desc' },
     include: { chat: { include: { participants: true } } },
   });
@@ -2024,7 +2024,7 @@ async function seedNotifications(): Promise<void> {
   }
 
   // Inquiry notifications
-  const inquiries = await prisma.inquiry.findMany({ take: 30 });
+  const inquiries = await prisma.inquiry.findMany({ take: 150 });
   for (const inquiry of inquiries) {
     const responses = await prisma.inquiryResponse.findMany({
       where: { inquiryId: inquiry.id },
@@ -2064,7 +2064,7 @@ async function seedNotifications(): Promise<void> {
   }
 
   // Booking notifications
-  const bookings = await prisma.booking.findMany({ take: 60 });
+  const bookings = await prisma.booking.findMany({ take: 300 });
   for (const booking of bookings) {
     // Booking request to provider
     if (booking.providerUserId) {
@@ -2118,7 +2118,7 @@ async function seedNotifications(): Promise<void> {
   }
 
   // Profile verified notifications for guides
-  const verifiedGuides = await prisma.guide.findMany({ where: { isVerified: true }, take: 15, select: { userId: true } });
+  const verifiedGuides = await prisma.guide.findMany({ where: { isVerified: true }, take: 75, select: { userId: true } });
   for (const g of verifiedGuides) {
     await prisma.notification.create({
       data: {
@@ -2135,7 +2135,7 @@ async function seedNotifications(): Promise<void> {
   }
 
   // Profile verified notifications for drivers
-  const verifiedDrivers = await prisma.driver.findMany({ where: { isVerified: true }, take: 15, select: { userId: true } });
+  const verifiedDrivers = await prisma.driver.findMany({ where: { isVerified: true }, take: 75, select: { userId: true } });
   for (const d of verifiedDrivers) {
     await prisma.notification.create({
       data: {
@@ -2153,7 +2153,7 @@ async function seedNotifications(): Promise<void> {
 
   // New review notifications for all providers
   const recentReviews = await prisma.review.findMany({
-    take: 100,
+    take: 500,
     orderBy: { createdAt: 'desc' },
     select: { id: true, targetType: true, targetId: true, rating: true, createdAt: true },
   });
@@ -2193,7 +2193,7 @@ async function seedNotifications(): Promise<void> {
 }
 
 // ============================================================================
-// PHASE 18: AUDIT LOGS (~200+)
+// PHASE 18: AUDIT LOGS (~1000+)
 // ============================================================================
 
 async function seedAuditLogs(): Promise<void> {
@@ -2203,7 +2203,7 @@ async function seedAuditLogs(): Promise<void> {
   const adminId = createdIds.adminUserIds[0];
 
   // Login events for many users
-  const sampleUsers = shuffle(createdIds.userIds).slice(0, 60);
+  const sampleUsers = shuffle(createdIds.userIds).slice(0, 300);
   for (const userId of sampleUsers) {
     await prisma.auditLog.create({
       data: {
@@ -2223,7 +2223,7 @@ async function seedAuditLogs(): Promise<void> {
   }
 
   // Failed login attempts
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 75; i++) {
     await prisma.auditLog.create({
       data: {
         id: uuid(),
@@ -2243,7 +2243,7 @@ async function seedAuditLogs(): Promise<void> {
   }
 
   // Profile updates
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 150; i++) {
     const userId = randomItem(createdIds.userIds);
     await prisma.auditLog.create({
       data: {
@@ -2261,7 +2261,7 @@ async function seedAuditLogs(): Promise<void> {
   }
 
   // Tour creations
-  for (let i = 0; i < Math.min(40, createdIds.tours.length); i++) {
+  for (let i = 0; i < Math.min(200, createdIds.tours.length); i++) {
     const tourId = createdIds.tours[i];
     const ownerId = createdIds.tourOwnerIds[i];
     await prisma.auditLog.create({
@@ -2296,7 +2296,7 @@ async function seedAuditLogs(): Promise<void> {
 
   // Guide/driver verification events by admin
   if (adminId) {
-    for (let i = 0; i < Math.min(15, createdIds.guides.length); i++) {
+    for (let i = 0; i < Math.min(75, createdIds.guides.length); i++) {
       await prisma.auditLog.create({
         data: {
           id: uuid(),
@@ -2311,7 +2311,7 @@ async function seedAuditLogs(): Promise<void> {
       logCount++;
     }
 
-    for (let i = 0; i < Math.min(10, createdIds.drivers.length); i++) {
+    for (let i = 0; i < Math.min(50, createdIds.drivers.length); i++) {
       await prisma.auditLog.create({
         data: {
           id: uuid(),
@@ -2328,7 +2328,7 @@ async function seedAuditLogs(): Promise<void> {
   }
 
   // Password changes
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 50; i++) {
     const userId = randomItem(createdIds.userIds);
     await prisma.auditLog.create({
       data: {
@@ -2345,7 +2345,7 @@ async function seedAuditLogs(): Promise<void> {
   }
 
   // Email verification events
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 100; i++) {
     const userId = randomItem(createdIds.userIds);
     await prisma.auditLog.create({
       data: {
@@ -2628,8 +2628,8 @@ async function seedUserSessions(): Promise<void> {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0',
   ];
 
-  // Active sessions for ~40 users
-  const activeUsers = randomItems(createdIds.userIds, 40);
+  // Active sessions for ~200 users
+  const activeUsers = randomItems(createdIds.userIds, 200);
   for (const userId of activeUsers) {
     const numSessions = randomInt(1, 3);
     for (let i = 0; i < numSessions; i++) {
@@ -2649,8 +2649,8 @@ async function seedUserSessions(): Promise<void> {
     }
   }
 
-  // Expired/revoked sessions for ~20 users
-  const expiredUsers = randomItems(createdIds.userIds, 20);
+  // Expired/revoked sessions for ~100 users
+  const expiredUsers = randomItems(createdIds.userIds, 100);
   for (const userId of expiredUsers) {
     await prisma.userSession.create({
       data: {
@@ -2679,9 +2679,9 @@ async function main(): Promise<void> {
   console.log('╔══════════════════════════════════════════════════════════╗');
   console.log('║           UNIFIED DATABASE SEEDER (seed-all)            ║');
   console.log('║                                                         ║');
-  console.log('║   Seeds ALL 35 tables with ~4x data volume             ║');
+  console.log('║   Seeds ALL 35 tables with ~20x data volume (5x mult)  ║');
   console.log('║   ~192 users, ~32 companies, ~56 guides, ~40 drivers   ║');
-  console.log('║   ~200 tours, ~580+ reviews, ~80 chats, ~100 bookings  ║');
+  console.log('║   ~800 tours, ~2900+ reviews, ~400 chats, ~500 books   ║');
   console.log('╚══════════════════════════════════════════════════════════╝');
   console.log('');
 

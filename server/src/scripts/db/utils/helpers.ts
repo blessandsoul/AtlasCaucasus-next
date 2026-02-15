@@ -196,13 +196,15 @@ export function formatDate(date: Date): string {
 /**
  * Generate a booking reference number (e.g., BK-260210-A3F2)
  */
+let bookingRefCounter = 0;
 export function generateBookingRef(): string {
   const date = new Date();
   const yy = date.getFullYear().toString().slice(-2);
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const dd = String(date.getDate()).padStart(2, '0');
   const suffix = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `BK-${yy}${mm}${dd}-${suffix}`;
+  bookingRefCounter++;
+  return `BK-${yy}${mm}${dd}-${suffix}${bookingRefCounter}`;
 }
 
 /**
