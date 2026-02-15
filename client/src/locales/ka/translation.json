@@ -387,7 +387,9 @@
       "min_capacity": "მინ. ტევადობა",
       "min_seats": "მინ. ადგილები",
       "clear_all": "გასუფთავება",
-      "active_filters": "აქტიური ფილტრები"
+      "active_filters": "აქტიური ფილტრები",
+      "date": "თარიღი",
+      "any_date": "ნებისმიერი თარიღი"
     },
     "tabs": {
       "select_category": "აირჩიეთ კატეგორია",
@@ -776,7 +778,45 @@
   "dashboard": {
     "title": "დაფა",
     "welcome_user": "მოგესალმებით, {{name}}!",
-    "overview": "მიმოხილვა",
+    "overview": {
+      "title": "მიმოხილვა",
+      "subtitle": "თქვენს ანგარიშზე მიმდინარე მოვლენები.",
+      "stats": {
+        "bookings": "ჯავშნები",
+        "favorites": "ფავორიტები",
+        "inquiries": "შეკითხვები",
+        "reviews": "მიმოხილვები",
+        "views": "ნახვები",
+        "views_30d": "ბოლო 30 დღე: {{count}}",
+        "response_rate": "პასუხის სიხშირე",
+        "avg_rating": "საშ. რეიტინგი",
+        "review_count": "{{count}} მიმოხილვა"
+      },
+      "browse_tours_desc": "აღმოაჩინეთ ახალი ტურები",
+      "send_inquiry": "შეკითხვის გაგზავნა",
+      "send_inquiry_desc": "დაუკავშირდით პროვაიდერს",
+      "create_tour_desc": "ახალი ტურის დამატება",
+      "company_desc": "კომპანიის მართვა",
+      "create_agent_desc": "გუნდის წევრის დამატება",
+      "analytics_desc": "თქვენი სტატისტიკა",
+      "ai_desc": "კონტენტის გენერაცია AI-ით",
+      "manage_users_desc": "მომხმარებლების მართვა",
+      "manage_blog_desc": "პოსტების მართვა",
+      "become_partner_desc": "დაიწყეთ ბიზნესი",
+      "quick_actions": "სწრაფი მოქმედებები",
+      "recent_activity": "ბოლო აქტივობა",
+      "view_all": "ყველას ნახვა",
+      "no_activity": "ბოლო აქტივობა არ არის",
+      "no_activity_desc": "თქვენი ბოლო ჯავშნები აქ გამოჩნდება"
+    },
+    "sidebar": {
+      "collapse": "ჩაკეცვა",
+      "expand": "გვერდითი პანელის გაშლა"
+    },
+    "search": {
+      "placeholder": "ძიება..."
+    },
+    "back_to_site": "საიტზე დაბრუნება",
     "activity_summary": "თქვენი აქტივობის შეჯამება",
     "content_soon": "შინაარსი მალე დაემატება",
     "menu": {
@@ -993,7 +1033,8 @@
     "subtitle": "მართეთ სისტემის პარამეტრები და მონაცემები.",
     "tabs": {
       "locations": "ლოკაციები",
-      "users": "მომხმარებლები"
+      "users": "მომხმარებლები",
+      "aiTemplates": "AI შაბლონები"
     },
     "locations": {
       "title": "ლოკაციები",
@@ -1338,6 +1379,7 @@
   },
   "bookings": {
     "title": "ჩემი ჯავშნები",
+    "received_title": "მიღებული ჯავშნები",
     "description": "თვალყური ადევნეთ და მართეთ თქვენი დადასტურებული ჯავშნები.",
     "cancel": "გაუქმება",
     "cancel_success": "ჯავშანი წარმატებით გაუქმდა",

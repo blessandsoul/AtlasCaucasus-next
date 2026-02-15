@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -55,6 +56,7 @@ export const UpdateRoleDialog = ({ user, open, onOpenChange }: UpdateRoleDialogP
             <DialogContent className="sm:max-w-[400px]">
                 <DialogHeader>
                     <DialogTitle>{t('admin.users.addRole')}</DialogTitle>
+                    <DialogDescription className="sr-only">{t('admin.users.selectRolePlaceholder')}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="text-sm text-muted-foreground">

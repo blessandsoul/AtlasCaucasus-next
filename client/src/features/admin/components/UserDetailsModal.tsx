@@ -7,6 +7,7 @@ import { Building, MapPin, Car } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -52,6 +53,7 @@ export const UserDetailsModal = ({ userId, open, onOpenChange }: UserDetailsModa
             <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{t('admin.users.userDetails')}</DialogTitle>
+                    <DialogDescription className="sr-only">{t('admin.users.details.subtitle')}</DialogDescription>
                 </DialogHeader>
 
                 {isLoading ? (

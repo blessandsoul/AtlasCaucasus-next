@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -59,6 +60,7 @@ export const NewChatDialog = ({
       <DialogContent className="z-[200]">
         <DialogHeader>
           <DialogTitle>{t('chat.new_chat_title', 'Start New Chat')}</DialogTitle>
+          <DialogDescription className="sr-only">{t('chat.new_chat_title', 'Start New Chat')}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

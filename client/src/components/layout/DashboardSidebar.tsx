@@ -83,7 +83,7 @@ export const DashboardSidebar = ({ className, onItemClick }: DashboardSidebarPro
                     {/* Overview Group */}
                     <div className="px-3 py-1">
                         <h2 className="mb-2 px-0 text-xs font-semibold tracking-tight text-muted-foreground uppercase">
-                            {t('dashboard.overview')}
+                            {t('dashboard.overview.title')}
                         </h2>
                         <div className="space-y-1">
                             <SidebarItem

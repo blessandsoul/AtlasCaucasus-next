@@ -362,7 +362,9 @@
       "min_years": "Min years",
       "coming_soon": "Coming soon...",
       "clear_all": "Clear all",
-      "active_filters": "Active filters"
+      "active_filters": "Active filters",
+      "date": "Date",
+      "any_date": "Any date"
     },
     "tabs": {
       "tours": "Tours",
@@ -749,7 +751,45 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome_user": "Welcome back, {{name}}!",
-    "overview": "Overview",
+    "overview": {
+      "title": "Overview",
+      "subtitle": "Here's what's happening with your account.",
+      "stats": {
+        "bookings": "Bookings",
+        "favorites": "Favorites",
+        "inquiries": "Inquiries",
+        "reviews": "Reviews",
+        "views": "Views",
+        "views_30d": "Last 30 days: {{count}}",
+        "response_rate": "Response Rate",
+        "avg_rating": "Avg Rating",
+        "review_count": "{{count}} reviews"
+      },
+      "browse_tours_desc": "Discover new tours",
+      "send_inquiry": "Send Inquiry",
+      "send_inquiry_desc": "Contact a provider",
+      "create_tour_desc": "Add a new tour listing",
+      "company_desc": "Manage your company",
+      "create_agent_desc": "Add a team member",
+      "analytics_desc": "View your stats",
+      "ai_desc": "Generate content with AI",
+      "manage_users_desc": "Manage users",
+      "manage_blog_desc": "Manage posts",
+      "become_partner_desc": "Start your business",
+      "quick_actions": "Quick Actions",
+      "recent_activity": "Recent Activity",
+      "view_all": "View all",
+      "no_activity": "No recent activity",
+      "no_activity_desc": "Your recent bookings will appear here"
+    },
+    "sidebar": {
+      "collapse": "Collapse",
+      "expand": "Expand sidebar"
+    },
+    "search": {
+      "placeholder": "Search..."
+    },
+    "back_to_site": "Back to website",
     "activity_summary": "Your activity summary",
     "content_soon": "Content coming soon",
     "menu": {
@@ -902,7 +942,8 @@
     "subtitle": "Manage system settings and data.",
     "tabs": {
       "locations": "Locations",
-      "users": "Users"
+      "users": "Users",
+      "aiTemplates": "AI Templates"
     },
     "locations": {
       "title": "Locations",
@@ -1225,6 +1266,7 @@
   },
   "bookings": {
     "title": "My Bookings",
+    "received_title": "Received Bookings",
     "description": "Track and manage your confirmed bookings.",
     "cancel": "Cancel",
     "cancel_success": "Booking cancelled successfully",

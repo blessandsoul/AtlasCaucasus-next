@@ -26,11 +26,11 @@ class UserService {
         return response.data.data.user;
     }
 
-    async getUser(id: string) {
-        const response = await apiClient.get<ApiResponse<{ user: IUser }>>(
+    async getUser(id: string): Promise<IUser> {
+        const response = await apiClient.get<ApiResponse<IUser>>(
             API_ENDPOINTS.USERS.BY_ID(id)
         );
-        return response.data.data.user;
+        return response.data.data;
     }
 
     async updateUser(userId: string, data: Partial<IUser>) {

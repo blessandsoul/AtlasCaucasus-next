@@ -23,7 +23,7 @@ import {
     Search,
     Home,
 } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { ROUTES } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
@@ -160,6 +160,8 @@ export const CommandPalette = ({ open, onOpenChange }: CommandPaletteProps): Rea
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent hideClose className="sm:max-w-lg p-0 gap-0 overflow-hidden">
+                <DialogTitle className="sr-only">Command Palette</DialogTitle>
+                <DialogDescription className="sr-only">Search and navigate to pages</DialogDescription>
                 {/* Search Input */}
                 <div className="flex items-center gap-3 border-b border-border px-4 py-3">
                     <Search className="h-4 w-4 text-muted-foreground shrink-0" />

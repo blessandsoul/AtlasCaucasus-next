@@ -50,11 +50,11 @@ function useNavGroups(): NavGroup[] {
 
     return [
         {
-            title: t('dashboard.overview', 'Overview'),
+            title: t('dashboard.overview.title', 'Overview'),
             items: [
                 {
                     icon: LayoutDashboard,
-                    label: t('dashboard.overview', 'Overview'),
+                    label: t('dashboard.overview.title', 'Overview'),
                     href: ROUTES.DASHBOARD,
                     matchExact: true,
                 },

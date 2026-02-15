@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -72,6 +73,7 @@ export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) 
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>{t('admin.users.createUser')}</DialogTitle>
+                    <DialogDescription className="sr-only">{t('admin.users.createUser')}</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">

@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -111,6 +112,7 @@ export const EditUserDialog = ({ user, open, onOpenChange }: EditUserDialogProps
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>{t('admin.users.editUser')}</DialogTitle>
+                    <DialogDescription className="sr-only">{t('admin.users.editUser')}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">

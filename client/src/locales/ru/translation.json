@@ -366,7 +366,9 @@
       "min_years": "Мин. лет",
       "coming_soon": "Скоро...",
       "clear_all": "Очистить все",
-      "active_filters": "Активные фильтры"
+      "active_filters": "Активные фильтры",
+      "date": "Дата",
+      "any_date": "Любая дата"
     },
     "tabs": {
       "tours": "Туры",
@@ -546,6 +548,7 @@
   },
   "bookings": {
     "title": "Мои бронирования",
+    "received_title": "Полученные бронирования",
     "description": "Отслеживайте и управляйте подтверждёнными бронированиями.",
     "cancel": "Отменить",
     "cancel_success": "Бронирование успешно отменено",
@@ -815,7 +818,45 @@
   "dashboard": {
     "title": "Панель управления",
     "welcome_user": "С возвращением, {{name}}!",
-    "overview": "Обзор",
+    "overview": {
+      "title": "Обзор",
+      "subtitle": "Что происходит с вашим аккаунтом.",
+      "stats": {
+        "bookings": "Бронирования",
+        "favorites": "Избранные",
+        "inquiries": "Запросы",
+        "reviews": "Отзывы",
+        "views": "Просмотры",
+        "views_30d": "За 30 дней: {{count}}",
+        "response_rate": "Процент ответов",
+        "avg_rating": "Средний рейтинг",
+        "review_count": "{{count}} отзывов"
+      },
+      "browse_tours_desc": "Откройте новые туры",
+      "send_inquiry": "Отправить запрос",
+      "send_inquiry_desc": "Связаться с провайдером",
+      "create_tour_desc": "Добавить новый тур",
+      "company_desc": "Управление компанией",
+      "create_agent_desc": "Добавить члена команды",
+      "analytics_desc": "Посмотреть статистику",
+      "ai_desc": "Генерация контента с AI",
+      "manage_users_desc": "Управление пользователями",
+      "manage_blog_desc": "Управление постами",
+      "become_partner_desc": "Начните свой бизнес",
+      "quick_actions": "Быстрые действия",
+      "recent_activity": "Последняя активность",
+      "view_all": "Показать все",
+      "no_activity": "Нет недавней активности",
+      "no_activity_desc": "Ваши последние бронирования появятся здесь"
+    },
+    "sidebar": {
+      "collapse": "Свернуть",
+      "expand": "Развернуть панель"
+    },
+    "search": {
+      "placeholder": "Поиск..."
+    },
+    "back_to_site": "Вернуться на сайт",
     "activity_summary": "Сводка вашей активности",
     "content_soon": "Контент скоро появится",
     "menu": {
@@ -923,7 +964,8 @@
     "title": "Панель администратора",
     "subtitle": "Управление настройками системы и данными.",
     "tabs": {
-      "locations": "Локации"
+      "locations": "Локации",
+      "aiTemplates": "AI Шаблоны"
     },
     "locations": {
       "title": "Локации",
