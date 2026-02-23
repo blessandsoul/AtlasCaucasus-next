@@ -66,6 +66,17 @@ export interface Guide {
   coverUrl: string | null; // Cover/hero image
 }
 
+export interface UpdateGuideInput {
+  bio?: string;
+  languages?: string[];
+  yearsOfExperience?: number;
+  phoneNumber?: string;
+  pricePerDay?: number;
+  currency?: string;
+  isAvailable?: boolean;
+  locationIds?: string[];
+}
+
 export interface GuideFilters {
   locationId?: string;
   language?: string;

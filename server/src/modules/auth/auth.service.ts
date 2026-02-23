@@ -62,6 +62,8 @@ async function toSafeUser(user: User): Promise<SafeUser> {
       guideProfileId: undefined,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      deletedAt: user.deletedAt,
+      lockedUntil: user.lockedUntil,
       avatar,
       avatarUrl: avatar?.url ?? null,
     };
@@ -83,6 +85,8 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     guideProfileId: userWithRelations.guideProfileId,
     createdAt: userWithRelations.createdAt,
     updatedAt: userWithRelations.updatedAt,
+    deletedAt: null,
+    lockedUntil: null,
     avatar,
     avatarUrl: avatar?.url ?? null,
   };
@@ -510,6 +514,9 @@ export async function refresh(refreshToken: string): Promise<AuthTokens> {
   if (!session) {
     throw new UnauthorizedError("Session not found or revoked", "SESSION_REVOKED");
   }
+
+  // Detect potential token reuse (concurrent refresh within 1 minute = suspicious)
+  await securityService.detectTokenReuse(payload.sessionId, payload.userId);
 
   // Validate refresh token hash matches stored hash (prevents session hijacking)
   const providedHash = hashToken(refreshToken);

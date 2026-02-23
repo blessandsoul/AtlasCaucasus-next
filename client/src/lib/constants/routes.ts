@@ -5,6 +5,7 @@ export const ROUTES = {
   COMPANY_REGISTER: '/register-company',
   VERIFY_EMAIL: '/verify-email',
   VERIFY_EMAIL_PENDING: '/verify-email-pending',
+  ACCEPT_INVITATION: '/accept-invitation',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',

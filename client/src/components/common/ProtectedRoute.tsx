@@ -3,6 +3,7 @@
 import { useAppSelector } from '@/store/hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -21,20 +22,30 @@ export const ProtectedRoute = ({ children, requireVerified = true, allowedRoles 
     }, []);
 
     // Redirect to login if not authenticated (only after mount to avoid hydration issues)
+    // Also clear the has_session cookie so middleware stays in sync
     useEffect(() => {
         if (hasMounted && !isAuthenticated) {
+            document.cookie = 'has_session=; path=/; max-age=0';
             router.push('/login');
         }
     }, [hasMounted, isAuthenticated, router]);
 
-    // Always render children during SSR and initial hydration to prevent mismatch
-    // After mount, check authentication
+    // Show a loading spinner during SSR/hydration to prevent flash of content
     if (!hasMounted) {
-        return <>{children}</>;
+        return (
+            <div className="flex h-[50vh] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
     }
 
     if (!isAuthenticated) {
-        return null; // Redirecting to login
+        // Show loading while redirect is in progress
+        return (
+            <div className="flex h-[50vh] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
     }
 
     if (requireVerified && !user?.emailVerified) {

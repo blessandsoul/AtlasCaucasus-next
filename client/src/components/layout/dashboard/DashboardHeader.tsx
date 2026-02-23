@@ -66,10 +66,11 @@ export const DashboardHeader = ({ onMobileMenuToggle, onOpenCommandPalette }: Da
         setHasMounted(true);
     }, []);
 
-    const { data: chatsData } = useChats({}, { enabled: isAuthenticated && hasMounted });
+    const isVerifiedUser = isAuthenticated && hasMounted && !!user?.emailVerified;
+    const { data: chatsData } = useChats({}, { enabled: isVerifiedUser });
     const totalUnread = chatsData?.items.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
 
-    const { data: unreadCountData } = useUnreadCount({ enabled: isAuthenticated && hasMounted });
+    const { data: unreadCountData } = useUnreadCount({ enabled: isVerifiedUser });
     const notificationCount = unreadCountData?.count || 0;
 
     useEffect(() => {

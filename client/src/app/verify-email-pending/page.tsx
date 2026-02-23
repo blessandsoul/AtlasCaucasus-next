@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Mail, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { authService } from '@/features/auth/services/auth.service';
@@ -9,13 +10,22 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/utils/error';
 import { logout } from '@/features/auth/store/authSlice';
+import { stopTokenRefreshMonitoring } from '@/lib/utils/token-refresh';
+import { clearCsrfToken } from '@/lib/api/csrf';
+import { ROUTES } from '@/lib/constants/routes';
 
 export default function VerifyEmailPendingPage() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const { user } = useAppSelector((state) => state.auth);
     const [isResending, setIsResending] = useState(false);
     const [resendSuccess, setResendSuccess] = useState(false);
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     const handleResendVerification = async () => {
         if (!user?.email) return;
@@ -35,7 +45,10 @@ export default function VerifyEmailPendingPage() {
     };
 
     const handleLogout = () => {
+        stopTokenRefreshMonitoring();
+        clearCsrfToken();
         dispatch(logout());
+        router.push(ROUTES.LOGIN);
     };
 
     return (
@@ -65,8 +78,8 @@ export default function VerifyEmailPendingPage() {
                         </p>
                     </div>
 
-                    {/* User Email Display */}
-                    {user?.email && (
+                    {/* User Email Display — only render after hydration to avoid mismatch */}
+                    {hasMounted && user?.email && (
                         <div className="bg-muted/50 rounded-md p-3 mb-6 text-center">
                             <p className="text-sm text-muted-foreground mb-1">
                                 {t('auth.verification_sent_to') || 'Verification email sent to'}

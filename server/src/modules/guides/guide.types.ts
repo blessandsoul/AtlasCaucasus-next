@@ -23,6 +23,8 @@ export interface UpdateGuideData {
     yearsOfExperience?: number;
     photoUrl?: string;
     phoneNumber?: string;
+    pricePerDay?: number;
+    currency?: string;
     isVerified?: boolean;
     isAvailable?: boolean;
     locationIds?: string[];

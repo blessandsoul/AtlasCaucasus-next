@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { successResponse, paginatedResponse } from "../../libs/response.js";
-import { ValidationError, BadRequestError } from "../../libs/errors.js";
+import { ValidationError, BadRequestError, ForbiddenError } from "../../libs/errors.js";
 import { validateUuidParam } from "../../libs/validation.js";
 import * as guideService from "./guide.service.js";
 import { updateGuideSchema, guideQuerySchema } from "./guide.schemas.js";
@@ -8,7 +8,10 @@ import {
     uploadMultipleFiles,
     getGuidePhotos,
     deleteMediaHelper,
+    uploadGuideAvatar,
+    uploadGuideCover,
 } from "../media/media.helpers.js";
+import { getMediaById } from "../media/media.repo.js";
 import type { UploadedFile } from "../media/media.types.js";
 
 export async function list(
@@ -152,7 +155,88 @@ export async function deletePhoto(
     // Verify guide exists
     await guideService.getGuideById(id);
 
+    // Verify the photo actually belongs to this guide (entityId must match guide ID)
+    const media = await getMediaById(photoId);
+    if (media && media.entityId !== id) {
+        throw new ForbiddenError(
+            "This photo does not belong to the specified guide",
+            "PHOTO_NOT_BELONGS_TO_GUIDE"
+        );
+    }
+
     const deleted = await deleteMediaHelper(request.user, photoId);
 
     return reply.send(successResponse("Photo deleted successfully", deleted));
+}
+
+// ==========================================
+// AVATAR & COVER MANAGEMENT
+// ==========================================
+
+export async function uploadAvatar(
+    request: FastifyRequest,
+    reply: FastifyReply
+): Promise<void> {
+    const id = validateUuidParam((request.params as { id: string }).id);
+
+    const parts = request.files();
+    let file: UploadedFile | null = null;
+
+    for await (const part of parts) {
+        const buffer = await part.toBuffer();
+        file = {
+            fieldname: part.fieldname,
+            filename: part.filename,
+            originalFilename: part.filename,
+            encoding: part.encoding,
+            mimetype: part.mimetype,
+            size: buffer.length,
+            buffer,
+        };
+        break; // Only take the first file for avatar
+    }
+
+    if (!file) {
+        throw new BadRequestError("No file provided", "NO_FILES_PROVIDED");
+    }
+
+    const media = await uploadGuideAvatar(request.user, id, file);
+
+    return reply.status(201).send(
+        successResponse("Avatar uploaded successfully", { avatarUrl: media.url })
+    );
+}
+
+export async function uploadCover(
+    request: FastifyRequest,
+    reply: FastifyReply
+): Promise<void> {
+    const id = validateUuidParam((request.params as { id: string }).id);
+
+    const parts = request.files();
+    let file: UploadedFile | null = null;
+
+    for await (const part of parts) {
+        const buffer = await part.toBuffer();
+        file = {
+            fieldname: part.fieldname,
+            filename: part.filename,
+            originalFilename: part.filename,
+            encoding: part.encoding,
+            mimetype: part.mimetype,
+            size: buffer.length,
+            buffer,
+        };
+        break; // Only take the first file for cover
+    }
+
+    if (!file) {
+        throw new BadRequestError("No file provided", "NO_FILES_PROVIDED");
+    }
+
+    const media = await uploadGuideCover(request.user, id, file);
+
+    return reply.status(201).send(
+        successResponse("Cover image uploaded successfully", { coverUrl: media.url })
+    );
 }

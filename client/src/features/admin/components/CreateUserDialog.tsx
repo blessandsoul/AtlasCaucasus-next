@@ -25,16 +25,6 @@ import {
 import { useCreateUser } from '../hooks/useCreateUser';
 import type { UserRole } from '@/features/auth/types/auth.types';
 
-const createUserSchema = z.object({
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    firstName: z.string().min(2, 'First name must be at least 2 characters'),
-    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-    role: z.string().optional(),
-});
-
-type CreateUserFormData = z.infer<typeof createUserSchema>;
-
 interface CreateUserDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -45,6 +35,16 @@ const ROLES: UserRole[] = ['USER', 'COMPANY', 'ADMIN', 'TOUR_AGENT', 'GUIDE', 'D
 export const CreateUserDialog = ({ open, onOpenChange }: CreateUserDialogProps) => {
     const { t } = useTranslation();
     const { mutate: createUser, isPending } = useCreateUser();
+
+    const createUserSchema = z.object({
+        email: z.string().email(t('validation.email_invalid', 'Invalid email address')),
+        password: z.string().min(8, t('validation.password_min', 'Password must be at least 8 characters')),
+        firstName: z.string().min(2, t('validation.first_name_min', 'First name must be at least 2 characters')),
+        lastName: z.string().min(2, t('validation.last_name_min', 'Last name must be at least 2 characters')),
+        role: z.string().optional(),
+    });
+
+    type CreateUserFormData = z.infer<typeof createUserSchema>;
 
     const {
         register,

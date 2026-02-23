@@ -23,11 +23,10 @@ export async function getCompanies(
     page: number,
     limit: number
 ): Promise<{ companies: CompanyResponse[]; total: number }> {
-    // For public access, only return verified companies unless explicitly filtering
-    // Create new object to avoid mutating input
+    // Public endpoint: always enforce verified-only (isVerified is not exposed in query schema)
     const effectiveFilters: CompanyFilters = {
         ...filters,
-        isVerified: filters.isVerified ?? true,
+        isVerified: true,
     };
 
     // Check cache first

@@ -22,7 +22,7 @@ export const useUploadCompanyCover = (companyId: string) => {
             queryClient.invalidateQueries({ queryKey: ['company', companyId] });
             queryClient.invalidateQueries({ queryKey: ['my-company'] });
             queryClient.invalidateQueries({ queryKey: ['companies'] });
-            toast.success(t('profile.cover.upload_success', 'Cover image uploaded successfully'));
+            toast.success(t('company.cover_uploaded', 'Cover image uploaded successfully'));
         },
         onError: (error) => {
             toast.error(getFileUploadErrorMessage(error));

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { userService } from '../services/user.service';
 import type { PaginationParams } from '@/lib/api/api.types';
 
-export const useUsers = (params: PaginationParams = {}) => {
+export const useUsers = (params: PaginationParams & { includeDeleted?: boolean } = {}) => {
     return useQuery({
         queryKey: ['users', params],
         queryFn: () => userService.getAllUsers(params),

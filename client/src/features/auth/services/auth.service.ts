@@ -34,11 +34,6 @@ class AuthService {
         await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
     }
 
-    async refreshToken(refreshToken: string): Promise<IAuthTokens> {
-        const response = await apiClient.post(API_ENDPOINTS.AUTH.REFRESH, { refreshToken });
-        return response.data.data;
-    }
-
     async getMe(): Promise<IUser> {
         const response = await apiClient.get(API_ENDPOINTS.AUTH.ME);
         return response.data.data;
@@ -67,6 +62,10 @@ class AuthService {
 
     async verifyEmail(token: string): Promise<void> {
         await apiClient.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL, { token });
+    }
+
+    async acceptInvitation(token: string, password: string): Promise<void> {
+        await apiClient.post(API_ENDPOINTS.AUTH.ACCEPT_INVITATION, { token, password });
     }
 }
 

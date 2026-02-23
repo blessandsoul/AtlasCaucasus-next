@@ -3,6 +3,7 @@ import { z } from "zod";
 export const createTourSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(200, "Title must be at most 200 characters"),
   price: z.number().min(0, "Price must be at least 0"),
+  companyId: z.string().uuid("Invalid company ID format").optional(),
   summary: z.string().max(1000, "Summary must be at most 1000 characters").optional(),
   currency: z.string().length(3, "Currency must be exactly 3 characters").optional(),
   city: z.string().max(100, "City must be at most 100 characters").optional(),

@@ -1,0 +1,55 @@
+[     218ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     567ms] [ERROR] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MDY5NDRlOC0xMGVjLTQ1Y2QtOTk3Yy1lZTNiODk1Mzk1YTYiLCJyb2xlcyI6WyJHVUlERSJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MTMyMDE4NiwiZXhwIjoxNzcxMzIxMDg2fQ.Yj6a9hu-SO0Cj6FD17aGB93F4gViNz1Zz8LIfey3d3E' failed: Error during WebSocket handshake: Unexpected response code: 404 @ http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:499
+[     567ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     956ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/bookings?limit=5:0
+[     977ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/auth/me:0
+[     978ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/bookings?limit=1:0
+[     979ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/favorites?limit=1:0
+[     979ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/inquiries?limit=1:0
+[     979ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/reviews/my?limit=1:0
+[     980ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/analytics/me:0
+[     980ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/chats:0
+[     980ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[     986ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/auth/refresh:0
+[     987ms] [ERROR] Failed to refresh token: AxiosError: Request failed with status code 400
+    at settle (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:1935:16)
+    at XMLHttpRequest.onloadend (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:2449:174)
+    at Axios.request (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:3253:49)
+    at async http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:1190:30
+    at async http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:1386:32
+    at async Axios.request (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:3249:20)
+    at async AuthService.getMe (http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:2527:26)
+    at async useAuth.useCallback[refreshUser] (http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:2608:34) @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     987ms] [ERROR] Failed to refresh user data: AxiosError: Request failed with status code 401
+    at settle (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:1935:16)
+    at XMLHttpRequest.onloadend (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:2449:174)
+    at Axios.request (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:3253:49)
+    at async AuthService.getMe (http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:2527:26)
+    at async useAuth.useCallback[refreshUser] (http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:2608:34) @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[    1886ms] [ERROR] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MDY5NDRlOC0xMGVjLTQ1Y2QtOTk3Yy1lZTNiODk1Mzk1YTYiLCJyb2xlcyI6WyJHVUlERSJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MTMyMDE4NiwiZXhwIjoxNzcxMzIxMDg2fQ.Yj6a9hu-SO0Cj6FD17aGB93F4gViNz1Zz8LIfey3d3E' failed: Error during WebSocket handshake: Unexpected response code: 404 @ http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:499
+[    1886ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[    1964ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/bookings?limit=5:0
+[    1985ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/bookings?limit=1:0
+[    1986ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/favorites?limit=1:0
+[    1986ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/inquiries?limit=1:0
+[    1986ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/reviews/my?limit=1:0
+[    1987ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/analytics/me:0
+[    1987ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/chats:0
+[    1987ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[    4207ms] [ERROR] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MDY5NDRlOC0xMGVjLTQ1Y2QtOTk3Yy1lZTNiODk1Mzk1YTYiLCJyb2xlcyI6WyJHVUlERSJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MTMyMDE4NiwiZXhwIjoxNzcxMzIxMDg2fQ.Yj6a9hu-SO0Cj6FD17aGB93F4gViNz1Zz8LIfey3d3E' failed: Error during WebSocket handshake: Unexpected response code: 404 @ http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:499
+[    4207ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[    8527ms] [ERROR] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MDY5NDRlOC0xMGVjLTQ1Y2QtOTk3Yy1lZTNiODk1Mzk1YTYiLCJyb2xlcyI6WyJHVUlERSJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MTMyMDE4NiwiZXhwIjoxNzcxMzIxMDg2fQ.Yj6a9hu-SO0Cj6FD17aGB93F4gViNz1Zz8LIfey3d3E' failed: Error during WebSocket handshake: Unexpected response code: 404 @ http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:499
+[    8528ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   16847ms] [ERROR] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MDY5NDRlOC0xMGVjLTQ1Y2QtOTk3Yy1lZTNiODk1Mzk1YTYiLCJyb2xlcyI6WyJHVUlERSJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MTMyMDE4NiwiZXhwIjoxNzcxMzIxMDg2fQ.Yj6a9hu-SO0Cj6FD17aGB93F4gViNz1Zz8LIfey3d3E' failed: Error during WebSocket handshake: Unexpected response code: 404 @ http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:499
+[   16847ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   20188ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   20191ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   20203ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides?limit=5:0
+[   29933ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   29936ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   29939ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides?limit=5:0
+[   29942ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   33175ms] [ERROR] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MDY5NDRlOC0xMGVjLTQ1Y2QtOTk3Yy1lZTNiODk1Mzk1YTYiLCJyb2xlcyI6WyJHVUlERSJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MTMyMDE4NiwiZXhwIjoxNzcxMzIxMDg2fQ.Yj6a9hu-SO0Cj6FD17aGB93F4gViNz1Zz8LIfey3d3E' failed: Error during WebSocket handshake: Unexpected response code: 404 @ http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:499
+[   33175ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   62004ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[   63017ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/notifications/unread-count:0

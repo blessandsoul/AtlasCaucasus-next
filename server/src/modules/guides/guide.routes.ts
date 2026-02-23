@@ -50,4 +50,22 @@ export async function guideRoutes(fastify: FastifyInstance): Promise<void> {
         { preHandler: [authGuard] },
         guideController.deletePhoto
     );
+
+    // ==========================================
+    // AVATAR & COVER MANAGEMENT
+    // ==========================================
+
+    // Auth required: Upload avatar for guide (ownership checked in helper)
+    fastify.post(
+        "/guides/:id/avatar",
+        { preHandler: [authGuard] },
+        guideController.uploadAvatar
+    );
+
+    // Auth required: Upload cover image for guide (ownership checked in helper)
+    fastify.post(
+        "/guides/:id/cover",
+        { preHandler: [authGuard] },
+        guideController.uploadCover
+    );
 }

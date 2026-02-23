@@ -39,10 +39,12 @@ apiClient.interceptors.request.use(async (config) => {
     }
   }
 
-  // Set Content-Type to application/json only if not already set and not FormData
-  // For FormData, let axios set the Content-Type automatically with the boundary
+  // Set Content-Type to application/json only if not already set, not FormData,
+  // and only when there is actually a body to send.
+  // Sending Content-Type: application/json with no body causes Fastify to reject
+  // the request with FST_ERR_CTP_EMPTY_JSON_BODY.
   if (config.headers && !config.headers['Content-Type']) {
-    if (!(config.data instanceof FormData)) {
+    if (config.data !== undefined && config.data !== null && !(config.data instanceof FormData)) {
       config.headers['Content-Type'] = 'application/json';
     }
   }
@@ -58,13 +60,16 @@ apiClient.interceptors.response.use(
     const errorCode = error.response?.data?.error?.code;
 
     // Handle email not verified (403 with EMAIL_NOT_VERIFIED)
-    // Redirect to verify-email-pending page so user can verify their email
+    // Redirect to verify-email-pending page so user can verify their email.
+    // Use setTimeout to defer the redirect — setting window.location.href
+    // synchronously during a React render cycle causes "Cannot update a component
+    // while rendering a different component" warnings.
     if (
       error.response?.status === 403 &&
       errorCode === 'EMAIL_NOT_VERIFIED'
     ) {
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/verify-email')) {
-        window.location.href = '/verify-email-pending';
+        setTimeout(() => { window.location.href = '/verify-email-pending'; }, 0);
       }
       return Promise.reject(error);
     }
@@ -98,7 +103,13 @@ apiClient.interceptors.response.use(
     }
 
     // Handle auth token expiration (401)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Skip for auth endpoints (login, register, etc.) — their 401s are legitimate errors, not expired tokens
+    const requestUrl = originalRequest.url || '';
+    const isAuthEndpoint = requestUrl.includes('/auth/login') ||
+      requestUrl.includes('/auth/register') ||
+      requestUrl.includes('/auth/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       // Use rate-limited refresh with backoff

@@ -1,6 +1,7 @@
-import { NotFoundError, ForbiddenError } from "../../libs/errors.js";
+import { NotFoundError, ForbiddenError, BadRequestError } from "../../libs/errors.js";
 import { verifyDriverOwnership } from "../../libs/authorization.js";
 import * as driverRepo from "./driver.repo.js";
+import { countByIds as countLocationsByIds } from "../locations/location.repo.js";
 import type { DriverResponse, UpdateDriverData, DriverFilters } from "./driver.types.js";
 import type { UserRole } from "../users/user.types.js";
 import { deleteDriverPhotos } from "../media/media.helpers.js";
@@ -74,6 +75,15 @@ export async function updateDriver(
     await driverRepo.update(id, updateData);
 
     if (data.locationIds !== undefined) {
+        if (data.locationIds.length > 0) {
+            const existingCount = await countLocationsByIds(data.locationIds);
+            if (existingCount !== data.locationIds.length) {
+                throw new BadRequestError(
+                    "One or more location IDs are invalid",
+                    "INVALID_LOCATION_IDS"
+                );
+            }
+        }
         await driverRepo.setLocations(id, data.locationIds);
     }
 

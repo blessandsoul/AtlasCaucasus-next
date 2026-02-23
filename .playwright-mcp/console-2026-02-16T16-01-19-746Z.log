@@ -1,0 +1,7 @@
+[     166ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[   21628ms] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests) @ http://localhost:8000/api/v1/auth/login:0
+[   21629ms] [ERROR] Login failed AxiosError: Request failed with status code 429
+    at settle (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:1935:16)
+    at XMLHttpRequest.onloadend (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:2449:174)
+    at Axios.request (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:3253:49)
+    at async AuthService.login (http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:2483:26) @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127

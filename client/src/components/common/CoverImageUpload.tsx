@@ -5,6 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { Camera, Loader2, Trash2, ImageIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { getMediaUrl } from '@/lib/utils/media';
 import { cn } from '@/lib/utils';
 import {
@@ -35,6 +45,7 @@ export const CoverImageUpload = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isLoading = isUploading || isDeleting;
 
@@ -81,8 +92,13 @@ export const CoverImageUpload = ({
     [onUpload, t]
   );
 
-  const handleDelete = useCallback(() => {
+  const handleDeleteClick = useCallback(() => {
+    setShowDeleteConfirm(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
     onDelete();
+    setShowDeleteConfirm(false);
   }, [onDelete]);
 
   const resolvedUrl =
@@ -164,7 +180,7 @@ export const CoverImageUpload = ({
             type="button"
             variant="outline"
             size="sm"
-            onClick={handleDelete}
+            onClick={handleDeleteClick}
             disabled={isLoading}
             className="text-destructive hover:text-destructive"
           >
@@ -178,6 +194,32 @@ export const CoverImageUpload = ({
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('profile.cover.delete_title', 'Remove cover image?')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('profile.cover.delete_description', 'This action cannot be undone. The cover image will be permanently removed.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : null}
+              {t('profile.cover.confirm_remove', 'Remove')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

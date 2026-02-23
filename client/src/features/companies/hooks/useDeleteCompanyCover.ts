@@ -27,7 +27,7 @@ export const useDeleteCompanyCover = (companyId: string) => {
             queryClient.invalidateQueries({ queryKey: ['company', companyId] });
             queryClient.invalidateQueries({ queryKey: ['my-company'] });
             queryClient.invalidateQueries({ queryKey: ['companies'] });
-            toast.success(t('profile.cover.delete_success', 'Cover image removed successfully'));
+            toast.success(t('company.cover_removed', 'Cover image removed successfully'));
         },
         onError: (error) => {
             toast.error(getErrorMessage(error));

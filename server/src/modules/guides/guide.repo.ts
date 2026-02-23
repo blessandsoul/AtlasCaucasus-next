@@ -203,6 +203,8 @@ export async function update(id: string, data: UpdateGuideData): Promise<Guide> 
             yearsOfExperience: data.yearsOfExperience,
             photoUrl: data.photoUrl,
             phoneNumber: data.phoneNumber,
+            pricePerDay: data.pricePerDay,
+            currency: data.currency,
             isVerified: data.isVerified,
             isAvailable: data.isAvailable,
         },

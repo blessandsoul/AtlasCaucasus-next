@@ -1,6 +1,6 @@
 import { apiClient } from '@/lib/api/axios.config';
 import { API_ENDPOINTS } from '@/lib/constants/api-endpoints';
-import type { Guide, GuideFilters, GuidePaginatedResponse, GuideMedia } from '../types/guide.types';
+import type { Guide, GuideFilters, GuidePaginatedResponse, GuideMedia, UpdateGuideInput } from '../types/guide.types';
 
 class GuideService {
   async getGuides(params: GuideFilters = {}): Promise<GuidePaginatedResponse> {
@@ -33,7 +33,7 @@ class GuideService {
     return response.data.data;
   }
 
-  async updateGuide(id: string, data: Partial<Guide>): Promise<Guide> {
+  async updateGuide(id: string, data: UpdateGuideInput): Promise<Guide> {
     const response = await apiClient.patch<{
       success: boolean;
       message: string;

@@ -1,0 +1,12 @@
+[     421ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/__nextjs_font/geist-latin.woff2:0
+[     443ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/atlascaucasus.png:0
+[     591ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    6599ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/users?limit=1&roles=USER:0
+[   27808ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[   27809ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/chats:0
+[   28232ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[   28446ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/chats:0
+[   28447ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[   29471ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/chats:0
+[   29472ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[   35032ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/auth/verify-email?token=bypass:0

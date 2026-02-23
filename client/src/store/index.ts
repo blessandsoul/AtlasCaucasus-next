@@ -23,14 +23,30 @@ export const store = configureStore({
   },
 });
 
-// Save auth state to localStorage on changes
+// Save auth state to localStorage on changes and sync session cookie for middleware
 if (typeof window !== 'undefined') {
+  const syncSessionCookie = (isAuthenticated: boolean): void => {
+    if (isAuthenticated) {
+      document.cookie = 'has_session=1; path=/; SameSite=Lax';
+    } else {
+      document.cookie = 'has_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    }
+  };
+
+  // Immediately sync cookie with initial state on page load.
+  // This prevents a deadlock where localStorage was cleared (manually or by corruption)
+  // but the has_session cookie persists, causing middleware to redirect /login → /dashboard
+  // while the client has no auth state, trapping the user.
+  syncSessionCookie(store.getState().auth.isAuthenticated);
+
   store.subscribe(() => {
+    const authState = store.getState().auth;
     try {
-      localStorage.setItem('auth', JSON.stringify(store.getState().auth));
+      localStorage.setItem('auth', JSON.stringify(authState));
     } catch {
       // Ignore localStorage errors
     }
+    syncSessionCookie(authState.isAuthenticated);
   });
 }
 

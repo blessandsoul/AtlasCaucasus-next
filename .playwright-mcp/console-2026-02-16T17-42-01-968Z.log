@@ -1,0 +1,29 @@
+[     194ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     433ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/bookings?limit=5:0
+[     434ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/auth/me:0
+[     434ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/bookings?limit=1:0
+[     435ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/favorites?limit=1:0
+[     445ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/inquiries?limit=1:0
+[     446ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/reviews/my?limit=1:0
+[     446ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/auth/refresh:0
+[     447ms] [ERROR] Failed to refresh token: AxiosError: Request failed with status code 403
+    at settle (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:1935:16)
+    at XMLHttpRequest.onloadend (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:2449:174)
+    at Axios.request (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:3253:49)
+    at async http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:1176:30 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     447ms] [WARNING] Token refresh failed: session_expired @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     456ms] [WARNING] WebSocket connection to 'ws://localhost:8000/ws?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzNTYwNDVlZS0zOTljLTQ1MjctYTljZC03N2RhOWQxNjY4N2MiLCJyb2xlcyI6WyJHVUlERSJdLCJ0b2tlblZlcnNpb24iOjAsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3MTI2MzY2NSwiZXhwIjoxNzcxMjY0NTY1fQ.2N4aceKsxe_wzfIkMGWZ630-upEB-NxHir7kE3jWFFM' failed: WebSocket is closed before the connection is established. @ http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:502
+[     459ms] [ERROR] Failed to refresh user data: AxiosError: Request failed with status code 401
+    at settle (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:1935:16)
+    at XMLHttpRequest.onloadend (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:2449:174)
+    at Axios.request (http://localhost:3000/_next/static/chunks/node_modules_axios_lib_99e19c7d._.js:3253:49)
+    at async AuthService.getMe (http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:2505:26)
+    at async useAuth.useCallback[refreshUser] (http://localhost:3000/_next/static/chunks/src_468cb7e2._.js:2580:34) @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     460ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/analytics/me:0
+[     460ms] [WARNING] Token refresh failed: no_refresh_token @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     461ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/chats:0
+[     461ms] [WARNING] Token refresh failed: no_refresh_token @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     462ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[     462ms] [WARNING] Token refresh failed: no_refresh_token @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     468ms] [ERROR] WebSocket error - connection failed. Check if server is running at http://localhost:8000 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     687ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297

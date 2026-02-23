@@ -4,16 +4,16 @@ import { z } from "zod";
 export const createUserSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  firstName: z.string().min(2, "First name must be at least 2 characters").max(100, "First name is too long"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").max(100, "Last name is too long"),
   role: z.enum(["USER", "COMPANY", "ADMIN", "TOUR_AGENT", "GUIDE", "DRIVER"]).optional(),
 });
 
 // Self-update: users can only update their own profile fields (no role, no isActive)
 export const updateUserSelfSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
-  firstName: z.string().min(2, "First name must be at least 2 characters").optional(),
-  lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
+  firstName: z.string().min(2, "First name must be at least 2 characters").max(100, "First name is too long").optional(),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").max(100, "Last name is too long").optional(),
   phoneNumber: z.string().max(20, "Phone number is too long").optional().nullable(),
   emailNotifications: z.boolean().optional(),
 });
@@ -21,8 +21,8 @@ export const updateUserSelfSchema = z.object({
 // Admin-update: admins can update any field including role and isActive
 export const updateUserAdminSchema = z.object({
   email: z.string().email("Invalid email format").optional(),
-  firstName: z.string().min(2, "First name must be at least 2 characters").optional(),
-  lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
+  firstName: z.string().min(2, "First name must be at least 2 characters").max(100, "First name is too long").optional(),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").max(100, "Last name is too long").optional(),
   phoneNumber: z.string().max(20, "Phone number is too long").optional().nullable(),
   role: z.enum(["USER", "COMPANY", "ADMIN", "TOUR_AGENT", "GUIDE", "DRIVER"]).optional(),
   isActive: z.boolean().optional(),

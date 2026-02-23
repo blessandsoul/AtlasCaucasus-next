@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/lib/constants/routes';
 import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '@/lib/utils/error';
+import { stopTokenRefreshMonitoring } from '@/lib/utils/token-refresh';
+import { clearCsrfToken } from '@/lib/api/csrf';
 
 export const useLogoutAll = () => {
     const { t } = useTranslation();
@@ -16,6 +18,10 @@ export const useLogoutAll = () => {
     return useMutation({
         mutationFn: () => authService.logoutAll(),
         onSuccess: () => {
+            // Stop token refresh monitoring
+            stopTokenRefreshMonitoring();
+            // Clear CSRF token
+            clearCsrfToken();
             // Clear Redux state
             dispatch(logoutAction());
             // Clear localStorage

@@ -8,6 +8,7 @@ import { ROUTES } from '@/lib/constants/routes';
 import { getErrorMessage } from '@/lib/utils/error';
 import type { IRegisterRequest } from '../types/auth.types';
 import { useTranslation } from 'react-i18next';
+import { resetRefreshAttempts, startTokenRefreshMonitoring } from '@/lib/utils/token-refresh';
 
 export const useRegister = () => {
     const { t } = useTranslation();
@@ -23,7 +24,9 @@ export const useRegister = () => {
                 tokens: response.tokens,
             }));
 
-            // TODO: Start automatic token refresh monitoring if implemented in Next.js client
+            // Start automatic token refresh monitoring
+            resetRefreshAttempts();
+            startTokenRefreshMonitoring();
 
             // Show success message with verification expiry notice
             toast.success(

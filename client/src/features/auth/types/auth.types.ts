@@ -20,6 +20,7 @@ export interface IUser {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null; // For soft-deleted users
+  lockedUntil?: string | null; // Account lockout timestamp
 }
 
 export type UserRole = 'USER' | 'COMPANY' | 'ADMIN' | 'GUIDE' | 'DRIVER' | 'TOUR_AGENT';

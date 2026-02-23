@@ -143,7 +143,7 @@ export const CompanyCard = ({ company, className, isFavorited, onFavorite, isCom
               <Globe className="h-3.5 w-3.5 shrink-0" />
               <span
                 className="truncate text-xs hover:underline hover:text-primary"
-                onClick={(e) => { e.stopPropagation(); window.open(company.websiteUrl!, '_blank'); }}
+                onClick={(e) => { e.stopPropagation(); window.open(company.websiteUrl!, '_blank', 'noopener,noreferrer'); }}
               >
                 {company.websiteUrl.replace(/^https?:\/\//, '')}
               </span>

@@ -13,14 +13,6 @@ import type { IUser } from '@/features/auth/types/auth.types';
 import { useUpdateProfile } from '../hooks/useUpdateProfile';
 import { AvatarUpload } from './AvatarUpload';
 
-const profileSchema = z.object({
-    firstName: z.string().min(1, 'First name is required').max(50),
-    lastName: z.string().min(1, 'Last name is required').max(50),
-    phoneNumber: z.string().optional(),
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
-
 interface ProfileGeneralProps {
     user: IUser;
 }
@@ -29,9 +21,18 @@ export const ProfileGeneral = ({ user }: ProfileGeneralProps) => {
     const { t } = useTranslation();
     const { mutate: updateProfile, isPending } = useUpdateProfile();
 
+    const profileSchema = z.object({
+        firstName: z.string().min(1, t('validation.first_name_required', 'First name is required')).max(50),
+        lastName: z.string().min(1, t('validation.last_name_required', 'Last name is required')).max(50),
+        phoneNumber: z.string().optional(),
+    });
+
+    type ProfileFormData = z.infer<typeof profileSchema>;
+
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors, isDirty },
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
@@ -43,7 +44,9 @@ export const ProfileGeneral = ({ user }: ProfileGeneralProps) => {
     });
 
     const onSubmit = (data: ProfileFormData) => {
-        updateProfile(data);
+        updateProfile(data, {
+            onSuccess: () => reset(data),
+        });
     };
 
     return (

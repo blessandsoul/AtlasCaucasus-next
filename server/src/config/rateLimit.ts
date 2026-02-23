@@ -42,9 +42,9 @@ export const rateLimitConfigs: Record<string, RateLimitConfig> = {
 };
 
 /**
- * Throws RateLimitError when rate limit is exceeded
- * This ensures proper error handling through global error handler
- * Note: onExceeded callback receives (request, key), not the context with ttl
+ * Throws RateLimitError when rate limit is exceeded.
+ * RateLimitError extends AppError, so the global error handler
+ * recognizes it and returns a proper 429 response.
  */
 function throwRateLimitError(
     _request: FastifyRequest,

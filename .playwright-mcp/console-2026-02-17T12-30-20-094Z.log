@@ -1,0 +1,5 @@
+[     245ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    1808ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    1808ms] [WARNING] i18next: init: i18next is already initialized. You should call init just once! @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    3021ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    3021ms] [WARNING] i18next: init: i18next is already initialized. You should call init just once! @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297

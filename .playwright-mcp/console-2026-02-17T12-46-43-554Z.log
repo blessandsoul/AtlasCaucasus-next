@@ -1,0 +1,29 @@
+[     165ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     287ms] [ERROR] Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render Router CompanyManagementPage CompanyManagementPage @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     383ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/companies/my:0
+[     409ms] [ERROR] Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render Router ProtectedRoute ProtectedRoute @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[     608ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     734ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/chats:0
+[     734ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[    1757ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/chats:0
+[    1759ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/notifications/unread-count:0
+[   28533ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/hero-backgrounds/hero-main.png:0
+[   28859ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-885.jpg:0
+[   28859ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1188.jpg:0
+[   28859ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1261.jpg:0
+[   28859ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1352.jpg:0
+[   28859ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1159.jpg:0
+[   28859ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1367.jpg:0
+[   28864ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-948.jpg:0
+[   28864ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-938.jpg:0
+[   28864ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1450.jpg:0
+[   28864ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-921.jpg:0
+[   28864ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-944.jpg:0
+[   28865ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1363.jpg:0
+[   28867ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1085.jpg:0
+[   28868ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1071.jpg:0
+[   28868ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1333.jpg:0
+[   28869ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1126.jpg:0
+[   28869ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-1459.jpg:0
+[   28869ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/seed-assets/image-988.jpg:0
+[   29344ms] [ERROR] Failed to load resource: net::ERR_CACHE_READ_FAILURE @ http://localhost:3000/_next/static/media/9c72aa0f40e4eef8-s.18a48cbc.woff2:0

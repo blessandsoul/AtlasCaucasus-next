@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { DriverDetailsClient } from './DriverDetailsClient';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
+    const { id } = await params;
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
-    const response = await fetch(`${apiUrl}/drivers/${params.id}`, {
+    const response = await fetch(`${apiUrl}/drivers/${id}`, {
       cache: 'no-store',
     });
 

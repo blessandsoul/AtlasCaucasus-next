@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     CREATE_TOUR_AGENT: '/auth/tour-agents',
     CLAIM_ROLE: '/auth/claim-role',
     LOGOUT_ALL: '/auth/logout-all',
+    ACCEPT_INVITATION: '/auth/accept-invitation',
   },
   USERS: {
     LIST: '/users',
@@ -34,6 +35,7 @@ export const API_ENDPOINTS = {
     UPDATE_ROLE: (id: string) => `/users/${id}/role`,
     REMOVE_ROLE: (id: string, role: string) => `/users/${id}/roles/${role}`,
     UPLOAD_AVATAR: (userId: string) => `/users/${userId}/avatar`,
+    UNLOCK: (id: string) => `/users/${id}/unlock`,
   },
   TOURS: {
     LIST: '/tours',

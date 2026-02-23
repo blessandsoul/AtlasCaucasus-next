@@ -25,6 +25,8 @@ async function toSafeUser(user: User): Promise<SafeUser> {
     emailNotifications: user.emailNotifications,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    deletedAt: user.deletedAt,
+    lockedUntil: user.lockedUntil,
     avatar, // First image as avatar
     avatarUrl: avatar?.url ?? null, // Convenience URL field for frontend
 
@@ -48,13 +50,22 @@ export async function createUser(input: CreateUserInput): Promise<SafeUser> {
 
   const passwordHash = await argon2.hash(input.password);
 
-  const user = await userRepo.createUser({
-    email: input.email,
-    passwordHash,
-    firstName: input.firstName,
-    lastName: input.lastName,
-    role: input.role,
-  });
+  let user;
+  try {
+    user = await userRepo.createUser({
+      email: input.email,
+      passwordHash,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      role: input.role,
+    });
+  } catch (err: any) {
+    // Handle race condition: another request created the same email between our check and insert
+    if (err?.code === "P2002") {
+      throw new ConflictError("Email already registered", "EMAIL_EXISTS");
+    }
+    throw err;
+  }
 
   return await toSafeUser(user);
 }
@@ -72,12 +83,13 @@ export async function getUserById(id: string): Promise<SafeUser> {
 // Admin-only: get all users
 export async function getAllUsers(
   page: number,
-  limit: number
+  limit: number,
+  includeDeleted = false
 ): Promise<{ items: SafeUser[]; totalItems: number }> {
   const offset = (page - 1) * limit;
 
-  const users = await userRepo.findAllUsers(offset, limit);
-  const totalItems = await userRepo.countAllUsers();
+  const users = await userRepo.findAllUsers(offset, limit, includeDeleted);
+  const totalItems = await userRepo.countAllUsers(includeDeleted);
 
   const safeUsers = await Promise.all(users.map(toSafeUser));
 

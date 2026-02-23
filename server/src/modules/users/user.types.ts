@@ -119,6 +119,8 @@ export interface SafeUser {
   guideProfileId?: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
+  lockedUntil: Date | null;
   avatar?: SafeMedia; // User avatar (single image)
   avatarUrl: string | null; // Convenience URL field for frontend
 }

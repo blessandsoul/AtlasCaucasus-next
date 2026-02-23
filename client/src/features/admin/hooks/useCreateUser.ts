@@ -2,12 +2,14 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { apiClient } from '@/lib/api/axios.config';
 import { API_ENDPOINTS } from '@/lib/constants/api-endpoints';
 import { getErrorMessage } from '@/lib/utils/error';
 import type { CreateUserInput } from '@/features/auth/types/auth.types';
 
 export const useCreateUser = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -17,7 +19,7 @@ export const useCreateUser = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
-            toast.success('User created successfully');
+            toast.success(t('admin.users.created'));
         },
         onError: (error) => {
             toast.error(getErrorMessage(error));

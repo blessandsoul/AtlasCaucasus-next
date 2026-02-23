@@ -109,12 +109,7 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
     uploadDriverAvatarHandler
   );
 
-  // Guides: Upload guide avatar (profile photo - replaces existing)
-  fastify.post<{ Params: { guideId: string } }>(
-    "/guides/:guideId/avatar",
-    { preHandler: [authGuard] },
-    uploadGuideAvatarHandler
-  );
+  // NOTE: Guide avatar upload is handled in guide.routes.ts (POST /guides/:id/avatar)
 
   // ==========================================
   // COVER IMAGE ENDPOINTS
@@ -127,12 +122,7 @@ export async function mediaRoutes(fastify: FastifyInstance): Promise<void> {
     uploadCompanyCoverHandler
   );
 
-  // Guides: Upload guide cover image (replaces existing)
-  fastify.post<{ Params: { guideId: string } }>(
-    "/guides/:guideId/cover",
-    { preHandler: [authGuard] },
-    uploadGuideCoverHandler
-  );
+  // NOTE: Guide cover upload is handled in guide.routes.ts (POST /guides/:id/cover)
 
   // Drivers: Upload driver cover image (replaces existing)
   fastify.post<{ Params: { driverId: string } }>(

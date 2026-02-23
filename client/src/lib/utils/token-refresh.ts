@@ -3,7 +3,7 @@
 import { jwtDecode } from 'jwt-decode';
 import { store } from '@/store';
 import { logout, updateTokens } from '@/features/auth/store/authSlice';
-import { clearCsrfToken } from '@/lib/api/csrf';
+import { clearCsrfToken, ensureCsrfToken } from '@/lib/api/csrf';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
@@ -162,9 +162,25 @@ export const refreshAccessToken = async (): Promise<boolean> => {
                 await new Promise(resolve => setTimeout(resolve, backoffDelay));
             }
 
-            const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-                refreshToken,
-            });
+            // Fetch CSRF token before refresh request (raw axios bypasses apiClient interceptors)
+            let csrfToken: string | undefined;
+            try {
+                csrfToken = await ensureCsrfToken();
+            } catch {
+                // Continue without CSRF if fetch fails
+            }
+
+            const response = await axios.post(
+                `${API_BASE_URL}/auth/refresh`,
+                { refreshToken },
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
+                    },
+                }
+            );
 
             const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 

@@ -72,6 +72,7 @@ export default function CompanyManagementPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
 
   const { data: company, isLoading, error, refetch } = useMyCompany();
   const updateMutation = useUpdateCompany();
@@ -195,7 +196,14 @@ export default function CompanyManagementPage() {
   };
 
   const handlePhotoDelete = (photoId: string) => {
-    deletePhotoMutation.mutate({ id: company.id, photoId });
+    setPhotoToDelete(photoId);
+  };
+
+  const handleConfirmPhotoDelete = () => {
+    if (photoToDelete) {
+      deletePhotoMutation.mutate({ id: company.id, photoId: photoToDelete });
+      setPhotoToDelete(null);
+    }
   };
 
   return (
@@ -540,6 +548,37 @@ export default function CompanyManagementPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Photo Delete Confirmation */}
+      <AlertDialog open={!!photoToDelete} onOpenChange={(open) => !open && setPhotoToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('company.photos.delete_title', 'Delete this photo?')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('company.photos.delete_description', 'This action cannot be undone. The photo will be permanently removed.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmPhotoDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deletePhotoMutation.isPending}
+            >
+              {deletePhotoMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('common.deleting', 'Deleting...')}
+                </>
+              ) : (
+                t('common.delete', 'Delete')
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Danger Zone */}
       <Card className="border-destructive/30">

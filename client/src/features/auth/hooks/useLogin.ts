@@ -17,12 +17,6 @@ export const useLogin = () => {
     return useMutation({
         mutationFn: (data: ILoginRequest) => authService.login(data),
         onSuccess: (response) => {
-            console.log('🔐 Login successful, response:', {
-                hasUser: !!response.user,
-                hasTokens: !!response.tokens,
-                emailVerified: response.user?.emailVerified,
-            });
-
             // Store user and tokens in Redux
             dispatch(setCredentials({
                 user: response.user,

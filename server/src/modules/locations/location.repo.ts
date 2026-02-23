@@ -14,6 +14,12 @@ export async function create(data: CreateLocationData): Promise<Location> {
     });
 }
 
+export async function countByIds(ids: string[]): Promise<number> {
+    return prisma.location.count({
+        where: { id: { in: ids } },
+    });
+}
+
 export async function findById(id: string): Promise<Location | null> {
     return prisma.location.findUnique({
         where: { id },

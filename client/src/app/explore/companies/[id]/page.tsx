@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { CompanyDetailsClient } from './CompanyDetailsClient';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
-    const response = await fetch(`${apiUrl}/companies/${params.id}`, {
+    const { id } = await params;
+    // Use server-side URL for SSR fetches (internal network), fallback to public URL
+    const apiUrl = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+    const response = await fetch(`${apiUrl}/companies/${id}`, {
       cache: 'no-store',
     });
 

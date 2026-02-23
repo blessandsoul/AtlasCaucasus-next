@@ -17,7 +17,7 @@ async function toCompanyResponseWithMedia(company: any): Promise<CompanyResponse
 
 export async function findById(id: string): Promise<CompanyResponse | null> {
     const company = await prisma.company.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
             user: {
                 select: {
@@ -35,13 +35,15 @@ export async function findById(id: string): Promise<CompanyResponse | null> {
 }
 
 export async function findByUserId(userId: string): Promise<Company | null> {
-    return prisma.company.findUnique({
-        where: { userId },
+    return prisma.company.findFirst({
+        where: { userId, deletedAt: null },
     });
 }
 
 function buildCompanyFilters(filters: CompanyFilters): any {
-    const where: any = {};
+    const where: any = {
+        deletedAt: null, // Always exclude soft-deleted companies
+    };
 
     // Verification filter
     if (filters.isVerified !== undefined) {
@@ -159,10 +161,10 @@ export async function update(id: string, data: UpdateCompanyData): Promise<Compa
 }
 
 export async function deleteCompany(id: string): Promise<void> {
-    // Soft delete - mark as unverified (companies don't have isActive, only isVerified)
+    // Proper soft delete using deletedAt timestamp
     await prisma.company.update({
         where: { id },
-        data: { isVerified: false },
+        data: { deletedAt: new Date() },
     });
 }
 

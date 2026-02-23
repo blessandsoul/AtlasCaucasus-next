@@ -1,0 +1,15 @@
+[     139ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[   20096ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/guides/f4056e5f-841d-4d03-a3fa-054fedb8f9df:0
+[   20099ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   20161ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   20165ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   20167ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   48244ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8000/api/v1/guides/00000000-0000-0000-0000-000000000000/photos:0
+[   48246ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/guides/not-uuid/photos:0
+[   48268ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/guides/f4056e5f-841d-4d03-a3fa-054fedb8f9df:0
+[   48270ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e:0
+[   48273ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/guides/not-uuid:0
+[   48275ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e/photos/4fc9942e-ae6b-4bae-a679-9c8238d65cf0:0
+[   48277ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e/photos/bad-uuid:0
+[   48282ms] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request) @ http://localhost:8000/api/v1/guides/ab3ef89f-d1d9-472f-baca-cf818b66ce4e/photos:0
+[   48305ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ http://localhost:8000/api/v1/guides/f4056e5f-841d-4d03-a3fa-054fedb8f9df/photos:0

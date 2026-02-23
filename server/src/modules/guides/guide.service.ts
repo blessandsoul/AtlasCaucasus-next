@@ -1,10 +1,16 @@
-import { NotFoundError, ForbiddenError } from "../../libs/errors.js";
+import { NotFoundError, ForbiddenError, BadRequestError } from "../../libs/errors.js";
 import { verifyGuideOwnership } from "../../libs/authorization.js";
 import * as guideRepo from "./guide.repo.js";
+import { countByIds as countLocationsByIds } from "../locations/location.repo.js";
 import type { GuideResponse, UpdateGuideData, GuideFilters } from "./guide.types.js";
 import type { UserRole } from "../users/user.types.js";
 import { deleteGuidePhotos } from "../media/media.helpers.js";
 import { cacheGet, cacheSet, cacheDeletePattern } from "../../libs/cache.js";
+
+/** Strip HTML tags from a string to prevent stored XSS */
+function stripHtmlTags(text: string): string {
+    return text.replace(/<[^>]*>/g, "");
+}
 
 export async function getGuides(
     filters: GuideFilters,
@@ -73,11 +79,28 @@ export async function updateGuide(
     const { isVerified, ...safeData } = data;
     const updateData = userRoles.includes("ADMIN") ? data : safeData;
 
+    // Sanitize text fields to prevent stored XSS
+    if (updateData.bio) {
+        updateData.bio = stripHtmlTags(updateData.bio);
+    }
+    if (updateData.phoneNumber) {
+        updateData.phoneNumber = stripHtmlTags(updateData.phoneNumber);
+    }
+
     // Update guide profile
     await guideRepo.update(id, updateData);
 
     // Update location associations if provided
     if (data.locationIds !== undefined) {
+        if (data.locationIds.length > 0) {
+            const existingCount = await countLocationsByIds(data.locationIds);
+            if (existingCount !== data.locationIds.length) {
+                throw new BadRequestError(
+                    "One or more location IDs are invalid",
+                    "INVALID_LOCATION_IDS"
+                );
+            }
+        }
         await guideRepo.setLocations(id, data.locationIds);
     }
 

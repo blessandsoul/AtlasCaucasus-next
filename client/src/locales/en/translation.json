@@ -38,6 +38,8 @@
       "page_of": "Page {{page}} of {{total}}"
     },
     "photo_uploaded": "Photo uploaded successfully",
+    "photo_deleted": "Photo deleted successfully",
+    "remove": "Remove",
     "email": "Email",
     "password": "Password",
     "firstName": "First Name",
@@ -48,7 +50,20 @@
     "refresh": "Refresh",
     "clear_filters": "Clear Filters",
     "next": "Next",
-    "go_back": "Go Back"
+    "go_back": "Go Back",
+    "name": "Name",
+    "overview": "Overview",
+    "yes": "Yes",
+    "no": "No",
+    "company": "Company",
+    "guide": "Guide",
+    "driver": "Driver",
+    "access_denied": "Access Denied",
+    "danger_zone": "Danger Zone",
+    "upload_photos": "Upload Photos",
+    "uploading": "Uploading...",
+    "saved_successfully": "Saved successfully",
+    "deleted_successfully": "Deleted successfully"
   },
   "header": {
     "nav": {
@@ -239,7 +254,13 @@
     "company_name_required": "Company name is required",
     "description_required": "Description is required",
     "registration_number_required": "Registration number is required",
-    "phone_number_required": "Phone number is required"
+    "phone_number_required": "Phone number is required",
+    "email_invalid": "Invalid email address",
+    "password_min": "Password must be at least 8 characters",
+    "first_name_min": "First name must be at least 2 characters",
+    "last_name_min": "Last name must be at least 2 characters",
+    "first_name_required": "First name is required",
+    "last_name_required": "Last name is required"
   },
   "home": {
     "title": "Discover the Beauty of Georgia",
@@ -515,7 +536,9 @@
       "subtitle": "Manage your company profile and settings",
       "company_info": "Information",
       "company_info_desc": "Update your company details and contact information",
-      "no_company": "You don't have a company profile yet"
+      "no_company": "You don't have a company profile yet",
+      "cover": "Cover Image",
+      "cover_desc": "The banner image displayed on your public company page"
     },
     "verified": "Verified",
     "name": "Company Name",
@@ -578,12 +601,21 @@
         "contact": "Contact",
         "status": "Status",
         "joined": "Joined"
-      }
+      },
+      "delete_title": "Remove Agent",
+      "delete_description": "Are you sure you want to remove this agent from your company? This action cannot be undone."
     },
+    "tour_agent_created": "Tour agent created successfully!",
+    "tour_agent_removed": "Tour agent removed successfully!",
+    "tour_agent_password_sent": "A temporary password has been sent to {{email}}. Please ask them to check their email.",
+    "cover_uploaded": "Cover image uploaded successfully",
+    "cover_removed": "Cover image removed successfully",
     "photos": {
       "title": "Photos",
       "description": "Upload photos to showcase your company",
-      "supported_formats": "Supports JPG, PNG, WebP (max 5MB each)"
+      "supported_formats": "Supports JPG, PNG, WebP (max 5MB each)",
+      "delete_title": "Delete this photo?",
+      "delete_description": "This action cannot be undone. The photo will be permanently removed."
     }
   },
   "partner": {
@@ -882,6 +914,19 @@
       "upload_success": "Avatar uploaded successfully",
       "delete_success": "Avatar removed successfully"
     },
+    "cover": {
+      "alt": "Cover image",
+      "placeholder": "Click to upload a cover image",
+      "upload": "Upload Cover",
+      "change": "Change Cover",
+      "remove": "Remove",
+      "formats": "JPEG, PNG, or WebP (max 5MB)",
+      "invalid_type": "Only JPEG, PNG, and WebP images are allowed",
+      "file_too_large": "File size must be less than 5MB",
+      "delete_title": "Remove cover image?",
+      "delete_description": "This action cannot be undone. The cover image will be permanently removed.",
+      "confirm_remove": "Remove"
+    },
     "general": {
       "avatar_title": "Profile Picture",
       "avatar_desc": "Your profile picture helps people recognize you.",
@@ -899,24 +944,60 @@
   },
   "driver": {
     "dashboard": {
-      "title": "Driver Profile",
+      "title": "Driver Dashboard",
       "profile": "Profile",
       "locations": "Locations"
     },
     "profile": {
-      "title": "Edit Profile"
+      "title": "Driver Profile",
+      "subtitle": "Manage your driver details and vehicle information",
+      "avatar": "Profile Photo",
+      "avatar_desc": "Your primary profile photo shown to customers",
+      "cover": "Cover Image",
+      "cover_desc": "The banner image displayed on your public profile page"
     },
     "locations": {
       "title": "Manage Locations",
       "coming_soon": "Location management coming soon..."
     },
     "vehicle_type": "Vehicle Type",
+    "vehicle_capacity": "Capacity",
+    "vehicle_make": "Make",
+    "vehicle_model": "Model",
+    "vehicle_details": "Vehicle Details",
     "capacity": "Capacity",
     "vehicle": "Vehicle",
     "license": "License Number",
+    "license_number": "License Plate",
     "phone": "Phone",
+    "phone_number": "Phone Number",
     "available": "Available",
-    "bio": "Bio"
+    "bio": "Bio",
+    "bio_placeholder": "Tell us about yourself...",
+    "no_bio": "No bio provided.",
+    "passengers": "passengers",
+    "delete_warning": "Irreversible actions for your driver profile",
+    "delete_profile": "Delete Driver Profile",
+    "delete_desc": "Once deleted, your driver profile and all associated data will be removed.",
+    "delete_confirm_title": "Are you sure?",
+    "delete_confirm_desc": "This action cannot be undone. Your driver profile will be permanently removed.",
+    "access_denied_desc": "You need a driver account to access this page.",
+    "photos": {
+      "title": "Photos",
+      "subtitle": "Upload photos of yourself and your vehicle",
+      "no_photos": "No photos uploaded yet",
+      "upload_hint": "Upload photos to showcase yourself and your vehicle",
+      "delete_confirm_title": "Delete photo?",
+      "delete_confirm_desc": "This photo will be permanently removed."
+    },
+    "validation": {
+      "vehicle_type_required": "Vehicle type is required",
+      "vehicle_make_required": "Vehicle make is required",
+      "vehicle_model_required": "Vehicle model is required",
+      "vehicle_capacity_min": "Capacity must be at least 1",
+      "license_number_required": "License number is required",
+      "phone_number_required": "Phone number is required"
+    }
   },
   "guide": {
     "dashboard": {
@@ -925,17 +1006,40 @@
       "locations": "Locations"
     },
     "profile": {
-      "title": "Edit Profile"
+      "title": "Guide Profile",
+      "subtitle": "Manage your guide details and experience",
+      "avatar": "Profile Photo",
+      "avatar_desc": "Your primary profile photo shown to customers",
+      "cover": "Cover Image",
+      "cover_desc": "The banner image displayed on your public profile page"
     },
     "locations": {
       "title": "Manage Locations",
+      "subtitle": "Select the locations where you offer guide services",
+      "search_placeholder": "Search locations...",
+      "selected_count": "{{count}} location(s) selected",
+      "no_locations": "No locations found",
       "coming_soon": "Location management coming soon..."
     },
-    "languages": "Languages",
+    "languages": "Languages (comma separated)",
     "experience": "Years of Experience",
     "phone": "Phone",
+    "phone_number": "Phone Number",
     "available": "Available",
-    "bio": "Bio"
+    "bio": "Bio",
+    "bio_placeholder": "Tell us about your experience...",
+    "no_bio": "No bio provided.",
+    "delete_warning": "Irreversible actions for your guide profile",
+    "delete_profile": "Delete Guide Profile",
+    "delete_desc": "Once deleted, your guide profile and all associated data will be removed.",
+    "delete_confirm_title": "Are you sure?",
+    "delete_confirm_desc": "This action cannot be undone. Your guide profile will be permanently removed.",
+    "photos": {
+      "title": "Photos",
+      "subtitle": "Upload photos to showcase your experience",
+      "no_photos": "No photos uploaded yet",
+      "upload_hint": "Upload photos to showcase your experience and tours"
+    }
   },
   "admin": {
     "title": "Admin Panel",
@@ -1014,7 +1118,7 @@
       "currentRoles": "Current Roles",
       "roleUpdated": "User role updated successfully",
       "deleteTitle": "Delete User?",
-      "deleteConfirm": "Are you sure you want to delete user {{email}}? This action cannot be undone.",
+      "deleteConfirm": "Are you sure you want to delete user {{name}}? This action cannot be undone.",
       "deleted": "User deleted successfully",
       "editUser": "Edit User",
       "updated": "User updated successfully",
@@ -1053,6 +1157,21 @@
           "license": "License"
         }
       },
+      "status": "Status",
+      "emailVerified": "Email Verified",
+      "joined": "Joined",
+      "lastUpdated": "Last Updated",
+      "noCompanyProfile": "No company profile",
+      "noGuideProfile": "No guide profile",
+      "noDriverProfile": "No driver profile",
+      "created": "User created successfully",
+      "restored": "User restored successfully",
+      "locked": "Locked",
+      "unlock": "Unlock",
+      "unlock_title": "Unlock User Account",
+      "unlock_description": "Are you sure you want to unlock the account for \"{{name}}\"? This will reset failed login attempts and allow them to log in again.",
+      "unlocking": "Unlocking...",
+      "unlocked": "User account unlocked successfully",
       "restore_title": "Restore User",
       "restore_description": "Are you sure you want to restore the user \"{{name}}\"? This will reactivate their account and they will be able to log in again.",
       "restoring": "Restoring...",

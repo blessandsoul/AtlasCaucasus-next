@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { auditService } from '../services/audit.service';
 import type { AuditLogFilters } from '../types/audit.types';
 import { getErrorMessage } from '@/lib/utils/error';
@@ -13,12 +14,13 @@ export const useAuditLogs = (filters: AuditLogFilters = {}) => {
 };
 
 export const useRestoreUser = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (userId: string) => auditService.restoreUser(userId),
     onSuccess: () => {
-      toast.success('User restored successfully');
+      toast.success(t('admin.users.restored'));
       queryClient.invalidateQueries({ queryKey: ['users'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'audit-logs'] });
     },

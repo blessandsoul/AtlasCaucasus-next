@@ -62,7 +62,8 @@ export async function authGuard(
     }
 
     // Verify tokenVersion matches - if not, the token was invalidated
-    if (payload.tokenVersion !== undefined && user.tokenVersion !== payload.tokenVersion) {
+    // Always enforce: AccessTokenPayload.tokenVersion is required (not optional)
+    if (user.tokenVersion !== payload.tokenVersion) {
       throw new UnauthorizedError("Session has been invalidated", "SESSION_INVALIDATED");
     }
 
@@ -137,7 +138,8 @@ export async function authGuardNoEmailCheck(
       throw new UnauthorizedError("Account is deactivated", "ACCOUNT_DEACTIVATED");
     }
 
-    if (payload.tokenVersion !== undefined && user.tokenVersion !== payload.tokenVersion) {
+    // Always enforce tokenVersion check
+    if (user.tokenVersion !== payload.tokenVersion) {
       throw new UnauthorizedError("Session has been invalidated", "SESSION_INVALIDATED");
     }
 

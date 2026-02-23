@@ -7,6 +7,8 @@ export const updateGuideSchema = z.object({
     yearsOfExperience: z.number().int().min(0).max(70).optional(),
     photoUrl: z.string().url("Invalid photo URL").max(512).optional(),
     phoneNumber: z.string().max(20).optional(),
+    pricePerDay: z.number().min(0).max(100000).optional(),
+    currency: z.enum(["GEL", "USD", "EUR"]).optional(),
     isVerified: z.boolean().optional(), // Admin only
     isAvailable: z.boolean().optional(),
     locationIds: z.array(z.string().uuid()).optional(),

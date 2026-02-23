@@ -41,6 +41,10 @@ export const companyRegisterSchema = z.object({
   websiteUrl: z.string()
     .url("Invalid website URL")
     .max(512, "URL is too long")
+    .refine(
+      (url) => /^https?:\/\//i.test(url),
+      "Website URL must start with http:// or https://"
+    )
     .optional(),
   phoneNumber: z.string()
     .max(20, "Phone number is too long")

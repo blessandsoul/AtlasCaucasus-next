@@ -49,6 +49,9 @@ export async function createUser(data: CreateUserData): Promise<User> {
         },
       },
     },
+    include: {
+      roles: true,
+    },
   });
 
   return toUser(user);
@@ -71,16 +74,17 @@ export async function findUserById(id: string): Promise<User | null> {
       id,
       deletedAt: null,
     },
+    include: {
+      roles: true,
+    },
   });
 
   return user ? toUser(user) : null;
 }
 
-export async function findAllUsers(skip: number, take: number): Promise<User[]> {
+export async function findAllUsers(skip: number, take: number, includeDeleted = false): Promise<User[]> {
   const users = await prisma.user.findMany({
-    where: {
-      deletedAt: null,
-    },
+    where: includeDeleted ? {} : { deletedAt: null },
     orderBy: {
       createdAt: "desc",
     },
@@ -94,11 +98,9 @@ export async function findAllUsers(skip: number, take: number): Promise<User[]> 
   return users.map(toUser);
 }
 
-export async function countAllUsers(): Promise<number> {
+export async function countAllUsers(includeDeleted = false): Promise<number> {
   return prisma.user.count({
-    where: {
-      deletedAt: null,
-    },
+    where: includeDeleted ? {} : { deletedAt: null },
   });
 }
 
@@ -106,6 +108,7 @@ export async function updateUser(id: string, data: UpdateUserData): Promise<User
   const user = await prisma.user.update({
     where: { id },
     data: {
+      email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
@@ -201,19 +204,25 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
 }
 
 export async function addUserRole(userId: string, role: UserRole): Promise<void> {
-  await prisma.userRoleAssignment.upsert({
-    where: {
-      userId_role: {
+  try {
+    await prisma.userRoleAssignment.upsert({
+      where: {
+        userId_role: {
+          userId,
+          role: role as PrismaUserRole,
+        },
+      },
+      update: {},
+      create: {
         userId,
         role: role as PrismaUserRole,
       },
-    },
-    update: {},
-    create: {
-      userId,
-      role: role as PrismaUserRole,
-    },
-  });
+    });
+  } catch (err: any) {
+    // Ignore unique constraint violation from concurrent upserts — role already exists
+    if (err?.code === "P2002") return;
+    throw err;
+  }
 }
 
 export async function removeUserRole(userId: string, role: UserRole): Promise<void> {

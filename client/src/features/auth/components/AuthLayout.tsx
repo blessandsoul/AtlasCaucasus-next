@@ -12,7 +12,9 @@ interface AuthLayoutProps {
     showSocialAuth?: boolean;
 }
 
-export const AuthLayout = ({ children, title, subtitle, showSocialAuth = true }: AuthLayoutProps) => {
+export const AuthLayout = ({ children, title, subtitle, showSocialAuth: _showSocialAuth = true }: AuthLayoutProps) => {
+    // Google OAuth is not yet implemented — hide the button until a handler is wired up
+    const showSocialAuth = false;
     const { t } = useTranslation();
 
     return (

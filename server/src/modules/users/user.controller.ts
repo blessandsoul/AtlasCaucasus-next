@@ -53,8 +53,9 @@ export async function getAllUsers(
   }
 
   const { page, limit } = paginationParsed.data;
+  const includeDeleted = (request.query as Record<string, string>).includeDeleted === 'true';
 
-  const { items, totalItems } = await userService.getAllUsers(page, limit);
+  const { items, totalItems } = await userService.getAllUsers(page, limit, includeDeleted);
 
   return reply.send(
     paginatedResponse("Users retrieved successfully", items, page, limit, totalItems)

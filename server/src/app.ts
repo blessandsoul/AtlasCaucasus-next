@@ -114,6 +114,19 @@ function buildApp() {
     },
   });
 
+  // Enforce CSRF validation on all state-changing requests (POST, PUT, PATCH, DELETE).
+  // Safe methods (GET, HEAD, OPTIONS) are exempt.
+  app.addHook("onRequest", (request, reply, done) => {
+    if (["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+      return done();
+    }
+
+    // Validate CSRF token + cookie
+    // csrfProtection is decorated by @fastify/csrf-protection and calls done(err) on failure
+    (app as unknown as { csrfProtection: (req: FastifyRequest, rep: FastifyReply, cb: (err?: Error) => void) => void })
+      .csrfProtection(request, reply, done);
+  });
+
   // Security headers with Helmet
   app.register(helmet, {
     // Minimal CSP for API server
@@ -176,7 +189,7 @@ function buildApp() {
     global: false, // We apply limits per-route
     max: 100, // Default fallback
     timeWindow: "1 minute",
-    onExceeded: function (_request, _key) {
+    onExceeded: function (_request: FastifyRequest, _key: string) {
       throw new RateLimitError(
         "Too many requests. Please try again later."
       );
@@ -195,7 +208,7 @@ function buildApp() {
 
     // Handle Fastify built-in errors with user-friendly messages
     if ('code' in error && typeof error.code === 'string') {
-      const fastifyErrorMap: Record<string, { statusCode: number; message: string }> = {
+      const fastifyErrorMap: Record<string, { statusCode: number; message: string; code?: string }> = {
         FST_REQ_FILE_TOO_LARGE: {
           statusCode: 413,
           message: `File too large. Maximum size is ${Math.round(env.MAX_FILE_SIZE / 1024 / 1024)}MB`
@@ -220,12 +233,40 @@ function buildApp() {
           statusCode: 400,
           message: 'Invalid content type for file upload'
         },
+        FST_ERR_CTP_INVALID_MEDIA_TYPE: {
+          statusCode: 415,
+          message: 'Unsupported media type'
+        },
+        FST_ERR_CTP_INVALID_CONTENT_LENGTH: {
+          statusCode: 400,
+          message: 'Invalid content length'
+        },
+        FST_ERR_CTP_EMPTY_JSON_BODY: {
+          statusCode: 400,
+          message: 'Request body cannot be empty'
+        },
+        FST_ERR_CTP_INVALID_JSON_BODY: {
+          statusCode: 400,
+          message: 'Malformed JSON in request body'
+        },
+        FST_CSRF_MISSING_SECRET: {
+          statusCode: 403,
+          message: 'CSRF token required. Please fetch a token from GET /api/v1/auth/csrf-token first.',
+          code: 'INVALID_CSRF_TOKEN', // Client expects this code for CSRF retry logic
+        },
+        FST_CSRF_INVALID_TOKEN: {
+          statusCode: 403,
+          message: 'Invalid or expired CSRF token',
+          code: 'INVALID_CSRF_TOKEN', // Client expects this code for CSRF retry logic
+        },
       };
 
       const mappedError = fastifyErrorMap[error.code];
       if (mappedError) {
         logger.warn({ err: error, requestId: request.id }, mappedError.message);
-        return reply.status(mappedError.statusCode).send(errorResponse(error.code, mappedError.message));
+        // Use custom code if provided (e.g., CSRF errors use INVALID_CSRF_TOKEN for client compatibility)
+        const responseCode = mappedError.code ?? error.code;
+        return reply.status(mappedError.statusCode).send(errorResponse(responseCode, mappedError.message));
       }
     }
 

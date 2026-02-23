@@ -3,9 +3,11 @@ import { GuideDetailsClient } from './GuideDetailsClient';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+    // Use internal API URL for server-side fetches (SSR runs on the server, not the browser)
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
     const response = await fetch(`${apiUrl}/guides/${params.id}`, {
       cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!response.ok) {

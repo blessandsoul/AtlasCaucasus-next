@@ -22,6 +22,19 @@ import type { User } from "../users/user.types.js";
  */
 
 // ==========================================
+// TOKEN UTILITIES
+// ==========================================
+
+/**
+ * Hash a token with SHA-256 for secure storage.
+ * Tokens are hashed before storing in DB so that a DB compromise
+ * doesn't expose usable tokens.
+ */
+function hashToken(token: string): string {
+    return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+// ==========================================
 // EMAIL VERIFICATION
 // ==========================================
 
@@ -46,13 +59,13 @@ export async function sendVerification(user: User, isResend: boolean = false): P
         : 7 * 24 * 60 * 60 * 1000; // 7 days for initial registration
     const expiresAt = new Date(Date.now() + expiryDuration);
 
-    // Store token in database with expiry
+    // Store hashed token in database (plaintext token is only sent via email)
     await userRepo.updateUser(user.id, {
-        verificationToken: token,
+        verificationToken: hashToken(token),
         verificationTokenExpiresAt: expiresAt,
     });
 
-    // Send email
+    // Send plaintext token via email (user clicks link containing this)
     const sent = await sendVerificationEmail(user.email, user.firstName, token);
 
     if (!sent) {
@@ -67,32 +80,20 @@ export async function sendVerification(user: User, isResend: boolean = false): P
  * SECURITY: Uses constant-time comparison to prevent timing attacks
  */
 export async function verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
-    // SECURITY FIX: Don't query by token directly - this allows timing attacks
-    // Instead, query by having a token and then use constant-time comparison
-    // All tokens now have expiry dates set
-    const usersWithTokens = await prisma.user.findMany({
+    // Hash the incoming token and query by hash directly.
+    // Since tokens are stored as SHA-256 hashes, we can do an exact DB lookup
+    // which is both simpler and more efficient than scanning all tokens.
+    // SHA-256 is a one-way function, so timing attacks on the DB query
+    // don't reveal the original token.
+    const tokenHash = hashToken(token);
+
+    const user = await prisma.user.findFirst({
         where: {
-            verificationToken: { not: null },
+            verificationToken: tokenHash,
             verificationTokenExpiresAt: { gt: new Date() },
             deletedAt: null,
         },
     });
-
-    // Find matching user using constant-time comparison
-    let user: typeof usersWithTokens[0] | null = null;
-    for (const candidate of usersWithTokens) {
-        if (!candidate.verificationToken) continue;
-
-        const tokenBuffer = Buffer.from(token);
-        const storedBuffer = Buffer.from(candidate.verificationToken);
-
-        if (tokenBuffer.length === storedBuffer.length) {
-            if (crypto.timingSafeEqual(tokenBuffer, storedBuffer)) {
-                user = candidate;
-                break;
-            }
-        }
-    }
 
     if (!user) {
         throw new BadRequestError("Invalid or expired verification token", "INVALID_VERIFICATION_TOKEN");
@@ -177,13 +178,13 @@ export async function requestPasswordReset(email: string): Promise<{ success: bo
     const token = generateSecureToken();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    // Store token
+    // Store hashed token (plaintext token is only sent via email)
     await userRepo.updateUser(user.id, {
-        resetPasswordToken: token,
+        resetPasswordToken: hashToken(token),
         resetPasswordTokenExpiresAt: expiresAt,
     });
 
-    // Send email
+    // Send plaintext token via email
     const sent = await sendPasswordResetEmail(user.email, user.firstName, token);
 
     if (!sent) {
@@ -203,35 +204,18 @@ export async function resetPassword(
     token: string,
     newPassword: string
 ): Promise<{ success: boolean; message: string }> {
-    // SECURITY FIX: Don't query by token directly - this allows timing attacks
-    // Instead, query by expiration and then use constant-time comparison
-    const usersWithValidTokens = await prisma.user.findMany({
+    // Hash the incoming token and query by hash directly.
+    // Since tokens are stored as SHA-256 hashes, timing attacks on the DB query
+    // don't reveal the original token.
+    const tokenHash = hashToken(token);
+
+    const user = await prisma.user.findFirst({
         where: {
-            resetPasswordToken: { not: null },
+            resetPasswordToken: tokenHash,
             resetPasswordTokenExpiresAt: { gt: new Date() },
             deletedAt: null,
         },
     });
-
-    // Find matching user using constant-time comparison
-    // This prevents timing attacks where attackers can guess tokens character-by-character
-    let user: typeof usersWithValidTokens[0] | null = null;
-    for (const candidate of usersWithValidTokens) {
-        if (!candidate.resetPasswordToken) continue;
-
-        // Both buffers must be same length for timingSafeEqual
-        // If lengths differ, token is definitely wrong, but we still do a dummy comparison
-        // to avoid leaking length information
-        const tokenBuffer = Buffer.from(token);
-        const storedBuffer = Buffer.from(candidate.resetPasswordToken);
-
-        if (tokenBuffer.length === storedBuffer.length) {
-            if (crypto.timingSafeEqual(tokenBuffer, storedBuffer)) {
-                user = candidate;
-                break;
-            }
-        }
-    }
 
     if (!user) {
         throw new BadRequestError("Invalid or expired reset token", "INVALID_RESET_TOKEN");

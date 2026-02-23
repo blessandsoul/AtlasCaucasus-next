@@ -15,8 +15,8 @@ export const useDeleteGuideAvatar = (guideId: string) => {
             if (!guideId) {
                 throw new Error('Guide ID is required');
             }
-            // Get avatar media for guide (using guide entityType)
-            const media = await mediaService.getMedia('guide', guideId);
+            // Get avatar media for guide (entityType must match server's "guide-avatar")
+            const media = await mediaService.getMedia('guide-avatar', guideId);
             // Delete all avatar media (should be only one)
             for (const item of media) {
                 await mediaService.deleteMedia(item.id);

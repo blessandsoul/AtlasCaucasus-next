@@ -24,7 +24,7 @@ async function toDriverResponseWithMedia(driver: any): Promise<DriverResponse> {
 
 export async function findById(id: string): Promise<DriverResponse | null> {
     const driver = await prisma.driver.findUnique({
-        where: { id },
+        where: { id, deletedAt: null },
         include: {
             user: {
                 select: {
@@ -50,12 +50,12 @@ export async function findById(id: string): Promise<DriverResponse | null> {
 
 export async function findByUserId(userId: string): Promise<Driver | null> {
     return prisma.driver.findUnique({
-        where: { userId },
+        where: { userId, deletedAt: null },
     });
 }
 
 function buildDriverFilters(filters: DriverFilters): any {
-    const where: any = {};
+    const where: any = { deletedAt: null };
 
     if (filters.isVerified !== undefined) {
         where.isVerified = filters.isVerified;
@@ -199,7 +199,7 @@ export async function update(id: string, data: UpdateDriverData): Promise<Driver
 export async function deleteDriver(id: string): Promise<void> {
     await prisma.driver.update({
         where: { id },
-        data: { isAvailable: false },
+        data: { deletedAt: new Date() },
     });
 }
 

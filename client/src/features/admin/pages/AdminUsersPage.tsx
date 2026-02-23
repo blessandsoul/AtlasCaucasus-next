@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Plus, RotateCcw } from 'lucide-react';
+import { Users, Plus, RotateCcw, Unlock } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { StatusIndicator } from '@/components/common/StatusIndicator';
@@ -17,6 +17,7 @@ import { CreateUserDialog } from '../components/CreateUserDialog';
 import { EditUserDialog } from '../components/EditUserDialog';
 import { DeleteUserDialog } from '../components/DeleteUserDialog';
 import { RestoreUserDialog } from '../components/RestoreUserDialog';
+import { UnlockUserDialog } from '../components/UnlockUserDialog';
 import { UserDetailsModal } from '../components/UserDetailsModal';
 import { formatDate } from '@/lib/utils/format';
 import type { IUser } from '@/features/auth/types/auth.types';
@@ -30,11 +31,13 @@ export const AdminUsersPage = () => {
     const [userToEdit, setUserToEdit] = useState<IUser | null>(null);
     const [userToDelete, setUserToDelete] = useState<IUser | null>(null);
     const [userToRestore, setUserToRestore] = useState<IUser | null>(null);
+    const [userToUnlock, setUserToUnlock] = useState<IUser | null>(null);
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
     const { data, isLoading, error } = useUsers({
         page,
         limit: ITEMS_PER_PAGE,
+        includeDeleted: true,
     });
 
     const { isUserOnline, onlineCount } = useOnlineUsers();
@@ -81,31 +84,52 @@ export const AdminUsersPage = () => {
         },
         {
             header: t('admin.users.table.status', 'Status'),
-            cell: (user) => (
-                <div className="flex justify-center items-center gap-2">
-                    {user.deletedAt ? (
-                        <>
-                            <Badge variant="destructive" className="text-xs">
-                                {t('admin.users.deleted', 'Deleted')}
-                            </Badge>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setUserToRestore(user);
-                                }}
-                                title={t('admin.users.restore', 'Restore')}
-                                className="h-7 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
-                            >
-                                <RotateCcw className="h-3.5 w-3.5" />
-                            </Button>
-                        </>
-                    ) : (
-                        <StatusIndicator isActive={user.isActive} />
-                    )}
-                </div>
-            ),
+            cell: (user) => {
+                const isLocked = user.lockedUntil && new Date(user.lockedUntil) > new Date();
+                return (
+                    <div className="flex justify-center items-center gap-2">
+                        {user.deletedAt ? (
+                            <>
+                                <Badge variant="destructive" className="text-xs">
+                                    {t('admin.users.deleted', 'Deleted')}
+                                </Badge>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setUserToRestore(user);
+                                    }}
+                                    title={t('admin.users.restore', 'Restore')}
+                                    className="h-7 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                </Button>
+                            </>
+                        ) : isLocked ? (
+                            <>
+                                <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
+                                    {t('admin.users.locked', 'Locked')}
+                                </Badge>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setUserToUnlock(user);
+                                    }}
+                                    title={t('admin.users.unlock', 'Unlock')}
+                                    className="h-7 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                >
+                                    <Unlock className="h-3.5 w-3.5" />
+                                </Button>
+                            </>
+                        ) : (
+                            <StatusIndicator isActive={user.isActive} />
+                        )}
+                    </div>
+                );
+            },
             className: "w-[150px] text-center"
         },
         {
@@ -203,6 +227,12 @@ export const AdminUsersPage = () => {
                 user={userToRestore}
                 open={!!userToRestore}
                 onOpenChange={(open) => !open && setUserToRestore(null)}
+            />
+
+            <UnlockUserDialog
+                user={userToUnlock}
+                open={!!userToUnlock}
+                onOpenChange={(open) => !open && setUserToUnlock(null)}
             />
 
             <UserDetailsModal

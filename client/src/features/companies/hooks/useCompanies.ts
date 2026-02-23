@@ -150,11 +150,13 @@ export const useUploadCompanyLogo = () => {
 
 // Tour agent management hooks
 export const useCreateTourAgent = () => {
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
 
   return useMutation({
     mutationFn: (data: CreateAgentFormData) => companyService.createTourAgent(data),
     onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ['company', 'agents'] });
       toast.success(
         t('company.tour_agent_created', 'Tour agent created successfully!'),
         {

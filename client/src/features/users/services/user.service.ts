@@ -10,7 +10,7 @@ export interface UpdateProfileData {
 }
 
 class UserService {
-    async getAllUsers(params: PaginationParams) {
+    async getAllUsers(params: PaginationParams & { includeDeleted?: boolean }) {
         const response = await apiClient.get<PaginatedApiResponse<IUser>>(
             API_ENDPOINTS.USERS.LIST,
             { params }
@@ -58,6 +58,11 @@ class UserService {
 
     async deleteUser(userId: string) {
         await apiClient.delete(API_ENDPOINTS.USERS.DELETE(userId));
+    }
+
+    async unlockUser(userId: string) {
+        const response = await apiClient.post(API_ENDPOINTS.USERS.UNLOCK(userId));
+        return response.data;
     }
 
     async uploadAvatar(userId: string, file: File): Promise<{ avatarUrl: string }> {

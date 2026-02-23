@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { guideService } from '../services/guide.service';
 import { getErrorMessage } from '@/lib/utils/error';
 import { ROUTES } from '@/lib/constants/routes';
-import type { Guide, GuideFilters, GuidePaginatedResponse } from '../types/guide.types';
+import type { GuideFilters, GuidePaginatedResponse, UpdateGuideInput } from '../types/guide.types';
 
 export const useGuides = (filters: GuideFilters = {}) => {
   return useQuery<GuidePaginatedResponse>({
@@ -38,7 +38,7 @@ export const useUpdateGuide = () => {
   const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Guide> }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateGuideInput }) =>
       guideService.updateGuide(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-guide'] });
