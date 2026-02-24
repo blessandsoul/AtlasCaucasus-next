@@ -54,10 +54,26 @@ apiClient.interceptors.request.use(async (config) => {
 
 // Response interceptor - Handle token refresh and CSRF errors
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Clear CSRF token after every state-changing request so the next one
+    // fetches a fresh token. @fastify/csrf-protection uses single-use tokens,
+    // so reusing a consumed token would always trigger a 403 retry cycle.
+    const method = response.config.method?.toLowerCase() || '';
+    if (STATE_CHANGING_METHODS.includes(method)) {
+      clearCsrfToken();
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const errorCode = error.response?.data?.error?.code;
+
+    // Clear CSRF token after failed state-changing requests too, since the
+    // server may have consumed it before returning the error.
+    const method = originalRequest?.method?.toLowerCase() || '';
+    if (STATE_CHANGING_METHODS.includes(method) && errorCode !== 'INVALID_CSRF_TOKEN') {
+      clearCsrfToken();
+    }
 
     // Handle email not verified (403 with EMAIL_NOT_VERIFIED)
     // Redirect to verify-email-pending page so user can verify their email.
@@ -82,16 +98,11 @@ apiClient.interceptors.response.use(
     ) {
       originalRequest._csrfRetry = true;
 
+      // Clear old token and fetch a new one
+      let newCsrfToken: string;
       try {
-        // Clear old token and fetch a new one
         clearCsrfToken();
-        const newCsrfToken = await fetchCsrfToken();
-
-        // Update the request with new CSRF token
-        originalRequest.headers['X-CSRF-Token'] = newCsrfToken;
-
-        // Retry the request
-        return apiClient(originalRequest);
+        newCsrfToken = await fetchCsrfToken();
       } catch (csrfError) {
         console.error('Failed to refresh CSRF token:', csrfError);
         // If CSRF refresh fails, redirect to login
@@ -100,6 +111,13 @@ apiClient.interceptors.response.use(
         }
         return Promise.reject(csrfError);
       }
+
+      // Update the request with new CSRF token and retry
+      // This is intentionally outside the try/catch so that errors from the
+      // retried request (e.g. 401 invalid credentials) propagate normally
+      // instead of being caught and triggering a redirect.
+      originalRequest.headers['X-CSRF-Token'] = newCsrfToken;
+      return apiClient(originalRequest);
     }
 
     // Handle auth token expiration (401)

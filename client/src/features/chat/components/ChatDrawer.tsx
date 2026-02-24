@@ -54,7 +54,7 @@ export const ChatDrawer = () => {
         dispatch(closeDrawer());
     };
 
-    if (!mounted || !isDrawerOpen) return null;
+    if (!mounted) return null;
 
     return createPortal(
         <AnimatePresence>

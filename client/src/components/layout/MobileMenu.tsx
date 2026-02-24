@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef, type FocusEvent } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Compass, Building2, Headset, Map as MapIcon, Hotel, Users, Car, ChevronRight, LogOut, LayoutDashboard, MessageSquare, Bell, User, Home, Info, BookOpen } from 'lucide-react';
+import { Menu, X, Building2, Map as MapIcon, Hotel, Users, Car, LogOut, LayoutDashboard, MessageSquare, Bell, User, BookOpen, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
+import { SearchSuggestions } from '@/components/common/SearchSuggestions';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { colors } from '@/lib/colors';
 import { getMediaUrl } from '@/lib/utils/media';
 import { useLoading } from '@/context/LoadingContext';
 import { useAppDispatch } from '@/store/hooks';
@@ -25,29 +26,26 @@ interface MobileMenuProps {
     onOpenNotifications: () => void;
 }
 
-interface NavSection {
-    key: string;
+interface CategoryLink {
+    title: string;
+    href: string;
     icon: React.ReactNode;
-    label: string;
-    items: {
-        title: string;
-        href: string;
-        icon: React.ReactNode;
-    }[];
 }
 
 export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) => {
     const { t, i18n } = useTranslation();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
-    const [expandedSection, setExpandedSection] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
+    const mobileSearchRef = useRef<HTMLDivElement>(null);
 
     const { isAuthenticated, user, logout } = useAuth();
     const { startLoading, stopLoading } = useLoading();
     const dispatch = useAppDispatch();
     const { currency: selectedCurrency, setCurrency: setSelectedCurrency } = useCurrency();
 
-    // Fetch unread counts
     const { data: chatsData } = useChats({}, { enabled: isAuthenticated && mounted });
     const totalUnreadChats = chatsData?.items.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
 
@@ -66,31 +64,19 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
         };
     }, [isOpen]);
 
-    const navSections: NavSection[] = [
-        {
-            key: 'explore',
-            icon: <Compass className="h-5 w-5" />,
-            label: t('header.nav.explore'),
-            items: [
-                { title: t('header.nav_menu.items.tour'), href: ROUTES.EXPLORE.TOURS, icon: <MapIcon className="h-4 w-4" /> },
-                { title: t('header.nav_menu.items.companies'), href: ROUTES.EXPLORE.COMPANIES, icon: <Building2 className="h-4 w-4" /> },
-                { title: t('header.nav_menu.items.hotels'), href: ROUTES.EXPLORE.TOURS, icon: <Hotel className="h-4 w-4" /> },
-                { title: t('header.nav_menu.items.guides'), href: ROUTES.EXPLORE.GUIDES, icon: <Users className="h-4 w-4" /> },
-                { title: t('header.nav_menu.items.drivers'), href: ROUTES.EXPLORE.DRIVERS, icon: <Car className="h-4 w-4" /> }
-            ]
-        }
+    const categoryLinks: CategoryLink[] = [
+        { title: t('header.nav_menu.items.tour'), href: ROUTES.EXPLORE.TOURS, icon: <MapIcon className="h-4.5 w-4.5" /> },
+        { title: t('header.nav_menu.items.companies'), href: ROUTES.EXPLORE.COMPANIES, icon: <Building2 className="h-4.5 w-4.5" /> },
+        { title: t('header.nav_menu.items.hotels'), href: ROUTES.EXPLORE.TOURS, icon: <Hotel className="h-4.5 w-4.5" /> },
+        { title: t('header.nav_menu.items.guides'), href: ROUTES.EXPLORE.GUIDES, icon: <Users className="h-4.5 w-4.5" /> },
+        { title: t('header.nav_menu.items.drivers'), href: ROUTES.EXPLORE.DRIVERS, icon: <Car className="h-4.5 w-4.5" /> },
     ];
 
-    const toggleSection = (key: string) => {
-        setExpandedSection(expandedSection === key ? null : key);
-    };
-
-    const closeMenu = () => {
+    const closeMenu = (): void => {
         setIsOpen(false);
-        setExpandedSection(null);
     };
 
-    const handleLanguageChange = (lang: string) => {
+    const handleLanguageChange = (lang: string): void => {
         const currentLang = i18n.language;
         if (currentLang === lang) return;
 
@@ -98,13 +84,31 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
         startLoading();
         setTimeout(() => {
             i18n.changeLanguage(lang);
-            setTimeout(() => {
-                stopLoading();
-            }, 300);
+            setTimeout(() => { stopLoading(); }, 300);
         }, 500);
     };
 
-    const getFlagCode = (lang: string) => {
+    const handleSearch = useCallback((): void => {
+        const trimmed = searchQuery.trim();
+        if (!trimmed) return;
+        router.push(`${ROUTES.EXPLORE.TOURS}?search=${encodeURIComponent(trimmed)}`);
+        setSearchQuery('');
+        setIsSuggestionsOpen(false);
+        closeMenu();
+    }, [searchQuery, router]);
+
+    const handleSearchBlur = useCallback((e: FocusEvent<HTMLDivElement>): void => {
+        if (mobileSearchRef.current?.contains(e.relatedTarget as Node)) return;
+        setIsSuggestionsOpen(false);
+    }, []);
+
+    const handleSuggestionSelect = useCallback((): void => {
+        setSearchQuery('');
+        setIsSuggestionsOpen(false);
+        closeMenu();
+    }, []);
+
+    const getFlagCode = (lang: string): string => {
         switch (lang) {
             case 'ka': return 'ge';
             case 'en': return 'gb';
@@ -114,7 +118,7 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
     };
 
     return (
-        <div className={cn("lg:hidden", className)}>
+        <div className={cn('lg:hidden', className)}>
             <Button
                 variant="ghost"
                 size="icon"
@@ -160,122 +164,82 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                     </Button>
                                 </div>
 
+                                {/* Search Bar */}
+                                <div
+                                    ref={mobileSearchRef}
+                                    className="relative px-4 py-3 border-b"
+                                    onBlur={handleSearchBlur}
+                                >
+                                    <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
+                                        <div className="relative">
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                            <input
+                                                type="text"
+                                                value={searchQuery}
+                                                onChange={(e) => { setSearchQuery(e.target.value); setIsSuggestionsOpen(true); }}
+                                                onFocus={() => setIsSuggestionsOpen(true)}
+                                                className={cn(
+                                                    'w-full h-10 pl-9 pr-4 rounded-full border border-border bg-muted/30 text-sm',
+                                                    'placeholder:text-muted-foreground',
+                                                    'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40',
+                                                    'transition-all'
+                                                )}
+                                                placeholder={t('header.search_placeholder', 'Search')}
+                                            />
+                                        </div>
+                                    </form>
+                                    <SearchSuggestions
+                                        query={searchQuery}
+                                        isOpen={isSuggestionsOpen}
+                                        onSelect={handleSuggestionSelect}
+                                    />
+                                </div>
+
                                 {/* Scrollable Navigation */}
                                 <div className="flex-1 overflow-y-auto py-2 px-3 space-y-1">
-                                    {/* Link: Home */}
-                                    <Link
-                                        href={ROUTES.HOME}
-                                        onClick={closeMenu}
-                                        className="flex items-center gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors mb-2"
-                                    >
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                                            <Home className="h-5 w-5" />
-                                        </div>
-                                        <span className="font-semibold text-sm">{t('header.nav.home')}</span>
-                                    </Link>
-
-                                    {navSections.map((section) => (
-                                        <div key={section.key} className="overflow-hidden rounded-xl border bg-card/50 mb-2">
-                                            <button
-                                                onClick={() => toggleSection(section.key)}
-                                                className={cn(
-                                                    "w-full flex items-center justify-between p-3 transition-all",
-                                                    expandedSection === section.key ? "bg-muted/50" : "hover:bg-muted/30"
-                                                )}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <div className={cn(
-                                                        "flex items-center justify-center w-8 h-8 rounded-lg",
-                                                        expandedSection === section.key ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
-                                                    )}>
-                                                        {section.icon}
-                                                    </div>
-                                                    <span className="font-semibold text-sm">{section.label}</span>
-                                                </div>
-                                                <ChevronRight className={cn(
-                                                    "h-4 w-4 text-muted-foreground transition-transform duration-200",
-                                                    expandedSection === section.key && "rotate-90"
-                                                )} />
-                                            </button>
-
-                                            <AnimatePresence>
-                                                {expandedSection === section.key && (
-                                                    <motion.div
-                                                        initial={{ height: 0, opacity: 0 }}
-                                                        animate={{ height: "auto", opacity: 1 }}
-                                                        exit={{ height: 0, opacity: 0 }}
-                                                        transition={{ duration: 0.2 }}
-                                                    >
-                                                        <div className="px-3 pb-3 pt-1 space-y-1">
-                                                            {section.items.map((item, idx) => (
-                                                                <Link
-                                                                    key={idx}
-                                                                    href={item.href}
-                                                                    onClick={closeMenu}
-                                                                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted transition-colors group"
-                                                                >
-                                                                    <div className="text-muted-foreground group-hover:text-primary transition-colors">
-                                                                        {item.icon}
-                                                                    </div>
-                                                                    <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                                                                        {item.title}
-                                                                    </span>
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
+                                    {/* Category Links — flat list */}
+                                    {categoryLinks.map((link, idx) => (
+                                        <Link
+                                            key={idx}
+                                            href={link.href}
+                                            onClick={closeMenu}
+                                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors"
+                                        >
+                                            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+                                                {link.icon}
+                                            </div>
+                                            <span className="font-medium text-sm">{link.title}</span>
+                                        </Link>
                                     ))}
 
+                                    <div className="h-px bg-border mx-2 my-2" />
+
+                                    {/* Blog */}
                                     <Link
                                         href={ROUTES.BLOG.LIST}
                                         onClick={closeMenu}
-                                        className="flex items-center gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors mt-2"
+                                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors"
                                     >
                                         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                                            <BookOpen className="h-5 w-5" />
+                                            <BookOpen className="h-4.5 w-4.5" />
                                         </div>
-                                        <span className="font-semibold text-sm">{t('header.nav.blog')}</span>
-                                    </Link>
-
-                                    <Link
-                                        href="/about"
-                                        onClick={closeMenu}
-                                        className="flex items-center gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors"
-                                    >
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                                            <Info className="h-5 w-5" />
-                                        </div>
-                                        <span className="font-semibold text-sm">{t('header.nav.about')}</span>
-                                    </Link>
-
-                                    <Link
-                                        href="/contact"
-                                        onClick={closeMenu}
-                                        className="flex items-center gap-3 p-3 rounded-xl border bg-card/50 hover:bg-muted/50 transition-colors"
-                                    >
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                                            <Headset className="h-5 w-5" />
-                                        </div>
-                                        <span className="font-semibold text-sm">{t('header.nav.contact')}</span>
+                                        <span className="font-medium text-sm">{t('header.nav.blog')}</span>
                                     </Link>
                                 </div>
 
                                 {/* Footer Area */}
                                 <div className="p-4 border-t bg-muted/10 space-y-4">
-                                    {/* Language Switcher - Compact Row */}
+                                    {/* Language Switcher */}
                                     <div className="flex items-center justify-center gap-2 p-1 bg-muted/50 rounded-lg">
                                         {['ka', 'en', 'ru'].map((lang) => (
                                             <button
                                                 key={lang}
                                                 onClick={() => handleLanguageChange(lang)}
                                                 className={cn(
-                                                    "flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium transition-all",
+                                                    'flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium transition-all',
                                                     i18n.language === lang
-                                                        ? "bg-background shadow-sm text-primary"
-                                                        : "text-muted-foreground hover:text-foreground"
+                                                        ? 'bg-background shadow-sm text-primary'
+                                                        : 'text-muted-foreground hover:text-foreground'
                                                 )}
                                             >
                                                 <span className={`fi fis fi-${getFlagCode(lang)} rounded-sm`} />
@@ -284,17 +248,17 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                         ))}
                                     </div>
 
-                                    {/* Currency Switcher - Compact Row */}
+                                    {/* Currency Switcher */}
                                     <div className="flex items-center justify-center gap-2 p-1 bg-muted/50 rounded-lg">
                                         {SUPPORTED_CURRENCIES.map((c) => (
                                             <button
                                                 key={c}
                                                 onClick={() => setSelectedCurrency(c)}
                                                 className={cn(
-                                                    "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
+                                                    'flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all',
                                                     selectedCurrency === c
-                                                        ? "bg-background shadow-sm text-primary"
-                                                        : "text-muted-foreground hover:text-foreground"
+                                                        ? 'bg-background shadow-sm text-primary'
+                                                        : 'text-muted-foreground hover:text-foreground'
                                                 )}
                                             >
                                                 <span className="font-semibold">{CURRENCY_SYMBOLS[c]}</span>
@@ -304,7 +268,15 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                     </div>
 
                                     {/* Auth Section */}
-                                    {isAuthenticated && user ? (
+                                    {!mounted ? (
+                                        <div className="flex items-center gap-3 px-1">
+                                            <div className="h-10 w-10 rounded-full bg-muted animate-pulse flex-shrink-0" />
+                                            <div className="flex-1 space-y-2">
+                                                <div className="h-3 w-24 bg-muted animate-pulse rounded" />
+                                                <div className="h-2.5 w-32 bg-muted animate-pulse rounded" />
+                                            </div>
+                                        </div>
+                                    ) : isAuthenticated && user ? (
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-3 px-1">
                                                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold overflow-hidden flex-shrink-0">
@@ -330,22 +302,17 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                                         {t('auth.dashboard')}
                                                     </Button>
                                                 </Link>
-
                                                 <Link href={ROUTES.PROFILE} onClick={closeMenu}>
                                                     <Button variant="outline" className="w-full justify-start h-9 text-xs" size="sm">
                                                         <User className="mr-2 h-3.5 w-3.5" />
                                                         {t('auth.profile')}
                                                     </Button>
                                                 </Link>
-
                                                 <Button
                                                     variant="outline"
                                                     className="w-full justify-start h-9 text-xs relative"
                                                     size="sm"
-                                                    onClick={() => {
-                                                        dispatch(openDrawer());
-                                                        closeMenu();
-                                                    }}
+                                                    onClick={() => { dispatch(openDrawer()); closeMenu(); }}
                                                 >
                                                     <MessageSquare className="mr-2 h-3.5 w-3.5" />
                                                     {t('auth.messages')}
@@ -353,15 +320,11 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                                         <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-destructive ring-1 ring-background" />
                                                     )}
                                                 </Button>
-
                                                 <Button
                                                     variant="outline"
                                                     className="w-full justify-start h-9 text-xs relative"
                                                     size="sm"
-                                                    onClick={() => {
-                                                        onOpenNotifications();
-                                                        closeMenu();
-                                                    }}
+                                                    onClick={() => { onOpenNotifications(); closeMenu(); }}
                                                 >
                                                     <Bell className="mr-2 h-3.5 w-3.5" />
                                                     {t('header.nav.notifications')}
@@ -370,33 +333,22 @@ export const MobileMenu = ({ className, onOpenNotifications }: MobileMenuProps) 
                                                     )}
                                                 </Button>
                                             </div>
-
                                             <Button
                                                 variant="outline"
                                                 className="w-full justify-start h-9 text-xs hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
                                                 size="sm"
-                                                onClick={() => {
-                                                    logout();
-                                                    closeMenu();
-                                                }}
+                                                onClick={() => { logout(); closeMenu(); }}
                                             >
                                                 <LogOut className="mr-2 h-3.5 w-3.5" />
                                                 {t('auth.logout')}
                                             </Button>
                                         </div>
                                     ) : (
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Link href={ROUTES.LOGIN} onClick={closeMenu}>
-                                                <Button variant="outline" className="w-full">
-                                                    {t('auth.login')}
-                                                </Button>
-                                            </Link>
-                                            <Link href={ROUTES.REGISTER} onClick={closeMenu}>
-                                                <Button className="w-full text-white" style={{ backgroundColor: colors.secondary }}>
-                                                    {t('auth.register')}
-                                                </Button>
-                                            </Link>
-                                        </div>
+                                        <Link href={ROUTES.LOGIN} onClick={closeMenu} className="block">
+                                            <Button className="w-full rounded-full bg-foreground text-background font-semibold hover:bg-foreground/90 transition-colors">
+                                                {t('auth.login')}
+                                            </Button>
+                                        </Link>
                                     )}
                                 </div>
                             </motion.div>

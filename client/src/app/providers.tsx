@@ -11,6 +11,7 @@ import { LoadingProvider } from '@/context/LoadingContext';
 import { WebSocketProvider } from '@/context/WebSocketContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import { NotificationInitializer } from '@/features/notifications/components/NotificationInitializer';
+import { AuthInitializer } from '@/features/auth/components/AuthInitializer';
 import { AgentationProvider } from '@/components/dev/AgentationProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <CurrencyProvider>
           <LoadingProvider>
             <WebSocketProvider>
+              <AuthInitializer />
               <NotificationInitializer />
               {children}
               <Toaster position="top-center" toastOptions={{ duration: 2000 }} />

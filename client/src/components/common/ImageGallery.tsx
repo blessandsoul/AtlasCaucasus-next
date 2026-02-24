@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -65,6 +67,16 @@ export const ImageGallery = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightboxIndex, nextImage, prevImage]);
 
+  // Lock body scroll when lightbox is open
+  useEffect(() => {
+    if (lightboxIndex !== null) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [lightboxIndex]);
+
   if (!images || images.length === 0) return null;
 
   const aspectRatioClass = {
@@ -105,67 +117,74 @@ export const ImageGallery = ({
         ))}
       </div>
 
-      {lightboxIndex !== null && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="absolute inset-0 bg-black/90 backdrop-blur-sm"
-            onClick={closeLightbox}
-          />
-
-          <div className="relative w-full max-h-screen p-4 flex flex-col items-center justify-center z-10">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 text-white/70 hover:text-white hover:bg-white/10 z-50 rounded-full"
+      {createPortal(
+        <AnimatePresence>
+          {lightboxIndex !== null && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+              role="dialog"
+              aria-modal="true"
               onClick={closeLightbox}
             >
-              <X className="w-6 h-6" />
-              <span className="sr-only">Close</span>
-            </Button>
+              {/* Close Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 z-10 text-white/70 hover:text-white hover:bg-white/10 rounded-full"
+                onClick={closeLightbox}
+              >
+                <X className="w-6 h-6" />
+                <span className="sr-only">Close</span>
+              </Button>
 
-            <div className="relative max-w-7xl w-full flex items-center justify-center">
-              <img
-                key={lightboxIndex}
-                src={getMediaUrl(images[lightboxIndex].url)}
-                alt={images[lightboxIndex].alt}
-                className="max-h-[85vh] max-w-full object-contain rounded-sm shadow-2xl"
-              />
+              {/* Main image + nav */}
+              <div className="relative w-full h-full flex items-center justify-center px-4 py-14 pointer-events-none">
+                <motion.img
+                  key={lightboxIndex}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.2 }}
+                  src={getMediaUrl(images[lightboxIndex].url)}
+                  alt={images[lightboxIndex].alt}
+                  className="max-h-full max-w-full object-contain rounded-sm shadow-2xl pointer-events-auto"
+                  onClick={(e) => e.stopPropagation()}
+                />
 
-              <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    'pointer-events-auto text-white/70 hover:text-white hover:bg-black/20 rounded-full w-12 h-12 ml-4 transition-opacity',
-                    images.length <= 1 && 'opacity-0'
-                  )}
-                  onClick={prevImage}
-                >
-                  <ChevronLeft className="w-8 h-8" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    'pointer-events-auto text-white/70 hover:text-white hover:bg-black/20 rounded-full w-12 h-12 mr-4 transition-opacity',
-                    images.length <= 1 && 'opacity-0'
-                  )}
-                  onClick={nextImage}
-                >
-                  <ChevronRight className="w-8 h-8" />
-                </Button>
+                {/* Prev / Next */}
+                {images.length > 1 && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:bg-white/10 rounded-full w-12 h-12 pointer-events-auto"
+                      onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                    >
+                      <ChevronLeft className="w-8 h-8" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:bg-white/10 rounded-full w-12 h-12 pointer-events-auto"
+                      onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                    >
+                      <ChevronRight className="w-8 h-8" />
+                    </Button>
+                  </>
+                )}
               </div>
-            </div>
 
-            <div className="absolute bottom-4 left-0 right-0 text-center text-white/60 text-sm font-medium">
-              {lightboxIndex + 1} / {images.length}
-            </div>
-          </div>
-        </div>
+              {/* Counter */}
+              <div className="absolute top-4 left-4 z-10 text-white/80 font-medium bg-black/50 px-3 py-1 rounded-full text-sm backdrop-blur-sm pointer-events-none">
+                {lightboxIndex + 1} / {images.length}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </div>
   );

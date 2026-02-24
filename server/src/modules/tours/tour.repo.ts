@@ -36,6 +36,8 @@ function toSafeTour(tour: PrismaTour): SafeTour {
     availableDates: tour.availableDates ? JSON.parse(tour.availableDates) : null,
     startTime: tour.startTime,
     itinerary: tour.itinerary ? JSON.parse(tour.itinerary) : null,
+    averageRating: tour.averageRating?.toString() ?? null,
+    reviewCount: tour.reviewCount,
   };
 }
 

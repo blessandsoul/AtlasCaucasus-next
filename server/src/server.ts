@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { promises as fsPromises } from "fs";
+import path from "path";
 import { env } from "./config/env.js";
 import { logger } from "./libs/logger.js";
 import { connectRedis, disconnectRedis, isRedisConnected } from "./libs/redis.js";
@@ -22,8 +24,31 @@ let stopKeepalive: (() => void) | null = null;
 let redisAvailable = false;
 let databaseAvailable = false;
 
+async function validateUploadDirectory(): Promise<boolean> {
+  const uploadDir = path.join(process.cwd(), env.UPLOAD_DIR);
+  try {
+    await fsPromises.mkdir(uploadDir, { recursive: true });
+    // Verify writability by writing and removing a test file
+    const testFile = path.join(uploadDir, `.write-test-${Date.now()}`);
+    await fsPromises.writeFile(testFile, "");
+    await fsPromises.unlink(testFile);
+    logger.info({ uploadDir }, "Upload directory is writable");
+    return true;
+  } catch (err) {
+    logger.error(
+      { err, uploadDir },
+      "Upload directory is NOT writable — file uploads will fail. " +
+      "If using Docker volumes, ensure the volume is owned by UID 1001 (fastify user)."
+    );
+    return false;
+  }
+}
+
 async function start(): Promise<void> {
   try {
+    // Validate upload directory (non-fatal — other features still work)
+    await validateUploadDirectory();
+
     // Test database connection (non-fatal)
     databaseAvailable = await testDatabaseConnection();
     if (!databaseAvailable) {

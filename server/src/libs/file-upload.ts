@@ -1,10 +1,11 @@
-import { promises as fs } from "fs";
+import { promises as fs, constants as fsConstants } from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { fileTypeFromBuffer } from "file-type";
 import { env } from "../config/env.js";
 import type { MediaEntityType } from "../modules/media/media.types.js";
 import { logger } from "./logger.js";
+import { InternalError } from "./errors.js";
 
 // Base upload directory (from environment or default)
 const UPLOAD_BASE_DIR = path.join(process.cwd(), env.UPLOAD_DIR);
@@ -272,14 +273,26 @@ function getEntityDirectory(entityType: MediaEntityType): string {
 }
 
 /**
- * Ensure directory exists, create if not
+ * Ensure directory exists and is writable, create if not
  * @param dirPath - Directory path
  */
 async function ensureDirectory(dirPath: string): Promise<void> {
   try {
-    await fs.access(dirPath);
-  } catch {
-    await fs.mkdir(dirPath, { recursive: true });
+    await fs.access(dirPath, fsConstants.W_OK);
+  } catch (err: unknown) {
+    const fsError = err as NodeJS.ErrnoException;
+    if (fsError.code === "ENOENT") {
+      // Directory doesn't exist — create it
+      await fs.mkdir(dirPath, { recursive: true });
+    } else if (fsError.code === "EACCES") {
+      // Directory exists but is not writable
+      logger.error({ dirPath }, "Upload directory is not writable");
+      throw new InternalError(
+        "File upload failed: storage directory is not writable. Check Docker volume permissions."
+      );
+    } else {
+      throw fsError;
+    }
   }
 }
 
@@ -298,14 +311,34 @@ export async function saveFile(
   // Get directory path
   const dirPath = getEntityDirectory(entityType);
 
-  // Ensure directory exists
+  // Ensure directory exists and is writable
   await ensureDirectory(dirPath);
 
   // Full file path
   const filePath = path.join(dirPath, filename);
 
   // Write file to disk
-  await fs.writeFile(filePath, buffer);
+  try {
+    await fs.writeFile(filePath, buffer);
+  } catch (err: unknown) {
+    const fsError = err as NodeJS.ErrnoException;
+    logger.error(
+      { err: fsError, filePath, entityType, code: fsError.code },
+      "Failed to save uploaded file"
+    );
+
+    if (fsError.code === "EACCES") {
+      throw new InternalError(
+        "File upload failed: permission denied. Check server file permissions."
+      );
+    }
+    if (fsError.code === "ENOSPC") {
+      throw new InternalError(
+        "File upload failed: disk full. Please contact the administrator."
+      );
+    }
+    throw new InternalError("File upload failed due to a server storage error.");
+  }
 
   // Return public URL path (using environment variable)
   return `${env.STATIC_URL_PREFIX}/${entityType}s/${filename}`;

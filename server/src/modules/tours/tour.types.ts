@@ -117,5 +117,7 @@ export interface SafeTour {
   availableDates: string[] | null;
   startTime: string | null;
   itinerary: ItineraryStep[] | null;
+  averageRating: string | null;
+  reviewCount: number;
   images?: SafeMedia[]; // Media images associated with tour
 }

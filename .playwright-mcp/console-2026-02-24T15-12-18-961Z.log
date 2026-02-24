@@ -1,0 +1,104 @@
+[     467ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/:0
+[     657ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     744ms] TypeError: Cannot read properties of undefined (reading 'ReactCurrentOwner')
+    at $$$reconciler (http://localhost:3001/_next/static/chunks/node_modules_react-reconciler_dd58c996._.js:395:54)
+    at createRenderer (http://localhost:3001/_next/static/chunks/node_modules_%40react-three_fiber_dist_798280f8._.js:298:183)
+    at module evaluation (http://localhost:3001/_next/static/chunks/node_modules_%40react-three_fiber_dist_798280f8._.js:1720:36)
+    at http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:904:13)
+    at instantiateModule (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:238:20)
+    at module evaluation (http://localhost:3001/_next/static/chunks/node_modules_%40react-three_fiber_dist_798280f8._.js:2337:207)
+    at http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:904:13)
+    at instantiateModule (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:238:20)
+    at module evaluation (http://localhost:3001/_next/static/chunks/src_8c14d6f4._.js:34:275)
+    at http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:904:13)
+    at instantiateModule (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:238:20)
+    at module evaluation (http://localhost:3001/_next/static/chunks/src_8c14d6f4._.js:1186:165)
+    at http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:904:13)
+    at instantiateModule (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:830:12)
+    at DevContext.commonJsRequire [as r] (http://localhost:3001/_next/static/chunks/turbopack-_23a915ee._.js:259:12)
+    at requireModule (http://localhost:3001/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:85:84)
+    at initializeModuleChunk (http://localhost:3001/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1089:25)
+    at resolveModuleChunk (http://localhost:3001/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1013:43)
+    at http://localhost:3001/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1735:24
+[     771ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/favicon.ico:0
+[    3819ms] [WARNING] The resource http://localhost:3001/_next/static/media/9a4536d8acff75fc-s.p.f885204c.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[    3819ms] [WARNING] The resource http://localhost:3001/_next/static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[    3819ms] [WARNING] The resource http://localhost:3001/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[    3819ms] [WARNING] The resource http://localhost:3001/_next/static/media/dc6d2a64e9dbf3bc-s.p.4b9eb7a1.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[    3819ms] [WARNING] The resource http://localhost:3001/_next/static/chunks/%5Broot-of-the-server%5D__17695607._.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[    3819ms] [WARNING] The resource http://localhost:3001/_next/static/media/70bc3e132a0a741e-s.p.15008bfb.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[   95899ms] [ERROR] ./src/components/common/Silk.tsx:4:1
+Module not found: Can't resolve '@react-three/fiber'
+  2 |
+  3 | /* eslint-disable react/no-unknown-property */
+> 4 | import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 | import { useRef, useMemo, useLayoutEffect } from 'react';
+  6 | import * as THREE from 'three';
+  7 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/common/Silk.tsx [Client Component Browser]
+    ./src/components/home/HeroSection.tsx [Client Component Browser]
+    ./src/components/home/HeroSection.tsx [Server Component]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/common/Silk.tsx [Client Component SSR]
+    ./src/components/home/HeroSection.tsx [Client Component SSR]
+    ./src/components/home/HeroSection.tsx [Server Component]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   95899ms] [ERROR] ./src/components/common/Silk.tsx:6:1
+Module not found: Can't resolve 'three'
+  4 | import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
+  5 | import { useRef, useMemo, useLayoutEffect } from 'react';
+> 6 | import * as THREE from 'three';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 |
+  8 | extend({ Mesh: THREE.Mesh, PlaneGeometry: THREE.PlaneGeometry, ShaderMaterial: THREE.ShaderMaterial });
+  9 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/common/Silk.tsx [Client Component Browser]
+    ./src/components/home/HeroSection.tsx [Client Component Browser]
+    ./src/components/home/HeroSection.tsx [Server Component]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/common/Silk.tsx [Client Component SSR]
+    ./src/components/home/HeroSection.tsx [Client Component SSR]
+    ./src/components/home/HeroSection.tsx [Server Component]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[   98922ms] [WARNING] The resource http://localhost:3001/_next/static/media/9a4536d8acff75fc-s.p.f885204c.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[   98922ms] [WARNING] The resource http://localhost:3001/_next/static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[   98922ms] [WARNING] The resource http://localhost:3001/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[   98922ms] [WARNING] The resource http://localhost:3001/_next/static/media/dc6d2a64e9dbf3bc-s.p.4b9eb7a1.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[   98922ms] [WARNING] The resource http://localhost:3001/_next/static/chunks/%5Broot-of-the-server%5D__17695607._.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[   98922ms] [WARNING] The resource http://localhost:3001/_next/static/media/70bc3e132a0a741e-s.p.15008bfb.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3001/:0
+[  124785ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  124786ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  125824ms] [WARNING] i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297

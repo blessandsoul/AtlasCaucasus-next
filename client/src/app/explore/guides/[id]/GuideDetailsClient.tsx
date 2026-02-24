@@ -77,8 +77,17 @@ export function GuideDetailsClient(): React.ReactElement {
     ? getMediaUrl(guide.coverUrl)
     : '/default-covers/guide-cover.jpg';
 
+  const languages = (() => {
+    if (!guide.languages) return [];
+    if (Array.isArray(guide.languages)) return guide.languages;
+    if (typeof guide.languages === 'string') {
+      try { const parsed = JSON.parse(guide.languages); return Array.isArray(parsed) ? parsed : []; } catch { return []; }
+    }
+    return [];
+  })();
+
   const guideSubtitle = [
-    guide.languages?.length ? guide.languages.join(', ') : null,
+    languages.length ? languages.join(', ') : null,
     guide.pricePerDay ? `${guide.pricePerDay} ${guide.currency || 'USD'}/${t('guide_details.per_day')}` : null,
   ].filter(Boolean).join(' - ');
 

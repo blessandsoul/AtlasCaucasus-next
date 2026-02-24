@@ -28,7 +28,7 @@ export const FeaturedToursSection = () => {
     };
 
     return (
-        <section className="py-20 bg-muted/20 overflow-hidden">
+        <section className="py-12 bg-muted/20 overflow-hidden">
             <div className="container mx-auto px-4 mb-10 flex items-end justify-between">
                 <div>
                     <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 text-gradient leading-tight pb-2">

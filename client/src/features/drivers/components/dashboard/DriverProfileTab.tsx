@@ -256,7 +256,7 @@ export const DriverProfileTab = () => {
                     placeholder="e.g. Sedan, Minivan"
                   />
                   {errors.vehicleType && (
-                    <p className="text-sm text-destructive">{t(`driver.validation.${errors.vehicleType.message}`, errors.vehicleType.message)}</p>
+                    <p className="text-sm text-destructive">{errors.vehicleType.message}</p>
                   )}
                 </div>
 
@@ -264,7 +264,7 @@ export const DriverProfileTab = () => {
                   <Label htmlFor="vehicleCapacity">{t('driver.vehicle_capacity', 'Capacity')}</Label>
                   <Input id="vehicleCapacity" type="number" min={1} {...register('vehicleCapacity')} />
                   {errors.vehicleCapacity && (
-                    <p className="text-sm text-destructive">{t(`driver.validation.${errors.vehicleCapacity.message}`, errors.vehicleCapacity.message)}</p>
+                    <p className="text-sm text-destructive">{errors.vehicleCapacity.message}</p>
                   )}
                 </div>
 
@@ -272,7 +272,7 @@ export const DriverProfileTab = () => {
                   <Label htmlFor="vehicleMake">{t('driver.vehicle_make', 'Make')}</Label>
                   <Input id="vehicleMake" {...register('vehicleMake')} placeholder="e.g. Toyota" />
                   {errors.vehicleMake && (
-                    <p className="text-sm text-destructive">{t(`driver.validation.${errors.vehicleMake.message}`, errors.vehicleMake.message)}</p>
+                    <p className="text-sm text-destructive">{errors.vehicleMake.message}</p>
                   )}
                 </div>
 
@@ -280,7 +280,7 @@ export const DriverProfileTab = () => {
                   <Label htmlFor="vehicleModel">{t('driver.vehicle_model', 'Model')}</Label>
                   <Input id="vehicleModel" {...register('vehicleModel')} placeholder="e.g. Camry" />
                   {errors.vehicleModel && (
-                    <p className="text-sm text-destructive">{t(`driver.validation.${errors.vehicleModel.message}`, errors.vehicleModel.message)}</p>
+                    <p className="text-sm text-destructive">{errors.vehicleModel.message}</p>
                   )}
                 </div>
 
@@ -288,7 +288,7 @@ export const DriverProfileTab = () => {
                   <Label htmlFor="licenseNumber">{t('driver.license_number', 'License Plate')}</Label>
                   <Input id="licenseNumber" {...register('licenseNumber')} placeholder="AB-123-CD" />
                   {errors.licenseNumber && (
-                    <p className="text-sm text-destructive">{t(`driver.validation.${errors.licenseNumber.message}`, errors.licenseNumber.message)}</p>
+                    <p className="text-sm text-destructive">{errors.licenseNumber.message}</p>
                   )}
                 </div>
 
@@ -296,7 +296,7 @@ export const DriverProfileTab = () => {
                   <Label htmlFor="phoneNumber">{t('driver.phone_number', 'Phone Number')}</Label>
                   <Input id="phoneNumber" {...register('phoneNumber')} placeholder="+995..." />
                   {errors.phoneNumber && (
-                    <p className="text-sm text-destructive">{t(`driver.validation.${errors.phoneNumber.message}`, errors.phoneNumber.message)}</p>
+                    <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
                   )}
                 </div>
               </div>

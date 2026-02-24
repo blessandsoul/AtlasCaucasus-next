@@ -91,7 +91,7 @@ export const AdminUsersPage = () => {
                         {user.deletedAt ? (
                             <>
                                 <Badge variant="destructive" className="text-xs">
-                                    {t('admin.users.deleted', 'Deleted')}
+                                    {t('admin.users.deletedStatus', 'Deleted')}
                                 </Badge>
                                 <Button
                                     variant="ghost"

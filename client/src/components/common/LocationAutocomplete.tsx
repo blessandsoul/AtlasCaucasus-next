@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { MapPin, Loader2, X } from 'lucide-react';
 import { useMockTranslation } from '@/hooks/use-mock-translation';
 import { useSearchLocations } from '@/features/search/hooks/useSearch';
+import { useLocations } from '@/features/locations/hooks/useLocations';
 import type { LocationSearchResult } from '@/features/search/types/search.types';
 import { cn } from '@/lib/utils';
 
@@ -11,6 +12,7 @@ interface LocationAutocompleteProps {
     onSelect?: () => void;
     placeholder?: string;
     className?: string;
+    triggerClassName?: string;
 }
 
 export const LocationAutocomplete = ({
@@ -20,14 +22,21 @@ export const LocationAutocomplete = ({
     placeholder,
     className,
     triggerClassName,
-}: LocationAutocompleteProps & { triggerClassName?: string }) => {
+}: LocationAutocompleteProps): JSX.Element => {
     const { t } = useMockTranslation();
     const [isFocused, setIsFocused] = useState(false);
     const [query, setQuery] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const { data: locations, isLoading } = useSearchLocations(query, 8);
+    const { data: searchResults, isLoading: isSearching } = useSearchLocations(query, 8);
+
+    // Fetch trending/popular locations to show when dropdown opens with no query
+    const { data: trendingData, isLoading: isTrendingLoading } = useLocations({
+        isActive: true,
+        limit: 5,
+    });
+    const trendingLocations = trendingData?.items || [];
 
     const handleSelect = useCallback(
         (location: LocationSearchResult) => {
@@ -55,7 +64,7 @@ export const LocationAutocomplete = ({
 
     // Close dropdown when clicking outside
     useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
+        const handleClickOutside = (e: MouseEvent): void => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setIsFocused(false);
             }
@@ -65,15 +74,17 @@ export const LocationAutocomplete = ({
     }, []);
 
     const displayValue = value ? `${value.name}${value.region ? `, ${value.region}` : ''}` : query;
-    const showDropdown = isFocused && (isLoading || (locations && locations.length > 0) || query.length > 0);
+
+    // Show dropdown when focused: either search results or trending destinations
+    const hasSearchQuery = query.length > 0;
+    const showDropdown = isFocused;
 
     return (
         <div ref={containerRef} className={cn('relative flex-1', className)}>
             <div
                 className={cn(
                     'flex items-center gap-3 px-6 h-full py-3 transition-colors',
-                    // Default rounded-l-full if no triggerClassName provided, otherwise controlled by parent or combined
-                    !triggerClassName && 'rounded-l-full',
+                    !triggerClassName && 'rounded-l-2xl',
                     triggerClassName,
                     isFocused ? 'bg-muted/50' : 'hover:bg-muted/50'
                 )}
@@ -107,31 +118,34 @@ export const LocationAutocomplete = ({
 
             {/* Dropdown */}
             {showDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-xl shadow-lg z-50 overflow-hidden">
-                    {isLoading && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-popover border rounded-xl shadow-lg z-50 overflow-hidden min-w-[280px] max-w-[calc(100vw-2rem)]">
+                    {/* Searching state */}
+                    {hasSearchQuery && isSearching && (
                         <div className="flex items-center justify-center py-4">
                             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                         </div>
                     )}
-                    {!isLoading && locations && locations.length === 0 && query.length > 0 && (
+
+                    {/* Search results */}
+                    {hasSearchQuery && !isSearching && searchResults && searchResults.length === 0 && (
                         <div className="py-4 text-center text-sm text-muted-foreground">
-                            {t('common.no_results')}
+                            {t('common.no_results', 'No results found')}
                         </div>
                     )}
-                    {!isLoading && locations && locations.length > 0 && (
+                    {hasSearchQuery && !isSearching && searchResults && searchResults.length > 0 && (
                         <ul className="py-1 max-h-60 overflow-y-auto">
-                            {locations.map((location) => (
+                            {searchResults.map((location) => (
                                 <li
                                     key={location.id}
                                     className="px-4 py-2.5 cursor-pointer hover:bg-muted/50 transition-colors"
                                     onClick={() => handleSelect(location)}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-muted rounded-lg">
+                                        <div className="p-2 bg-muted rounded-lg shrink-0">
                                             <MapPin className="h-4 w-4 text-muted-foreground" />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="text-sm font-medium">{location.name}</p>
+                                            <p className="text-sm font-semibold">{location.name}</p>
                                             {location.region && (
                                                 <p className="text-xs text-muted-foreground">
                                                     {location.region}, {location.country}
@@ -142,6 +156,53 @@ export const LocationAutocomplete = ({
                                 </li>
                             ))}
                         </ul>
+                    )}
+
+                    {/* Trending destinations (shown when no search query) */}
+                    {!hasSearchQuery && (
+                        <>
+                            <div className="px-4 pt-3 pb-1">
+                                <p className="text-sm font-semibold text-foreground">
+                                    {t('home.hero.search.trending_destinations', 'Trending destinations')}
+                                </p>
+                            </div>
+                            {isTrendingLoading ? (
+                                <div className="flex items-center justify-center py-4">
+                                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                                </div>
+                            ) : trendingLocations.length > 0 ? (
+                                <ul className="py-1 max-h-60 overflow-y-auto">
+                                    {trendingLocations.map((location) => (
+                                        <li
+                                            key={location.id}
+                                            className="px-4 py-2.5 cursor-pointer hover:bg-muted/50 transition-colors"
+                                            onClick={() => handleSelect({
+                                                id: location.id,
+                                                name: location.name,
+                                                region: location.region || null,
+                                                country: location.country,
+                                            })}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-muted rounded-lg shrink-0">
+                                                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-semibold">{location.name}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {location.country}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="py-4 text-center text-sm text-muted-foreground">
+                                    {t('home.hero.no_destinations', 'No featured destinations available')}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             )}

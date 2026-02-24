@@ -1,0 +1,13 @@
+[     371ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://www.tripadvisor.com/:0
+[    1397ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://www.tripadvisor.com/static/gtm/gtm1p.html?gtmParams=&parentDomain=https%3A%2F%2Fwww.tripadvisor.com&gclid=undefined&gbraid=undefined&wbraid=undefined&targetingConsent=granted&analyticsConsent=granted:0
+[    1615ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://micro.rubiconproject.com/prebid/dynamic/13406.js:23
+[    1832ms] [WARNING] [GSI_LOGGER]: Your client application uses one of the Google One Tap prompt UI status methods that may stop functioning when FedCM becomes mandatory. Refer to the migration guide to update your code accordingly and opt-in to FedCM to test your changes. Learn more: https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#display_moment and https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#skipped_moment @ https://accounts.google.com/gsi/client:80
+[    1835ms] [ERROR] Not signed in with the identity provider. @ https://www.tripadvisor.com/:0
+[    1941ms] [ERROR] Failed to load resource: the server responded with a status of 451 () @ https://api.rlcdn.com/api/identity/envelope?pid=13529:0
+[    4469ms] [ERROR] [GSI_LOGGER]: FedCM get() rejects with NetworkError: Error retrieving a token. @ https://static.tacdn.com/assets/8cre3h.gxuh19I.js:0
+[   17437ms] [WARNING] [TikTok Pixel] - Missing 'content_id' paramter
+Issue: The 'content_id' parameter isn't being received. This is required for Video Shopping Ads (VSA).
+Suggestion: Include the 'content_id' parameter in your source code. This is required for Video Shopping Ads (VSA). See https://ads.tiktok.com/help/article/standard-events-parameters?redirected=2 for more information. @ https://analytics.tiktok.com/i18n/pixel/static/main.MTEwMjY2ZTExOQ.js:0
+[   42960ms] [ERROR] Failed to load resource: the server responded with a status of 410 (Gone) @ https://ads.stickyadstv.com/pbs-user-sync?gdpr=&gdpr_consent=&us_privacy=&gpp=&gpp_sid=&r=https%3A%2F%2Fcookies.nextmillmedia.com%2Fsetuid%3Fbidder%3Dfreewheel-ssp%26nmuid%3D%26gdpr%3D%26gdpr_consent%3D%26us_privacy%3D%26uid%3D%7Bviewerid%7D:0
+[   44676ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ chrome-error://chromewebdata/:0
+[   44680ms] [ERROR] Refused to display 'https://cs.ingage.tech/' in a frame because it set 'X-Frame-Options' to 'sameorigin'. @ chrome-error://chromewebdata/:0

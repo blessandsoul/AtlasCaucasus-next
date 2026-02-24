@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -53,9 +54,17 @@ export const TourLightbox = ({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
-    if (!isOpen) return null;
+    // Lock body scroll when lightbox is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = '';
+            };
+        }
+    }, [isOpen]);
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <motion.div
@@ -63,14 +72,14 @@ export const TourLightbox = ({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
+                    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-sm"
                     onClick={onClose}
                 >
                     {/* Close Button */}
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute right-4 top-4 z-50 text-white/70 hover:bg-white/10 hover:text-white"
+                        className="absolute right-4 top-4 z-10 text-white/70 hover:bg-white/10 hover:text-white"
                         onClick={onClose}
                     >
                         <X className="h-6 w-6" />
@@ -81,7 +90,7 @@ export const TourLightbox = ({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="hidden md:flex absolute left-4 top-1/2 z-50 -translate-y-1/2 text-white/70 hover:bg-white/10 hover:text-white h-12 w-12 rounded-full"
+                        className="hidden md:flex absolute left-4 top-1/2 z-10 -translate-y-1/2 text-white/70 hover:bg-white/10 hover:text-white h-12 w-12 rounded-full"
                         onClick={(e) => {
                             e.stopPropagation();
                             handlePrev();
@@ -95,7 +104,7 @@ export const TourLightbox = ({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="hidden md:flex absolute right-4 top-1/2 z-50 -translate-y-1/2 text-white/70 hover:bg-white/10 hover:text-white h-12 w-12 rounded-full"
+                        className="hidden md:flex absolute right-4 top-1/2 z-10 -translate-y-1/2 text-white/70 hover:bg-white/10 hover:text-white h-12 w-12 rounded-full"
                         onClick={(e) => {
                             e.stopPropagation();
                             handleNext();
@@ -106,7 +115,7 @@ export const TourLightbox = ({
                     </Button>
 
                     {/* Main Image Container */}
-                    <div className="relative h-full w-full flex flex-col items-center justify-center p-4 md:pb-24 pointer-events-none">
+                    <div className="relative h-full w-full flex flex-col items-center justify-center px-4 pt-14 pb-28 pointer-events-none">
                         <motion.div
                             key={currentIndex}
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -127,14 +136,14 @@ export const TourLightbox = ({
                             <img
                                 src={getMediaUrl(images[currentIndex].url)}
                                 alt={images[currentIndex].altText || `Image ${currentIndex + 1}`}
-                                className="max-h-[85vh] w-auto max-w-[95vw] object-contain select-none"
+                                className="max-h-[calc(100vh-11rem)] w-auto max-w-[95vw] object-contain select-none"
                             />
                         </motion.div>
                     </div>
 
                     {/* Thumbnails Strip */}
                     <div
-                        className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 p-4 overflow-x-auto scrollbar-hide snap-x"
+                        className="absolute bottom-0 left-0 right-0 flex justify-center items-center gap-1.5 px-4 py-3 pointer-events-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {images.map((img, index) => (
@@ -142,7 +151,7 @@ export const TourLightbox = ({
                                 key={img.id || index}
                                 onClick={() => setCurrentIndex(index)}
                                 className={cn(
-                                    "relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-md border-2 transition-all snap-center",
+                                    "relative h-12 w-12 md:h-14 md:w-14 shrink-0 overflow-hidden rounded-md border-2 transition-all",
                                     index === currentIndex
                                         ? "border-primary opacity-100 scale-110 z-10"
                                         : "border-transparent opacity-50 hover:opacity-80"
@@ -158,11 +167,12 @@ export const TourLightbox = ({
                     </div>
 
                     {/* Counter */}
-                    <div className="absolute top-4 left-4 z-50 text-white/80 font-medium bg-black/50 px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+                    <div className="absolute top-4 left-4 z-10 text-white/80 font-medium bg-black/50 px-3 py-1 rounded-full text-sm backdrop-blur-sm">
                         {currentIndex + 1} / {images.length}
                     </div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 };

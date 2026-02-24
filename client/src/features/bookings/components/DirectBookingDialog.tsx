@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import {
@@ -38,6 +38,7 @@ interface TourBookingData {
     maxPeople: number | null;
     availabilityType: AvailabilityType;
     availableDates: string[] | null;
+    nextAvailableDate?: string | null;
 }
 
 interface DirectBookingDialogProps {
@@ -143,6 +144,7 @@ export function DirectBookingDialog({
     // State
     const [step, setStep] = useState(1);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+    const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
     const [guests, setGuests] = useState(1);
     const [notes, setNotes] = useState('');
     const [contactPhone, setContactPhone] = useState('');
@@ -177,9 +179,17 @@ export function DirectBookingDialog({
                     return day !== 0 && day !== 6; // Disable weekdays
                 }
                 case 'SPECIFIC_DATES': {
-                    if (!tour.availableDates || tour.availableDates.length === 0) return true;
                     const dateIso = toISODate(date);
-                    return !tour.availableDates.includes(dateIso);
+                    if (tour.availableDates && tour.availableDates.length > 0) {
+                        return !tour.availableDates.includes(dateIso);
+                    }
+                    // Fallback: if no availableDates but nextAvailableDate exists, allow that date
+                    if (tour.nextAvailableDate) {
+                        const nextDate = new Date(tour.nextAvailableDate);
+                        nextDate.setHours(0, 0, 0, 0);
+                        return toISODate(date) !== toISODate(nextDate);
+                    }
+                    return true;
                 }
                 case 'DAILY':
                 case 'BY_REQUEST':
@@ -187,13 +197,75 @@ export function DirectBookingDialog({
                     return false;
             }
         };
-    }, [tour.availabilityType, tour.availableDates]);
+    }, [tour.availabilityType, tour.availableDates, tour.nextAvailableDate]);
 
-    // Reset state when dialog opens/closes
+    // Parse nextAvailableDate from the tour as a fallback
+    const parsedNextAvailable = useMemo((): Date | undefined => {
+        if (!tour.nextAvailableDate) return undefined;
+        const d = new Date(tour.nextAvailableDate);
+        if (isNaN(d.getTime())) return undefined;
+        d.setHours(0, 0, 0, 0);
+        const tomorrow = new Date();
+        tomorrow.setHours(0, 0, 0, 0);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return d >= tomorrow ? d : undefined;
+    }, [tour.nextAvailableDate]);
+
+    // Compute the first available date so the calendar opens to the right month
+    const firstAvailableDate = useMemo((): Date | undefined => {
+        const tomorrow = new Date();
+        tomorrow.setHours(0, 0, 0, 0);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        switch (tour.availabilityType) {
+            case 'SPECIFIC_DATES': {
+                if (tour.availableDates && tour.availableDates.length > 0) {
+                    const sorted = [...tour.availableDates].sort();
+                    for (const ds of sorted) {
+                        const [y, m, d] = ds.split('-').map(Number);
+                        const date = new Date(y, m - 1, d);
+                        if (date >= tomorrow) return date;
+                    }
+                }
+                // Fallback to nextAvailableDate from the server
+                return parsedNextAvailable ?? tomorrow;
+            }
+            case 'WEEKDAYS': {
+                const d = new Date(tomorrow);
+                while (d.getDay() === 0 || d.getDay() === 6) {
+                    d.setDate(d.getDate() + 1);
+                }
+                return d;
+            }
+            case 'WEEKENDS': {
+                const d = new Date(tomorrow);
+                while (d.getDay() !== 0 && d.getDay() !== 6) {
+                    d.setDate(d.getDate() + 1);
+                }
+                return d;
+            }
+            case 'DAILY':
+            case 'BY_REQUEST':
+            default:
+                return parsedNextAvailable ?? tomorrow;
+        }
+    }, [tour.availabilityType, tour.availableDates, parsedNextAvailable]);
+
+    // Set calendar to first available date when dialog opens
+    useEffect(() => {
+        if (open) {
+            const target = firstAvailableDate ?? new Date();
+            setCalendarMonth(target);
+            setSelectedDate(firstAvailableDate);
+        }
+    }, [open, firstAvailableDate]);
+
+    // Reset state when dialog closes
     const handleOpenChange = useCallback((value: boolean): void => {
         if (!value) {
             setStep(1);
             setSelectedDate(undefined);
+            setCalendarMonth(new Date());
             setGuests(1);
             setNotes('');
             setContactPhone('');
@@ -256,6 +328,8 @@ export function DirectBookingDialog({
                                 selected={selectedDate}
                                 onSelect={setSelectedDate}
                                 disabled={disabledDays}
+                                month={calendarMonth}
+                                onMonthChange={setCalendarMonth}
                                 fromDate={new Date()}
                                 aria-label="Select a booking date"
                             />

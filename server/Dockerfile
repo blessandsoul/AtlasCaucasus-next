@@ -50,18 +50,23 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Copy built application
 COPY --from=builder /app/dist ./dist
 
+# Copy public directory for static files
+COPY --from=builder /app/public ./public
+
 # Copy PM2 ecosystem config for cluster mode
 COPY ecosystem.config.cjs ./
 
-# Install PM2 globally for production use
+# Install PM2 globally and su-exec for entrypoint privilege dropping
 RUN npm install -g pm2
+RUN apk add --no-cache su-exec
 
-# Create necessary directories
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Create necessary directories with correct ownership
 RUN mkdir -p uploads logs
 RUN chown -R fastify:nodejs /app
-
-# Switch to non-root user
-USER fastify
 
 # Environment
 ENV NODE_ENV=production
@@ -72,6 +77,9 @@ EXPOSE 8000
 # Health check (force IPv4, no Origin header - CORS allows requests without Origin)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8000/api/v1/health || exit 1
+
+# Entrypoint fixes volume permissions then drops to fastify user
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Run migrations and start server with PM2 in cluster mode (all cores)
 # pm2-runtime keeps PM2 in foreground for Docker

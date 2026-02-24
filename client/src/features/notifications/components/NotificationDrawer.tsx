@@ -105,7 +105,7 @@ export const NotificationDrawer = ({ isOpen, onClose }: NotificationDrawerProps)
     const hasNotifications = groupedNotifications.length > 0;
     const hasUnread = groupedNotifications.some((n) => !n.isRead);
 
-    if (!mounted || !isOpen) return null;
+    if (!mounted) return null;
 
     return createPortal(
         <AnimatePresence>

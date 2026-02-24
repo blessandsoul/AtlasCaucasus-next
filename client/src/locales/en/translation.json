@@ -101,6 +101,7 @@
       "slogan": "Travel without extra worry"
     },
     "nav_menu": {
+      "title": "Explore",
       "items": {
         "tour": "Tour",
         "hotels": "Hotels",
@@ -127,7 +128,8 @@
         "guides_desc": "Professional guides",
         "drivers_desc": "Executive transport"
       }
-    }
+    },
+    "search_placeholder": "Search tours, companies, guides..."
   },
   "auth": {
     "login": "Login",
@@ -266,9 +268,9 @@
     "title": "Discover the Beauty of Georgia",
     "subtitle": "Experience breathtaking landscapes, ancient culture, and warm hospitality",
     "hero": {
-      "title_start": "Ready for",
-      "title_end": "adventure?",
-      "subtitle": "Discover amazing tours, hotels, and experiences from trusted local operators",
+      "title_start": "Travel with Peace and",
+      "title_end": "Comfort",
+      "subtitle": "Curated tours and exceptional hotels from trusted operators",
       "booked_today": "847 tours booked today",
       "trending": "Trending:",
       "countries": {
@@ -281,18 +283,24 @@
       "search": {
         "where": "WHERE",
         "destinations_placeholder": "Search destinations",
+        "trending_destinations": "Trending destinations",
         "when": "WHEN",
         "dates_placeholder": "Add dates",
         "who": "WHO",
-        "guests_placeholder": "Add guests",
+        "guests_placeholder": "Add people",
+        "people": "People",
+        "person": "person",
+        "people_plural": "people",
         "search_button": "Search"
+      },
+      "category_tabs": {
+        "all": "All",
+        "adventure": "Adventure",
+        "cultural": "Cultural",
+        "wine_food": "Wine & Food",
+        "nature": "Nature",
+        "beach": "Beach"
       }
-    },
-    "promotional_banner": {
-      "new_badge": "New",
-      "title": "Introducing Premium Tours",
-      "description": "Experience Georgia like never before with our exclusive guided packages.",
-      "cta_button": "Learn More"
     },
     "features": {
       "title": "Featured Tours",
@@ -300,43 +308,19 @@
       "view_all": "View All",
       "view_all_tours": "View All Tours"
     },
+    "companies": {
+      "title": "Tour Companies",
+      "subtitle": "Trusted operators and travel agencies",
+      "view_all": "View All Companies"
+    },
+    "guides": {
+      "title": "Local Guides",
+      "subtitle": "Experienced guides who know every corner",
+      "view_all": "View All Guides"
+    },
     "destinations": {
       "title": "Popular Destinations",
       "tours_count": "{{count}} Tours"
-    },
-    "why_choose": {
-      "title": "Why Choose Atlas Caucasus?",
-      "subtitle": "We provide the best travel experiences with local expertise and premium support.",
-      "verified_guides": "Guides",
-      "verified_guides_desc": "All our guides go through a strict verification process to ensure your safety and quality of experience.",
-      "best_prices": "Prices",
-      "best_prices_desc": "We guarantee the best market rates with no hidden fees. Direct booking prices from operators.",
-      "support": "Support",
-      "support_desc": "Our local support team is always available to help you with any questions or emergencies."
-    },
-    "cta": {
-      "title": "Ready to start your journey?",
-      "subtitle": "Join thousands of travelers exploring the beauty of Georgia. Create your account today and get exclusive deals.",
-      "get_started": "Get Started",
-      "browse_tours": "Browse Tours"
-    },
-    "categories": {
-      "title": "Find Your Vibe",
-      "subtitle": "Discover tours that match your travel style.",
-      "items": {
-        "hiking": "Hiking",
-        "wine": "Wine",
-        "culture": "Culture",
-        "sea": "Sea",
-        "adventure": "Adventure"
-      }
-    },
-    "testimonials": {
-      "title": "Trusted by Travelers",
-      "review_1": "The best experience of my life! Georgia is stunning.",
-      "review_2": "Incredible guides and seamless organization.",
-      "review_3": "Highly recommended for solo travelers.",
-      "review_4": "Food, wine, and views - everything was perfect."
     }
   },
   "explore_page": {
@@ -1120,6 +1104,7 @@
       "deleteTitle": "Delete User?",
       "deleteConfirm": "Are you sure you want to delete user {{name}}? This action cannot be undone.",
       "deleted": "User deleted successfully",
+      "deletedStatus": "Deleted",
       "editUser": "Edit User",
       "updated": "User updated successfully",
       "addRole": "Add Role",

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMockTranslation } from '@/hooks/use-mock-translation';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Plane, TrendingUp, Sun, Mountain, Building2, Calendar, Users, Search, X, MapPin } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Compass, Landmark, Wine, Leaf, Umbrella, Calendar, Users, Search, X, Minus, Plus } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { colors } from '@/lib/colors';
 import { LocationAutocomplete } from '@/components/common/LocationAutocomplete';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -12,48 +13,88 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import type { LocationSearchResult } from '@/features/search/types/search.types';
 import { cn } from '@/lib/utils';
 import { useLocations } from '@/features/locations/hooks/useLocations';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
-// Helper to determine icon based on name
-const getLocationIcon = (name: string) => {
-    const lowerName = name.toLowerCase();
-    if (lowerName.includes('turkey') || lowerName.includes('sun')) return Sun;
-    if (lowerName.includes('armenia') || lowerName.includes('mountain')) return Mountain;
-    if (lowerName.includes('azerbaijan') || lowerName.includes('city')) return Building2;
-    if (lowerName.includes('greece') || lowerName.includes('island')) return Plane;
-    if (lowerName.includes('georgia')) return TrendingUp;
-    return MapPin; // Default
-};
+interface CategoryTab {
+    key: string;
+    translationKey: string;
+    icon: LucideIcon;
+    categorySlug: string | null;
+    destinations: string[];
+}
 
-const getLocationIconColor = (name: string) => {
-    const lowerName = name.toLowerCase();
-    if (lowerName.includes('turkey')) return "text-orange-400";
-    if (lowerName.includes('armenia')) return "text-yellow-600";
-    if (lowerName.includes('azerbaijan')) return "text-blue-500";
-    if (lowerName.includes('greece')) return "text-sky-500";
-    if (lowerName.includes('georgia')) return "text-emerald-600";
-    return "text-muted-foreground";
-};
+const HERO_CATEGORIES: CategoryTab[] = [
+    {
+        key: 'all',
+        translationKey: 'home.hero.category_tabs.all',
+        icon: Sparkles,
+        categorySlug: null,
+        destinations: ['Tbilisi', 'Batumi', 'Kazbegi (Stepantsminda)', 'Kutaisi', 'Mestia', 'Borjomi'],
+    },
+    {
+        key: 'adventure',
+        translationKey: 'home.hero.category_tabs.adventure',
+        icon: Compass,
+        categorySlug: 'Adventure',
+        destinations: ['Kazbegi (Stepantsminda)', 'Tusheti (Omalo)', 'Gudauri', 'Shatili', 'Lagodekhi', 'Mestia'],
+    },
+    {
+        key: 'cultural',
+        translationKey: 'home.hero.category_tabs.cultural',
+        icon: Landmark,
+        categorySlug: 'Cultural',
+        destinations: ['Tbilisi', 'Kutaisi', 'Gori', 'Vardzia', 'David Gareja', 'Uplistsikhe'],
+    },
+    {
+        key: 'wine_food',
+        translationKey: 'home.hero.category_tabs.wine_food',
+        icon: Wine,
+        categorySlug: 'Wine & Food',
+        destinations: ['Telavi', 'Signagi', 'Kvareli', 'Tsinandali'],
+    },
+    {
+        key: 'nature',
+        translationKey: 'home.hero.category_tabs.nature',
+        icon: Leaf,
+        categorySlug: 'Nature',
+        destinations: ['Borjomi', 'Martvili', 'Lagodekhi', 'Mestia', 'Ushguli'],
+    },
+    {
+        key: 'beach',
+        translationKey: 'home.hero.category_tabs.beach',
+        icon: Umbrella,
+        categorySlug: 'Beach & Coast',
+        destinations: ['Batumi', 'Kobuleti'],
+    },
+];
 
-export const HeroSection = () => {
+export const HeroSection = (): JSX.Element => {
     const { t } = useMockTranslation();
     const router = useRouter();
-    const { scrollY } = useScroll();
-    const backgroundY = useTransform(scrollY, [0, 500], [0, 150]);
+    const isDesktop = useMediaQuery('(min-width: 768px)');
+    const [mounted, setMounted] = useState(false);
 
     const [selectedLocation, setSelectedLocation] = useState<LocationSearchResult | null>(null);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-    const [guests, setGuests] = useState<string>('');
+    const [guests, setGuests] = useState<number>(0);
     const [dateOpen, setDateOpen] = useState(false);
-    const [guestsFocused, setGuestsFocused] = useState(false);
+    const [guestsOpen, setGuestsOpen] = useState(false);
+    const [activeCategory, setActiveCategory] = useState<string>('all');
 
-    const guestsInputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => { setMounted(true); }, []);
 
-    // Fetch dynamic locations
+    // Fetch dynamic locations (limit 30 to resolve all category destination IDs)
     const { data: locationsData, isLoading: isLoadingLocations } = useLocations({
         isActive: true,
-        limit: 5 // Limit to 5 for the hero section chips
+        limit: 30,
     });
     const locations = locationsData?.items || [];
+
+    const findLocationByName = useCallback((name: string): { id: string; name: string } | undefined => {
+        return locations?.find((loc) => loc.name === name);
+    }, [locations]);
+
+    const activeCategoryData = HERO_CATEGORIES.find((c) => c.key === activeCategory) ?? HERO_CATEGORIES[0];
 
     // Auto-focus flow: Location -> Date -> Guests
     const handleLocationSelect = useCallback(() => {
@@ -63,10 +104,17 @@ export const HeroSection = () => {
     const handleDateSelect = useCallback((date: Date | undefined) => {
         setSelectedDate(date);
         setDateOpen(false);
-        // Focus guests input after date selection
         setTimeout(() => {
-            guestsInputRef.current?.focus();
-        }, 100);
+            setGuestsOpen(true);
+        }, 150);
+    }, []);
+
+    const handleGuestsIncrement = useCallback(() => {
+        setGuests((prev) => Math.min(prev + 1, 50));
+    }, []);
+
+    const handleGuestsDecrement = useCallback(() => {
+        setGuests((prev) => Math.max(prev - 1, 0));
     }, []);
 
     const handleSearch = useCallback(() => {
@@ -77,218 +125,357 @@ export const HeroSection = () => {
         if (selectedDate) {
             params.set('dateFrom', selectedDate.toISOString().split('T')[0]);
         }
-        if (guests) {
-            params.set('maxPeople', guests);
+        if (guests > 0) {
+            params.set('maxPeople', String(guests));
         }
         router.push(`/explore/tours?${params.toString()}`);
     }, [router, selectedLocation, selectedDate, guests]);
 
-    const formatDate = (date: Date | undefined) => {
+    const formatDate = (date: Date | undefined): string => {
         if (!date) return '';
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     };
 
-    return (
-        <section className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-2 min-[370px]:px-4 pt-40 pb-24 overflow-hidden">
-            {/* Background Image with Parallax */}
-            <div className="absolute inset-0 z-0">
-                <motion.div
-                    style={{ y: backgroundY, scale: 1.1 }}
-                    className="absolute inset-0 w-full h-full"
+    const getGuestsDisplayText = (): string => {
+        if (guests === 0) return t('home.hero.search.guests_placeholder');
+        if (guests === 1) return `1 ${t('home.hero.search.person')}`;
+        return `${guests} ${t('home.hero.search.people_plural')}`;
+    };
+
+    // Shared date trigger content
+    const dateTriggerContent = (isMobile: boolean): JSX.Element => (
+        <>
+            <Calendar className="text-muted-foreground w-5 h-5 shrink-0" />
+            <span className={cn("flex flex-col text-left min-w-0 flex-1", isMobile ? "py-2" : "py-3")}>
+                <span className="text-xs font-bold text-foreground uppercase tracking-wider mb-0.5">
+                    {t('home.hero.search.when')}
+                </span>
+                <span className={cn(
+                    'text-sm truncate font-medium',
+                    selectedDate ? 'text-foreground' : 'text-muted-foreground'
+                )}>
+                    {selectedDate ? formatDate(selectedDate) : t('home.hero.search.dates_placeholder')}
+                </span>
+            </span>
+            {selectedDate && (
+                <span
+                    role="button"
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); setSelectedDate(undefined); }}
+                    className="p-1 hover:bg-muted rounded-full transition-colors shrink-0"
                 >
-                    {/* Using simple img for parity, next/image generally preferred but needs width/height or fill */}
-                    <img
-                        src="/hero-backgrounds/hero-main.png"
-                        alt="Hero Background"
-                        className="h-full w-full object-cover"
-                        style={{ objectPosition: 'center 30%' }}
-                    />
-                    <div className="absolute inset-0 bg-black/40" />
-                </motion.div>
+                    <X className="h-4 w-4 text-muted-foreground" />
+                </span>
+            )}
+        </>
+    );
+
+    // Shared guests trigger content
+    const guestsTriggerContent = (isMobile: boolean): JSX.Element => (
+        <>
+            <Users className="text-muted-foreground w-5 h-5 shrink-0" />
+            <span className={cn("flex flex-col text-left min-w-0 flex-1", isMobile ? "py-2" : "py-3")}>
+                <span className="text-xs font-bold text-foreground uppercase tracking-wider mb-0.5">
+                    {t('home.hero.search.who')}
+                </span>
+                <span className={cn(
+                    'text-sm truncate font-medium',
+                    guests > 0 ? 'text-foreground' : 'text-muted-foreground'
+                )}>
+                    {getGuestsDisplayText()}
+                </span>
+            </span>
+            {guests > 0 && (
+                <span
+                    role="button"
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); setGuests(0); }}
+                    className="p-1 hover:bg-muted rounded-full transition-colors shrink-0"
+                >
+                    <X className="h-4 w-4 text-muted-foreground" />
+                </span>
+            )}
+        </>
+    );
+
+    // Shared calendar popover content
+    const calendarContent = (
+        <PopoverContent className="w-auto p-0" align="center" sideOffset={12}>
+            <CalendarComponent
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                disabled={(date) => date < new Date()}
+                initialFocus
+            />
+        </PopoverContent>
+    );
+
+    // Shared guests popover content
+    const guestsPopoverContent = (
+        <PopoverContent className="w-64 p-4" align="center" sideOffset={12}>
+            <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground">
+                    {t('home.hero.search.people', 'People')}
+                </span>
+                <div className="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onClick={handleGuestsDecrement}
+                        disabled={guests <= 0}
+                        className={cn(
+                            'h-9 w-9 rounded-lg border flex items-center justify-center transition-colors',
+                            guests <= 0
+                                ? 'border-border text-muted-foreground/40 cursor-not-allowed'
+                                : 'border-border text-foreground hover:bg-muted cursor-pointer'
+                        )}
+                    >
+                        <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="text-base font-semibold tabular-nums w-6 text-center">
+                        {guests}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={handleGuestsIncrement}
+                        disabled={guests >= 50}
+                        className={cn(
+                            'h-9 w-9 rounded-lg border flex items-center justify-center transition-colors',
+                            guests >= 50
+                                ? 'border-border text-muted-foreground/40 cursor-not-allowed'
+                                : 'border-border text-foreground hover:bg-muted cursor-pointer'
+                        )}
+                    >
+                        <Plus className="h-4 w-4" />
+                    </button>
+                </div>
+            </div>
+        </PopoverContent>
+    );
+
+    // Determine if we should render popovers (only after mount, and only for the active layout)
+    const renderDesktopPopovers = mounted && isDesktop;
+    const renderMobilePopovers = mounted && !isDesktop;
+
+    return (
+        <section className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-2 min-[370px]:px-4 pt-40 pb-24">
+            {/* Video Background */}
+            <div className="absolute inset-0 z-0 overflow-hidden bg-[#0a1a2e]">
+                <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                >
+                    <source src="/hero.mp4" type="video/mp4" />
+                </video>
+                {/* Dark overlay for readability */}
+                <div className="absolute inset-0 bg-black/40" />
             </div>
 
-            {/* Bottom Gradient Transition */}
-            <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background via-background/60 to-transparent z-0 pointer-events-none" />
-
-            <div className="relative z-10 flex flex-col items-center w-full">
-                <h2 className="font-heading text-center text-xl min-[370px]:text-2xl min-[420px]:text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-semibold text-white mb-6 tracking-[1.15px] leading-relaxed pb-4 max-w-5xl mx-auto drop-shadow-md">
+            <div className="relative z-[2] flex flex-col items-center w-full">
+                <h2 className="font-heading text-center text-xl min-[370px]:text-2xl min-[420px]:text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-semibold text-white mb-6 tracking-[1.15px] leading-loose pb-4 max-w-5xl mx-auto drop-shadow-md">
                     {t('home.hero.title_start')} <span className="text-gradient">{t('home.hero.title_end')}</span>
                 </h2>
                 <p className="text-center text-sm min-[370px]:text-lg sm:text-xl text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-sm">
                     {t('home.hero.subtitle')}
                 </p>
 
-                <div className="w-full max-w-[896px] bg-background border shadow-lg flex flex-col md:flex-row items-stretch md:items-center rounded-3xl md:rounded-full p-2 md:p-0 md:pr-2">
-                    {/* Where - Location Autocomplete */}
-                    <LocationAutocomplete
-                        value={selectedLocation}
-                        onChange={setSelectedLocation}
-                        onSelect={handleLocationSelect}
-                        className="flex-1 min-h-[72px] md:min-h-0"
-                        triggerClassName="h-full flex items-center px-4 md:px-6 rounded-2xl md:rounded-l-full md:rounded-r-none hover:bg-muted/50 transition-colors"
-                    />
+                {/* Search Bar - Cubic connected design */}
+                <div className="w-full max-w-[900px]">
+                    {/* Desktop layout */}
+                    <div className="hidden md:flex bg-background border-[3px] shadow-lg rounded-lg items-stretch" style={{ borderColor: colors.secondary }}>
+                        {/* Where - Location */}
+                        <LocationAutocomplete
+                            value={selectedLocation}
+                            onChange={setSelectedLocation}
+                            onSelect={handleLocationSelect}
+                            className="flex-[1.2] min-w-0"
+                            triggerClassName="h-full flex items-center px-5 rounded-l-md rounded-r-none hover:bg-muted/50 transition-colors"
+                        />
 
-                    {/* Divider */}
-                    <div className="hidden md:block w-px h-10 bg-border shrink-0" />
-                    <div className="block md:hidden w-full h-px bg-border shrink-0 my-1" />
+                        {/* Vertical Divider */}
+                        <div className="w-[3px] shrink-0" style={{ backgroundColor: colors.secondary }} />
 
-                    {/* When - Date Picker */}
-                    <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                        <PopoverTrigger asChild>
-                            <div className={cn(
-                                'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 cursor-pointer transition-colors min-h-[72px] md:min-h-0 rounded-2xl md:rounded-none',
-                                dateOpen ? 'bg-muted/50' : 'hover:bg-muted/50'
-                            )}>
-                                <Calendar className="text-muted-foreground w-5 h-5 shrink-0" />
-                                <div className="flex flex-col text-left min-w-0 flex-1 py-2">
-                                    <span className="text-xs font-bold text-foreground uppercase tracking-wider mb-0.5">
-                                        {t('home.hero.search.when')}
-                                    </span>
-                                    <span className={cn(
-                                        'text-sm truncate font-medium',
-                                        selectedDate ? 'text-foreground' : 'text-muted-foreground'
-                                    )}>
-                                        {selectedDate ? formatDate(selectedDate) : t('home.hero.search.dates_placeholder')}
-                                    </span>
-                                </div>
-                                {selectedDate && (
-                                    <button
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); setSelectedDate(undefined); }}
-                                        className="p-1 hover:bg-muted rounded-full transition-colors"
-                                    >
-                                        <X className="h-4 w-4 text-muted-foreground" />
-                                    </button>
-                                )}
+                        {/* When - Date Picker */}
+                        {renderDesktopPopovers ? (
+                            <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                                <PopoverTrigger className={cn(
+                                    'flex-1 flex items-center gap-3 px-5 cursor-pointer transition-colors min-w-0 border-none bg-transparent',
+                                    dateOpen ? 'bg-muted/50' : 'hover:bg-muted/50'
+                                )}>
+                                    {dateTriggerContent(false)}
+                                </PopoverTrigger>
+                                {calendarContent}
+                            </Popover>
+                        ) : (
+                            <div className="flex-1 flex items-center gap-3 px-5 cursor-pointer transition-colors min-w-0 hover:bg-muted/50">
+                                {dateTriggerContent(false)}
                             </div>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="center" sideOffset={8}>
-                            <CalendarComponent
-                                mode="single"
-                                selected={selectedDate}
-                                onSelect={handleDateSelect}
-                                disabled={(date) => date < new Date()}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
-
-                    {/* Divider */}
-                    <div className="hidden md:block w-px h-10 bg-border shrink-0" />
-                    <div className="block md:hidden w-full h-px bg-border shrink-0 my-1" />
-
-                    {/* Who - Guest Count (Inline Input) */}
-                    <div
-                        className={cn(
-                            'flex-1 flex items-center gap-3 px-4 md:px-3 lg:px-6 transition-colors min-h-[72px] md:min-h-0 rounded-2xl md:rounded-none',
-                            guestsFocused ? 'bg-muted/50' : 'hover:bg-muted/50'
                         )}
-                        onClick={() => guestsInputRef.current?.focus()}
-                    >
-                        <Users className="text-muted-foreground w-5 h-5 shrink-0" />
-                        <div className="flex flex-col text-left min-w-0 flex-1 py-2">
-                            <span className="text-xs font-bold text-foreground uppercase tracking-wider mb-0.5">
-                                {t('home.hero.search.who')}
-                            </span>
-                            <input
-                                ref={guestsInputRef}
-                                type="number"
-                                min="1"
-                                max="50"
-                                value={guests}
-                                onChange={(e) => setGuests(e.target.value)}
-                                onFocus={() => setGuestsFocused(true)}
-                                onBlur={() => setGuestsFocused(false)}
-                                placeholder={t('home.hero.search.guests_placeholder')}
-                                className="text-sm font-medium bg-transparent border-none outline-none w-full text-foreground placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-0"
-                            />
-                        </div>
-                        {guests && (
-                            <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); setGuests(''); }}
-                                className="p-1 hover:bg-muted rounded-full transition-colors"
-                            >
-                                <X className="h-4 w-4 text-muted-foreground" />
-                            </button>
+
+                        {/* Vertical Divider */}
+                        <div className="w-[3px] shrink-0" style={{ backgroundColor: colors.secondary }} />
+
+                        {/* Who - People Selector Popover */}
+                        {renderDesktopPopovers ? (
+                            <Popover open={guestsOpen} onOpenChange={setGuestsOpen}>
+                                <PopoverTrigger className={cn(
+                                    'flex-1 flex items-center gap-3 px-5 cursor-pointer transition-colors min-w-0 border-none bg-transparent',
+                                    guestsOpen ? 'bg-muted/50' : 'hover:bg-muted/50'
+                                )}>
+                                    {guestsTriggerContent(false)}
+                                </PopoverTrigger>
+                                {guestsPopoverContent}
+                            </Popover>
+                        ) : (
+                            <div className="flex-1 flex items-center gap-3 px-5 cursor-pointer transition-colors min-w-0 hover:bg-muted/50">
+                                {guestsTriggerContent(false)}
+                            </div>
                         )}
+
+                        {/* Search Button - connected to right edge */}
+                        <button
+                            onClick={handleSearch}
+                            style={{ backgroundColor: colors.secondary }}
+                            className="hover:opacity-90 text-primary-foreground rounded-r px-7 flex items-center justify-center gap-2 font-medium transition-all cursor-pointer shrink-0"
+                        >
+                            <Search className="w-5 h-5" />
+                            <span>{t('home.hero.search.search_button')}</span>
+                        </button>
                     </div>
 
-                    {/* Search Button */}
-                    <button
-                        onClick={handleSearch}
-                        style={{ backgroundColor: colors.secondary }}
-                        className="hover:opacity-90 text-primary-foreground rounded-2xl md:rounded-full px-5 lg:px-8 h-[64px] md:h-14 flex items-center justify-center gap-2 font-medium shadow-md transition-all mt-2 md:mt-0 md:ml-0.5 cursor-pointer shrink-0 w-full md:w-auto"
-                    >
-                        <Search className="w-5 h-5" />
-                        <span className="md:hidden">Search</span>
-                        <span className="hidden md:inline">{t('home.hero.search.search_button')}</span>
-                    </button>
-                </div>
+                    {/* Mobile layout - stacked connected card */}
+                    <div className="flex md:hidden flex-col bg-background border-[3px] shadow-lg rounded-lg" style={{ borderColor: colors.secondary }}>
+                        {/* Where */}
+                        <LocationAutocomplete
+                            value={selectedLocation}
+                            onChange={setSelectedLocation}
+                            onSelect={handleLocationSelect}
+                            className="min-h-[64px]"
+                            triggerClassName="h-full flex items-center px-4 rounded-t-md rounded-b-none hover:bg-muted/50 transition-colors"
+                        />
 
-                {/* Booked Today Stat */}
-                <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-background px-4 py-1.5 text-sm font-medium shadow-sm border border-border/50">
-                    <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span className="flex items-center gap-1.5 text-muted-foreground">
-                        <div className="p-0.5 rounded bg-blue-100/50">
-                            <Plane className="h-3 w-3 text-blue-500" />
+                        {/* Horizontal Divider */}
+                        <div className="h-[3px]" style={{ backgroundColor: colors.secondary }} />
+
+                        {/* When */}
+                        {renderMobilePopovers ? (
+                            <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                                <PopoverTrigger className={cn(
+                                    'w-full flex items-center gap-3 px-4 cursor-pointer transition-colors min-h-[64px] border-none bg-transparent',
+                                    dateOpen ? 'bg-muted/50' : 'hover:bg-muted/50'
+                                )}>
+                                    {dateTriggerContent(true)}
+                                </PopoverTrigger>
+                                {calendarContent}
+                            </Popover>
+                        ) : (
+                            <div className="flex items-center gap-3 px-4 cursor-pointer transition-colors min-h-[64px] hover:bg-muted/50">
+                                {dateTriggerContent(true)}
+                            </div>
+                        )}
+
+                        {/* Horizontal Divider */}
+                        <div className="h-[3px]" style={{ backgroundColor: colors.secondary }} />
+
+                        {/* Who - People */}
+                        {renderMobilePopovers ? (
+                            <Popover open={guestsOpen} onOpenChange={setGuestsOpen}>
+                                <PopoverTrigger className={cn(
+                                    'w-full flex items-center gap-3 px-4 cursor-pointer transition-colors min-h-[64px] border-none bg-transparent',
+                                    guestsOpen ? 'bg-muted/50' : 'hover:bg-muted/50'
+                                )}>
+                                    {guestsTriggerContent(true)}
+                                </PopoverTrigger>
+                                {guestsPopoverContent}
+                            </Popover>
+                        ) : (
+                            <div className="flex items-center gap-3 px-4 cursor-pointer transition-colors min-h-[64px] hover:bg-muted/50">
+                                {guestsTriggerContent(true)}
+                            </div>
+                        )}
+
+                        {/* Search Button - full width at bottom */}
+                        <div className="p-3 pt-1">
+                            <button
+                                onClick={handleSearch}
+                                style={{ backgroundColor: colors.secondary }}
+                                className="hover:opacity-90 text-primary-foreground rounded-lg px-5 h-[52px] flex items-center justify-center gap-2 font-medium shadow-md transition-all cursor-pointer w-full"
+                            >
+                                <Search className="w-5 h-5" />
+                                <span>{t('home.hero.search.search_button')}</span>
+                            </button>
                         </div>
-                        {t('home.hero.booked_today')}
-                    </span>
+                    </div>
                 </div>
 
-                {/* Trending Section */}
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-backwards min-h-[40px]">
-                    {isLoadingLocations ? (
-                        // Simple Skeleton Loading
-                        Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="h-9 w-24 rounded-full bg-muted/50 animate-pulse" />
-                        ))
-                    ) : (
-                        <>
-                            {/* Static 'All' or 'Georgia' can be kept if needed, but user asked for dynamic resources. 
-                                We can add a "All Destinations" or similar if we want, but let's stick to the fetched list functionality first.
-                                Or we can hardcode Georgia if it's special, but safer to rely on DB. 
-                            */}
+                {/* Category Tabs + Sub-Tags */}
+                <div className="mt-4 w-full max-w-[900px] flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-backwards">
+                    {/* Category Tabs Row — compact segmented control */}
+                    <div className="w-full flex rounded-md overflow-hidden bg-background shadow-sm">
+                        {HERO_CATEGORIES.map((category) => {
+                            const Icon = category.icon;
+                            const isActive = activeCategory === category.key;
+                            return (
+                                <button
+                                    key={category.key}
+                                    onClick={() => setActiveCategory(category.key)}
+                                    className={cn(
+                                        "flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer",
+                                        isActive
+                                            ? "text-primary-foreground"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                    )}
+                                    style={isActive ? { backgroundColor: colors.secondary } : undefined}
+                                >
+                                    <Icon className="h-3 w-3" />
+                                    <span className="hidden min-[480px]:inline">{t(category.translationKey)}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
 
-                            {locations?.map((location) => {
-                                const Icon = getLocationIcon(location.name);
-                                const isSelected = selectedLocation?.id === location.id;
-
-                                return (
-                                    <button
-                                        key={location.id}
-                                        onClick={() => {
-                                            const params = new URLSearchParams();
-                                            params.set('locationId', location.id);
-                                            router.push(`/explore/tours?${params.toString()}`);
-                                        }}
-                                        className={cn(
-                                            "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium shadow-sm border transition-all cursor-pointer",
-                                            isSelected
-                                                ? "bg-primary text-primary-foreground border-primary"
-                                                : "bg-background text-muted-foreground border-border/50 hover:shadow-md hover:text-foreground"
-                                        )}
-                                    >
-                                        <Icon className={cn(
-                                            "h-3.5 w-3.5",
-                                            isSelected ? "text-primary-foreground" : getLocationIconColor(location.name)
-                                        )} />
-                                        {location.name}
-                                    </button>
-                                );
-                            })}
-
-                            {(!locations || locations.length === 0) && (
-                                <span className="text-sm text-muted-foreground">
-                                    {t('home.hero.no_destinations', 'No featured destinations available')}
-                                </span>
-                            )}
-                        </>
-                    )}
+                    {/* Sub-Tags Row */}
+                    <div className="flex flex-wrap items-center justify-center gap-2.5 min-h-[36px]">
+                        {isLoadingLocations ? (
+                            Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="h-8 w-20 rounded-full bg-muted/50 animate-pulse" />
+                            ))
+                        ) : (
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeCategory}
+                                    initial={{ opacity: 0, y: 6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -6 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="flex flex-wrap items-center justify-center gap-2.5"
+                                >
+                                    {activeCategoryData.destinations.map((destName) => {
+                                        const location = findLocationByName(destName);
+                                        return (
+                                            <button
+                                                key={destName}
+                                                onClick={() => {
+                                                    const params = new URLSearchParams();
+                                                    if (activeCategoryData.categorySlug) {
+                                                        params.set('category', activeCategoryData.categorySlug);
+                                                    }
+                                                    if (location) {
+                                                        params.set('locationId', location.id);
+                                                    }
+                                                    router.push(`/explore/tours?${params.toString()}`);
+                                                }}
+                                                className="text-sm font-medium text-muted-foreground bg-background hover:bg-muted hover:text-foreground rounded-full px-3.5 py-1.5 transition-all duration-150 cursor-pointer shadow-sm border border-border/50"
+                                            >
+                                                # {destName}
+                                            </button>
+                                        );
+                                    })}
+                                </motion.div>
+                            </AnimatePresence>
+                        )}
+                    </div>
                 </div>
             </div>
         </section>

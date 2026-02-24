@@ -481,8 +481,8 @@ function CompanyDetailsContent(): React.ReactElement {
               <Card className="bg-emerald-500/5 border-emerald-500/10">
                 <CardContent className="p-6 space-y-4">
                   {company.isVerified && (
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 shrink-0 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                         <ShieldCheck className="w-6 h-6" />
                       </div>
                       <div>
@@ -499,9 +499,9 @@ function CompanyDetailsContent(): React.ReactElement {
                     const rt = formatResponseTime(company.avgResponseTimeMinutes);
                     if (!rt) return null;
                     return (
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-start gap-4">
                         <div className={cn(
-                          'w-12 h-12 rounded-full flex items-center justify-center',
+                          'w-12 h-12 shrink-0 rounded-full flex items-center justify-center',
                           rt.variant === 'success' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
                           rt.variant === 'warning' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
                           rt.variant === 'muted' && 'bg-muted text-muted-foreground',

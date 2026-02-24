@@ -132,6 +132,7 @@ export function TourDetailsClient(): React.ReactElement {
           maxPeople: tour.maxPeople,
           availabilityType: tour.availabilityType,
           availableDates: tour.availableDates,
+          nextAvailableDate: tour.nextAvailableDate,
         }}
       />
 
