@@ -6,6 +6,16 @@ export type AvailabilityType = 'DAILY' | 'WEEKDAYS' | 'WEEKENDS' | 'SPECIFIC_DAT
 export interface ItineraryStep {
   title: string;
   description: string;
+  locationId?: string | null;
+}
+
+export interface SafeItineraryStep {
+  title: string;
+  description: string;
+  locationId?: string | null;
+  locationName?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface Tour {
@@ -89,6 +99,16 @@ export interface UpdateTourData {
   itinerary?: ItineraryStep[] | null;
 }
 
+export interface SafeTourLocation {
+  locationId: string;
+  name: string;
+  region: string | null;
+  country: string;
+  latitude: number | null;
+  longitude: number | null;
+  order: number;
+}
+
 export interface SafeTour {
   id: string;
   ownerId: string;
@@ -116,8 +136,9 @@ export interface SafeTour {
   availabilityType: string;
   availableDates: string[] | null;
   startTime: string | null;
-  itinerary: ItineraryStep[] | null;
+  itinerary: SafeItineraryStep[] | null;
   averageRating: string | null;
   reviewCount: number;
-  images?: SafeMedia[]; // Media images associated with tour
+  images?: SafeMedia[];
+  locations?: SafeTourLocation[];
 }

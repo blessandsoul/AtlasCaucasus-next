@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 interface ItineraryStep {
   title: string;
   description: string;
+  locationId?: string | null;
 }
 
 // Itinerary data mapped by tour title (exact match)
@@ -161,6 +162,118 @@ const ITINERARIES: Record<string, ItineraryStep[]> = {
   ],
 };
 
+// Maps tour title -> step title -> location name (must match Location table names exactly)
+const STEP_LOCATION_MAP: Record<string, Record<string, string>> = {
+  "Wine Tasting in Kakheti": {
+    "Departure from Tbilisi": "Tbilisi",
+    "Sighnaghi Viewpoint": "Signagi",
+    "Return to Tbilisi": "Tbilisi",
+  },
+  "Hiking to Gergeti Trinity": {
+    "Early Morning Departure": "Tbilisi",
+    "Arrive in Stepantsminda": "Kazbegi (Stepantsminda)",
+    "Gergeti Trinity Church": "Kazbegi (Stepantsminda)",
+    "Descent & Lunch": "Kazbegi (Stepantsminda)",
+  },
+  "Old Tbilisi Walking Tour": {
+    "Meeting at Freedom Square": "Tbilisi",
+    "Rustaveli Avenue": "Tbilisi",
+    "Narikala Fortress & Cable Car": "Tbilisi",
+    "Abanotubani (Bath District)": "Tbilisi",
+    "Leghvtakhevi Waterfall": "Tbilisi",
+    "Shardeni & Cafe Culture": "Tbilisi",
+  },
+  "Prometheus Cave Exploration": {
+    "Morning Drive to Imereti": "Kutaisi",
+    "Enter Prometheus Cave": "Kutaisi",
+    "Sataplia Nature Reserve": "Kutaisi",
+  },
+  "Black Sea Sunset Cruise": {
+    "Batumi Marina Check-in": "Batumi",
+    "Coastal Cruise": "Batumi",
+    "Return Under the Stars": "Batumi",
+  },
+  "Svaneti Ancient Towers Trek": {
+    "Fly or Drive to Mestia": "Mestia",
+    "Mestia Town & Museum": "Mestia",
+    "Drive to Ushguli": "Ushguli",
+    "Explore Ushguli": "Ushguli",
+    "Return & Farewell Dinner": "Mestia",
+  },
+  "Borjomi National Park Hike": {
+    "Arrive in Borjomi": "Borjomi",
+    "Enter the National Park": "Borjomi",
+  },
+  "Vardzia Cave City Adventure": {
+    "Vardzia Cave Monastery": "Vardzia",
+  },
+  "Mtskheta Cultural Heritage": {
+    "Drive to Mtskheta": "Mtskheta",
+    "Jvari Monastery": "Mtskheta",
+    "Svetitskhoveli Cathedral": "Mtskheta",
+    "Samtavro Monastery": "Mtskheta",
+  },
+  "Kazbegi Jeep Tour": {
+    "Tbilisi to Ananuri": "Tbilisi",
+    "Jeep Ride to Gergeti": "Kazbegi (Stepantsminda)",
+    "Lunch & Hot Springs": "Kazbegi (Stepantsminda)",
+  },
+  "Martvili Canyon Boat Ride": {
+    "Arrive at Martvili Canyon": "Martvili",
+    "Boat Ride Through the Canyon": "Martvili",
+  },
+  "Ushguli Off-road Experience": {
+    "4x4 Departure from Mestia": "Mestia",
+    "Arrive in Ushguli": "Ushguli",
+    "Village Exploration": "Ushguli",
+    "Return to Mestia": "Mestia",
+  },
+  "Batumi City Highlights": {
+    "Batumi Boulevard": "Batumi",
+    "Old Town & Piazza": "Batumi",
+    "Batumi Botanical Garden": "Batumi",
+    "Cable Car Ride": "Batumi",
+  },
+  "Georgian Culinary Masterclass": {
+    "Market Visit": "Tbilisi",
+    "Supra Feast": "Tbilisi",
+  },
+  "Signagi Love City Tour": {
+    "Scenic Drive to Signagi": "Signagi",
+    "City Walls Walk": "Signagi",
+    "Bodbe Monastery": "Signagi",
+    "Wine Cellar Visit": "Signagi",
+    "Lunch & Free Time": "Signagi",
+  },
+  "Telavi Royal Palace Tour": {
+    "Drive to Kakheti": "Telavi",
+    "Batonis Tsikhe Palace": "Telavi",
+    "Tsinandali Estate": "Tsinandali",
+  },
+  "Kutaisi Historical Discovery": {
+    "Arrive in Kutaisi": "Kutaisi",
+    "Bagrati Cathedral": "Kutaisi",
+    "Gelati Monastery": "Kutaisi",
+    "Colchis Fountain & City Center": "Kutaisi",
+    "Traditional Imeretian Lunch": "Kutaisi",
+  },
+  "Tusheti Horse Riding": {
+    "Drive to Omalo": "Tusheti (Omalo)",
+    "Horse Assignment & Training": "Tusheti (Omalo)",
+    "Return Ride & Campfire": "Tusheti (Omalo)",
+  },
+  "Gudauri Ski Resort Day Trip": {
+    "Morning Drive to Gudauri": "Gudauri",
+    "Equipment & Lift Passes": "Gudauri",
+    "Skiing & Snowboarding": "Gudauri",
+    "Return to Tbilisi": "Tbilisi",
+  },
+  "David Gareji Monastery Visit": {
+    "David Gareji Monastery": "David Gareja",
+    "Hike to Udabno Caves": "David Gareja",
+  },
+};
+
 // Generic itinerary generator for tours without specific data
 function generateGenericItinerary(title: string, city: string | null, durationMinutes: number | null): ItineraryStep[] {
   const hours = durationMinutes ? Math.round(durationMinutes / 60) : 4;
@@ -188,6 +301,13 @@ function generateGenericItinerary(title: string, city: string | null, durationMi
 async function main(): Promise<void> {
   console.log("🗺️  Starting itinerary seeding...\n");
 
+  // Build location name -> ID lookup map
+  const allLocations = await prisma.location.findMany({
+    select: { id: true, name: true },
+  });
+  const locationByName = new Map(allLocations.map((loc) => [loc.name, loc.id]));
+  console.log(`Loaded ${allLocations.length} locations for mapping.\n`);
+
   const tours = await prisma.tour.findMany({
     select: {
       id: true,
@@ -204,17 +324,32 @@ async function main(): Promise<void> {
   let skipped = 0;
 
   for (const tour of tours) {
-    // Skip tours that already have itinerary data
-    if (tour.itinerary) {
-      console.log(`⏭️  Skipping "${tour.title}" — already has itinerary`);
-      skipped++;
-      continue;
-    }
-
     // Use specific itinerary if available, otherwise generate a generic one
-    const itinerary = ITINERARIES[tour.title]
+    const hasSpecificItinerary = ITINERARIES[tour.title] != null;
+    const baseItinerary = ITINERARIES[tour.title]
       ?? generateGenericItinerary(tour.title, tour.city, tour.durationMinutes);
 
+    // Resolve locationIds from the step-location map (for specific itineraries)
+    const stepLocationMap = STEP_LOCATION_MAP[tour.title] ?? {};
+
+    // For generic itineraries, link first and last steps to the tour's city
+    const cityLocationId = tour.city ? locationByName.get(tour.city) ?? null : null;
+
+    const itinerary = baseItinerary.map((step, idx) => {
+      // First try explicit step-location mapping
+      const locationName = stepLocationMap[step.title];
+      const locationId = locationName ? locationByName.get(locationName) ?? null : null;
+      if (locationId) return { ...step, locationId };
+
+      // For generic itineraries, link first and last steps to the city
+      if (!hasSpecificItinerary && cityLocationId && (idx === 0 || idx === baseItinerary.length - 1)) {
+        return { ...step, locationId: cityLocationId };
+      }
+
+      return step;
+    });
+
+    // Always overwrite itinerary to include locationIds for existing tours
     await prisma.tour.update({
       where: { id: tour.id },
       data: {
@@ -222,7 +357,8 @@ async function main(): Promise<void> {
       },
     });
 
-    console.log(`✅ Added ${itinerary.length}-step itinerary to "${tour.title}"`);
+    const linkedCount = itinerary.filter((s) => s.locationId).length;
+    console.log(`✅ Updated "${tour.title}" — ${itinerary.length} steps, ${linkedCount} linked to locations`);
     updated++;
   }
 

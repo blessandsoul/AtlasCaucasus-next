@@ -2,9 +2,9 @@
 
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Zap, ShieldCheck, Send, Calendar, Clock, MessageCircle } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Zap, ShieldCheck, Calendar, Clock, MessageCircle } from 'lucide-react';
 import type { Tour } from '@/features/tours/types/tour.types';
 import type { AvailabilityType } from '@/features/tours/types/tour.types';
 import { cn } from '@/lib/utils';
@@ -29,7 +29,7 @@ function AvailabilityInfo({ tour }: { tour: Tour }): React.ReactElement {
   };
 
   return (
-    <div className="text-sm bg-muted/50 p-3 rounded-md space-y-2">
+    <div className="text-sm space-y-2">
       <div className="flex items-center gap-2 text-foreground font-medium">
         <Calendar className="h-4 w-4 text-primary" />
         <span>{t(availabilityLabels[type])}</span>
@@ -70,7 +70,7 @@ interface TourSidebarProps {
   onAskQuestion?: () => void;
 }
 
-export const TourSidebar = ({ tour, className, onBook, onAskQuestion }: TourSidebarProps) => {
+export const TourSidebar = ({ tour, className, onBook, onAskQuestion }: TourSidebarProps): React.ReactElement => {
   const { t } = useTranslation();
   const { formatPrice } = useCurrency();
   const price = parseFloat(tour.price);
@@ -81,80 +81,101 @@ export const TourSidebar = ({ tour, className, onBook, onAskQuestion }: TourSide
     : 0;
 
   return (
-    <Card
+    <div
       className={cn(
-        'border-none shadow-lg bg-card/50 backdrop-blur-sm sticky top-24',
+        'hidden lg:block sticky top-24 rounded-xl border bg-card p-6 shadow-lg',
         className
       )}
     >
-      <CardHeader className="space-y-1 pb-4">
-        {hasDiscount && (
-          <div className="flex items-center justify-between mb-2">
-            <Badge variant="destructive" className="font-bold">
-              Save {discountPercent}%
-            </Badge>
-            <span className="text-sm text-muted-foreground line-through">
-              {formatPrice(originalPrice, tour.currency)}
-            </span>
-          </div>
-        )}
-        <div className="flex items-baseline gap-1">
+      {/* Price section */}
+      <div className="space-y-1">
+        <div className="flex items-baseline gap-2">
+          <span className="text-sm text-muted-foreground">From</span>
           <span className="text-3xl font-bold text-foreground">
             {formatPrice(price, tour.currency)}
           </span>
-          <span className="text-muted-foreground">/ person</span>
         </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          {tour.isInstantBooking && (
-            <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
-              <Zap className="h-4 w-4 fill-emerald-100 dark:fill-emerald-900" />
-              <span className="font-medium">Instant confirmation</span>
-            </div>
-          )}
-          {tour.hasFreeCancellation && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ShieldCheck className="h-4 w-4" />
-              <span>Free cancellation up to 24h</span>
-            </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">per adult</span>
+          {hasDiscount && (
+            <>
+              <span className="text-sm text-muted-foreground line-through">
+                {formatPrice(originalPrice, tour.currency)}
+              </span>
+              <Badge variant="destructive" className="text-xs">
+                -{discountPercent}%
+              </Badge>
+            </>
           )}
         </div>
+      </div>
 
-        <AvailabilityInfo tour={tour} />
-      </CardContent>
+      <Separator className="my-5" />
 
-      <CardFooter className="flex flex-col gap-3">
-        <Button
-          size="lg"
-          className="w-full text-lg font-semibold shadow-md active:scale-95 transition-transform"
-          onClick={onBook}
-        >
-          <Send className="mr-2 h-4 w-4" />
-          {tour.availabilityType === 'BY_REQUEST'
-            ? t('bookings.request_booking', 'Request Booking')
-            : t('bookings.book_now', 'Book Now')}
-        </Button>
+      {/* Availability */}
+      <AvailabilityInfo tour={tour} />
+
+      <Separator className="my-5" />
+
+      {/* Cancellation policy */}
+      {tour.hasFreeCancellation && (
+        <>
+          <div className="flex items-start gap-3 text-sm">
+            <ShieldCheck className="h-4 w-4 mt-0.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div>
+              <span className="font-semibold text-foreground">Cancellation policy</span>
+              <p className="text-muted-foreground mt-1">
+                Cancel anytime before your experience for a full refund.
+              </p>
+            </div>
+          </div>
+          <Separator className="my-5" />
+        </>
+      )}
+
+      {/* Instant confirmation */}
+      {tour.isInstantBooking && (
+        <>
+          <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+            <Zap className="h-4 w-4" />
+            <span className="font-medium">Instant confirmation</span>
+          </div>
+          <Separator className="my-5" />
+        </>
+      )}
+
+      {/* Secondary actions */}
+      <div className="space-y-2">
         {onAskQuestion && (
           <Button
-            variant="ghost"
-            size="sm"
-            className="w-full text-muted-foreground hover:text-foreground"
+            variant="outline"
+            size="default"
+            className="w-full"
             onClick={onAskQuestion}
           >
             <MessageCircle className="mr-2 h-4 w-4" />
-            {t('bookings.ask_question', 'Ask a Question')}
+            {t('bookings.ask_question', 'Ask a question')}
           </Button>
         )}
         <ChatButton
           otherUserId={tour.ownerId}
-          variant="outline"
-          size="lg"
+          variant="ghost"
+          size="default"
           label="Message Host"
-          className="w-full"
+          className="w-full text-muted-foreground hover:text-foreground"
         />
-      </CardFooter>
-    </Card>
+      </div>
+
+      {/* Primary CTA — at the bottom */}
+      <Button
+        size="lg"
+        className="w-full text-base font-semibold h-12 rounded-full shadow-md active:scale-[0.98] transition-all mt-5"
+        onClick={onBook}
+      >
+        {tour.availabilityType === 'BY_REQUEST'
+          ? t('bookings.request_booking', 'Request Booking')
+          : t('bookings.reserve_now', 'Reserve Now')}
+      </Button>
+    </div>
   );
 };

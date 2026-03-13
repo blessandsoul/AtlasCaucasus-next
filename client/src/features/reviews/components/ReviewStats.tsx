@@ -20,19 +20,31 @@ interface RatingBarProps {
   total: number;
 }
 
-const RatingBar = ({ rating, count, total }: RatingBarProps) => {
+const RATING_LABELS: Record<number, string> = {
+  5: 'Excellent',
+  4: 'Very good',
+  3: 'Average',
+  2: 'Poor',
+  1: 'Terrible',
+};
+
+const RatingBar = ({ rating, count, total }: RatingBarProps): React.ReactElement => {
   const percentage = total > 0 ? (count / total) * 100 : 0;
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="w-3 text-muted-foreground">{rating}</span>
+    <div className="flex items-center gap-3 text-sm">
+      <span className="w-20 text-muted-foreground text-right shrink-0">
+        {RATING_LABELS[rating]}
+      </span>
       <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
         <div
-          className="h-full bg-amber-400 rounded-full transition-all duration-300"
+          className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-300"
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <span className="w-8 text-right text-muted-foreground text-xs">{count}</span>
+      <span className="w-10 text-right text-muted-foreground text-xs tabular-nums">
+        {count}
+      </span>
     </div>
   );
 };
@@ -42,7 +54,7 @@ export const ReviewStats = ({
   targetId,
   showDistribution = false,
   className,
-}: ReviewStatsProps) => {
+}: ReviewStatsProps): React.ReactElement | null => {
   const { t } = useTranslation();
   const { data: stats, isLoading, error } = useReviewStats(targetType, targetId);
 
@@ -55,9 +67,9 @@ export const ReviewStats = ({
           <Skeleton className="h-4 w-20" />
         </div>
         {showDistribution && (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {[5, 4, 3, 2, 1].map((n) => (
-              <Skeleton key={n} className="h-4 w-full" />
+              <Skeleton key={n} className="h-5 w-full" />
             ))}
           </div>
         )}
@@ -80,7 +92,7 @@ export const ReviewStats = ({
   }
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('space-y-4', className)}>
       {/* Summary */}
       <div className="flex items-center gap-3">
         <span className="text-3xl font-bold">
@@ -96,7 +108,7 @@ export const ReviewStats = ({
 
       {/* Distribution */}
       {showDistribution && ratingDistribution && (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {([5, 4, 3, 2, 1] as const).map((rating) => (
             <RatingBar
               key={rating}

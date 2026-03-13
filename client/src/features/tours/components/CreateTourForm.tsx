@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { CalendarIcon, Loader2, Upload, X, Check, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { CalendarIcon, Loader2, Upload, X, Check, Plus, Trash2, ArrowUp, ArrowDown, MapPin } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -47,10 +47,13 @@ import { cn } from "@/lib/utils";
 
 import { tourService } from '../services/tour.service';
 import type { CreateTourInput } from '../types/tour.types';
+import { useLocations } from '@/features/locations/hooks/useLocations';
 
 export const CreateTourForm = () => {
     const { t } = useTranslation();
     const router = useRouter();
+    const { data: locationsData } = useLocations({ limit: 100 });
+    const locations = locationsData?.items ?? [];
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,6 +110,7 @@ export const CreateTourForm = () => {
             description: z.string()
                 .min(1, t('tours.create.validation.itinerary_desc_required', 'Step description is required'))
                 .max(2000, t('tours.create.validation.itinerary_desc_max', 'Step description must be at most 2000 characters')),
+            locationId: z.string().uuid().nullable().optional(),
         })).max(30).optional(),
     }), [t]);
 
@@ -137,7 +141,7 @@ export const CreateTourForm = () => {
 
     const handleAddStep = useCallback((): void => {
         if (itineraryFields.length >= 30) return;
-        appendStep({ title: '', description: '' });
+        appendStep({ title: '', description: '', locationId: null });
     }, [itineraryFields.length, appendStep]);
 
     const handleMoveUp = useCallback((index: number): void => {
@@ -594,6 +598,37 @@ export const CreateTourForm = () => {
                                                                         />
                                                                     </FormControl>
                                                                     <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`itinerary.${index}.locationId`}
+                                                            render={({ field: locField }) => (
+                                                                <FormItem>
+                                                                    <Select
+                                                                        value={locField.value ?? ''}
+                                                                        onValueChange={(val) => locField.onChange(val === 'none' ? null : val)}
+                                                                    >
+                                                                        <FormControl>
+                                                                            <SelectTrigger className="h-9">
+                                                                                <div className="flex items-center gap-2 text-sm">
+                                                                                    <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                                                                    <SelectValue placeholder={t('tours.create.itinerary_link_location', 'Link to map location (optional)')} />
+                                                                                </div>
+                                                                            </SelectTrigger>
+                                                                        </FormControl>
+                                                                        <SelectContent>
+                                                                            <SelectItem value="none">
+                                                                                {t('tours.create.itinerary_no_location', 'No location')}
+                                                                            </SelectItem>
+                                                                            {locations.map((loc) => (
+                                                                                <SelectItem key={loc.id} value={loc.id}>
+                                                                                    {loc.name}{loc.region ? `, ${loc.region}` : ''}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
                                                                 </FormItem>
                                                             )}
                                                         />

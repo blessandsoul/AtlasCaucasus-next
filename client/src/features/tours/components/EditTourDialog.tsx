@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { CalendarIcon, X, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { CalendarIcon, X, Plus, Trash2, ArrowUp, ArrowDown, MapPin } from 'lucide-react';
 
 import {
     Dialog,
@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils';
 import { useUpdateTour } from '../hooks/useTours';
 import { TourImageManager } from './TourImageManager';
 import type { Tour, UpdateTourInput, AvailabilityType } from '../types/tour.types';
+import { useLocations } from '@/features/locations/hooks/useLocations';
 
 const editTourSchema = z.object({
     title: z.string().min(3, 'Title must be at least 3 characters').max(200),
@@ -58,6 +59,7 @@ const editTourSchema = z.object({
     itinerary: z.array(z.object({
         title: z.string().min(1, 'Step title is required').max(200),
         description: z.string().min(1, 'Step description is required').max(2000),
+        locationId: z.string().uuid().nullable().optional(),
     })).max(30).optional(),
 });
 
@@ -72,6 +74,8 @@ interface EditTourDialogProps {
 export const EditTourDialog = ({ tour, open, onOpenChange }: EditTourDialogProps) => {
     const { t } = useTranslation();
     const updateTour = useUpdateTour();
+    const { data: locationsData } = useLocations({ limit: 100 });
+    const locationsList = locationsData?.items ?? [];
 
     const {
         register,
@@ -109,7 +113,7 @@ export const EditTourDialog = ({ tour, open, onOpenChange }: EditTourDialogProps
 
     const handleAddStep = useCallback((): void => {
         if (itineraryFields.length >= 30) return;
-        appendStep({ title: '', description: '' });
+        appendStep({ title: '', description: '', locationId: null });
     }, [itineraryFields.length, appendStep]);
 
     const handleMoveUp = useCallback((index: number): void => {
@@ -452,6 +456,27 @@ export const EditTourDialog = ({ tour, open, onOpenChange }: EditTourDialogProps
                                             {errors.itinerary?.[index]?.description && (
                                                 <p className="text-xs text-destructive">{errors.itinerary[index].description?.message}</p>
                                             )}
+                                            <Select
+                                                value={watch(`itinerary.${index}.locationId`) ?? ''}
+                                                onValueChange={(val) => setValue(`itinerary.${index}.locationId`, val === 'none' ? null : val)}
+                                            >
+                                                <SelectTrigger className="h-8">
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                                        <SelectValue placeholder={t('tours.create.itinerary_link_location', 'Link to map location (optional)')} />
+                                                    </div>
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="none">
+                                                        {t('tours.create.itinerary_no_location', 'No location')}
+                                                    </SelectItem>
+                                                    {locationsList.map((loc) => (
+                                                        <SelectItem key={loc.id} value={loc.id}>
+                                                            {loc.name}{loc.region ? `, ${loc.region}` : ''}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
                                         <div className="flex flex-col gap-0.5 shrink-0">

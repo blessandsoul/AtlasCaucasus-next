@@ -6,6 +6,22 @@ export type AvailabilityType = 'DAILY' | 'WEEKDAYS' | 'WEEKENDS' | 'SPECIFIC_DAT
 export interface ItineraryStep {
     title: string;
     description: string;
+    duration?: number | null;
+    stopType?: 'stop' | 'pass_by' | null;
+    locationId?: string | null;
+    locationName?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+}
+
+export interface TourLocation {
+    locationId: string;
+    name: string;
+    region: string | null;
+    country: string;
+    latitude: number | null;
+    longitude: number | null;
+    order: number;
 }
 
 export interface Tour {
@@ -39,6 +55,7 @@ export interface Tour {
     images?: TourImage[];
     averageRating: string | null;
     reviewCount: number;
+    locations?: TourLocation[];
 }
 
 export interface TourImage {

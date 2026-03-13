@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hooks';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,7 +29,7 @@ export const ReviewsSection = ({
   targetType,
   targetId,
   className,
-}: ReviewsSectionProps) => {
+}: ReviewsSectionProps): React.ReactElement => {
   const { t } = useTranslation();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
@@ -48,11 +47,11 @@ export const ReviewsSection = ({
   const hasReviewed = hasReviewedData?.hasReviewed ?? false;
   const existingReview = hasReviewedData?.review ?? null;
 
-  const handleEditReview = (review: Review) => {
+  const handleEditReview = (review: Review): void => {
     setEditingReview(review);
   };
 
-  const handleDeleteReview = (review: Review) => {
+  const handleDeleteReview = (review: Review): void => {
     setDeletingId(review.id);
     deleteReview.mutate(
       {
@@ -68,84 +67,84 @@ export const ReviewsSection = ({
     );
   };
 
-  const handleReviewSuccess = () => {
+  const handleReviewSuccess = (): void => {
     setShowWriteReview(false);
     setEditingReview(null);
   };
 
   return (
-    <Card className={cn('', className)}>
-      <CardHeader>
-        <CardTitle>{t('reviews.section_title')}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Stats */}
-        <ReviewStats
-          targetType={targetType}
-          targetId={targetId}
-          showDistribution
-        />
+    <div className={cn('space-y-6', className)} id="reviews-section">
+      {/* Section heading */}
+      <h2 className="text-xl font-bold tracking-tight text-foreground">
+        {t('reviews.section_title')}
+      </h2>
 
-        <Separator />
+      {/* Stats */}
+      <ReviewStats
+        targetType={targetType}
+        targetId={targetId}
+        showDistribution
+      />
 
-        {/* Write Review Button / Form */}
-        {isAuthenticated && !checkingReview && (
-          <div>
-            {hasReviewed && existingReview ? (
-              <div className="bg-muted/50 rounded-lg p-4">
-                <p className="text-sm text-muted-foreground mb-2">
-                  {t('reviews.already_reviewed')}
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditingReview(existingReview)}
-                >
-                  {t('reviews.edit_your_review')}
-                </Button>
-              </div>
-            ) : (
-              <div>
-                {showWriteReview ? (
-                  <div className="border rounded-lg p-4">
-                    <h4 className="font-medium mb-4">
-                      {t('reviews.write_review')}
-                    </h4>
-                    <ReviewForm
-                      targetType={targetType}
-                      targetId={targetId}
-                      onSuccess={handleReviewSuccess}
-                      onCancel={() => setShowWriteReview(false)}
-                    />
-                  </div>
-                ) : (
-                  <Button onClick={() => setShowWriteReview(true)}>
+      <Separator />
+
+      {/* Write Review Button / Form */}
+      {isAuthenticated && !checkingReview && (
+        <div>
+          {hasReviewed && existingReview ? (
+            <div className="bg-muted/50 rounded-lg p-4">
+              <p className="text-sm text-muted-foreground mb-2">
+                {t('reviews.already_reviewed')}
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingReview(existingReview)}
+              >
+                {t('reviews.edit_your_review')}
+              </Button>
+            </div>
+          ) : (
+            <div>
+              {showWriteReview ? (
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium mb-4">
                     {t('reviews.write_review')}
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                  </h4>
+                  <ReviewForm
+                    targetType={targetType}
+                    targetId={targetId}
+                    onSuccess={handleReviewSuccess}
+                    onCancel={() => setShowWriteReview(false)}
+                  />
+                </div>
+              ) : (
+                <Button onClick={() => setShowWriteReview(true)}>
+                  {t('reviews.write_review')}
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
-        {!isAuthenticated && (
-          <p className="text-sm text-muted-foreground">
-            {t('reviews.login_to_review')}
-          </p>
-        )}
+      {!isAuthenticated && (
+        <p className="text-sm text-muted-foreground">
+          {t('reviews.login_to_review')}
+        </p>
+      )}
 
-        <Separator />
+      <Separator />
 
-        {/* Reviews List */}
-        <ReviewList
-          targetType={targetType}
-          targetId={targetId}
-          currentUserId={user?.id}
-          onEditReview={handleEditReview}
-          onDeleteReview={handleDeleteReview}
-          isDeletingId={deletingId ?? undefined}
-        />
-      </CardContent>
+      {/* Reviews List */}
+      <ReviewList
+        targetType={targetType}
+        targetId={targetId}
+        currentUserId={user?.id}
+        onEditReview={handleEditReview}
+        onDeleteReview={handleDeleteReview}
+        isDeletingId={deletingId ?? undefined}
+      />
 
       {/* Edit Review Dialog */}
       <Dialog
@@ -172,6 +171,6 @@ export const ReviewsSection = ({
           )}
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   );
 };

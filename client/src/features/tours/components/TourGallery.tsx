@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import type { TourImage } from '@/features/tours/types/tour.types';
 import { cn } from '@/lib/utils';
-import { ImageOff, Grid } from 'lucide-react';
+import { ImageOff, Camera } from 'lucide-react';
 import { getMediaUrl } from '@/lib/utils/media';
-import { Button } from '@/components/ui/button';
 import { TourLightbox } from './TourLightbox';
 
 interface TourGalleryProps {
@@ -13,11 +12,11 @@ interface TourGalleryProps {
   className?: string;
 }
 
-export const TourGallery = ({ images = [], className }: TourGalleryProps) => {
+export const TourGallery = ({ images = [], className }: TourGalleryProps): React.ReactElement => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const openLightbox = (index: number) => {
+  const openLightbox = (index: number): void => {
     setLightboxIndex(index);
     setIsLightboxOpen(true);
   };
@@ -38,38 +37,7 @@ export const TourGallery = ({ images = [], className }: TourGalleryProps) => {
     );
   }
 
-  // Determine grid class based on image count
-  const getImageGridClass = (index: number, total: number) => {
-    // 5+ Images Layout
-    if (total >= 5) {
-      if (index === 0) return 'col-span-2 row-span-2 cursor-pointer'; // Main large
-      return 'col-span-1 row-span-1 cursor-pointer'; // Small squares
-    }
-
-    // 4 Images Layout
-    if (total === 4) {
-      if (index === 0) return 'col-span-2 row-span-2 cursor-pointer'; // Main large left
-      if (index === 1) return 'col-span-1 row-span-1 cursor-pointer'; // Top middle
-      if (index === 2) return 'col-span-1 row-span-1 cursor-pointer'; // Top right
-      return 'col-span-2 row-span-1 cursor-pointer'; // Bottom bar
-    }
-
-    // 3 Images Layout
-    if (total === 3) {
-      if (index === 0) return 'col-span-2 row-span-2 cursor-pointer'; // Main large left
-      return 'col-span-2 row-span-1 cursor-pointer'; // Right stacked
-    }
-
-    // 2 Images Layout
-    if (total === 2) {
-      return 'col-span-2 row-span-2 cursor-pointer'; // Split vertically
-    }
-
-    // 1 Image Layout
-    return 'col-span-4 row-span-2 cursor-pointer';
-  };
-
-  const displayImages = images.slice(0, 5);
+  const displayImages = images.slice(0, 3);
 
   return (
     <div className={cn('relative w-full group', className)}>
@@ -92,57 +60,87 @@ export const TourGallery = ({ images = [], className }: TourGalleryProps) => {
         ))}
       </div>
 
-      {/* Desktop/Tablet: BENTO GRID (>= 500px) */}
-      <div className="hidden min-[500px]:grid grid-cols-4 grid-rows-2 gap-2 h-[350px] md:h-[500px] rounded-xl overflow-hidden">
-        {displayImages.map((img, index) => (
+      {/* Desktop/Tablet: TripAdvisor 1+2 Grid (>= 500px) */}
+      <div className="hidden min-[500px]:block">
+        {/* Single image layout */}
+        {displayImages.length === 1 && (
           <div
-            key={img.id || index}
-            className={cn(
-              "relative overflow-hidden group/image",
-              getImageGridClass(index, images.length)
-            )}
-            onClick={() => openLightbox(index)}
-          >
-            <img
-              src={getMediaUrl(img.url)}
-              alt={img.altText || `Tour image ${index + 1}`}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover/image:scale-105"
-            />
-
-            {/* Overlay for "View All" on the last image if there are more */}
-            {index === 4 && images.length > 5 && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-medium text-lg backdrop-blur-[2px] transition-colors hover:bg-black/60">
-                +{images.length - 5} more
-              </div>
-            )}
-
-            {/* Hover overlay for interaction hint */}
-            <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 transition-colors duration-300" />
-
-            {/* Index 0 Cover Badge */}
-            {index === 0 && (
-              <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded-md font-medium shadow-sm z-10">
-                Cover
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* View All Button (Desktop Floating) */}
-      {images.length > 0 && (
-        <div className="hidden md:block absolute bottom-4 right-4 pointer-events-none">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="shadow-md gap-2 pointer-events-auto"
+            className="relative h-[350px] md:h-[450px] rounded-xl overflow-hidden cursor-pointer group/image"
             onClick={() => openLightbox(0)}
           >
-            <Grid className="w-4 h-4" />
-            Show all photos
-          </Button>
-        </div>
-      )}
+            <img
+              src={getMediaUrl(displayImages[0].url)}
+              alt={displayImages[0].altText || 'Tour image 1'}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover/image:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 transition-colors duration-300" />
+            {/* Photo count badge */}
+            {images.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); openLightbox(0); }}
+                className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 text-white text-sm font-medium rounded-full backdrop-blur-sm hover:bg-black/75 transition-colors"
+              >
+                <Camera className="h-4 w-4" />
+                <span>{images.length}</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Multi-image grid: 1 large + 2 stacked */}
+        {displayImages.length >= 2 && (
+          <div className="grid grid-cols-[3fr_1fr] gap-1 h-[350px] md:h-[450px] rounded-xl overflow-hidden">
+            {/* Large main image (left) */}
+            <div
+              className="relative overflow-hidden cursor-pointer group/image"
+              onClick={() => openLightbox(0)}
+            >
+              <img
+                src={getMediaUrl(displayImages[0].url)}
+                alt={displayImages[0].altText || 'Tour image 1'}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover/image:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 transition-colors duration-300" />
+
+              {/* Photo count badge */}
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); openLightbox(0); }}
+                className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 text-white text-sm font-medium rounded-full backdrop-blur-sm hover:bg-black/75 transition-colors"
+              >
+                <Camera className="h-4 w-4" />
+                <span>{images.length}</span>
+              </button>
+            </div>
+
+            {/* Right side: 2 stacked images */}
+            <div className="grid grid-rows-2 gap-1">
+              {displayImages.slice(1, 3).map((img, i) => {
+                const actualIndex = i + 1;
+                return (
+                  <div
+                    key={img.id || actualIndex}
+                    className="relative overflow-hidden cursor-pointer group/image"
+                    onClick={() => openLightbox(actualIndex)}
+                  >
+                    <img
+                      src={getMediaUrl(img.url)}
+                      alt={img.altText || `Tour image ${actualIndex + 1}`}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover/image:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 transition-colors duration-300" />
+                  </div>
+                );
+              })}
+              {/* Fill empty slot if only 2 images */}
+              {displayImages.length < 3 && (
+                <div className="bg-muted" />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Lightbox Component */}
       <TourLightbox

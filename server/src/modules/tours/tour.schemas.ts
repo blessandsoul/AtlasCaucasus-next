@@ -21,6 +21,7 @@ export const createTourSchema = z.object({
   itinerary: z.array(z.object({
     title: z.string().min(1, "Itinerary step title is required").max(200, "Title must be at most 200 characters"),
     description: z.string().min(1, "Itinerary step description is required").max(2000, "Description must be at most 2000 characters"),
+    locationId: z.string().uuid("Invalid location ID format").nullable().optional(),
   })).max(30, "Maximum 30 itinerary steps").optional(),
 });
 
@@ -45,6 +46,7 @@ export const updateTourSchema = z.object({
   itinerary: z.array(z.object({
     title: z.string().min(1, "Itinerary step title is required").max(200, "Title must be at most 200 characters"),
     description: z.string().min(1, "Itinerary step description is required").max(2000, "Description must be at most 2000 characters"),
+    locationId: z.string().uuid("Invalid location ID format").nullable().optional(),
   })).max(30, "Maximum 30 itinerary steps").nullable().optional(),
 });
 

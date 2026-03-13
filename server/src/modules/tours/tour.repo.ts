@@ -1,6 +1,6 @@
 import { prisma } from "../../libs/prisma.js";
 import type { Tour as PrismaTour } from "@prisma/client";
-import type { CreateTourData, UpdateTourData, SafeTour, TourDifficulty } from "./tour.types.js";
+import type { CreateTourData, UpdateTourData, SafeTour, SafeTourLocation, SafeItineraryStep, ItineraryStep, TourDifficulty } from "./tour.types.js";
 import { getMediaByEntity, getMediaByEntityIds } from "../media/media.repo.js";
 import type { SafeMedia } from "../media/media.types.js";
 import { logger } from "../../libs/logger.js";
@@ -39,6 +39,47 @@ function toSafeTour(tour: PrismaTour): SafeTour {
     averageRating: tour.averageRating?.toString() ?? null,
     reviewCount: tour.reviewCount,
   };
+}
+
+// Resolve locationIds in itinerary steps to full location data (name, lat, lng)
+async function resolveItineraryLocations(
+  steps: ItineraryStep[]
+): Promise<SafeItineraryStep[]> {
+  const locationIds = steps
+    .map((s) => s.locationId)
+    .filter((id): id is string => id != null);
+
+  if (locationIds.length === 0) {
+    return steps.map((s) => ({ ...s }));
+  }
+
+  const uniqueIds = [...new Set(locationIds)];
+  const locations = await prisma.location.findMany({
+    where: { id: { in: uniqueIds } },
+    select: { id: true, name: true, latitude: true, longitude: true },
+  });
+
+  const locationMap = new Map(
+    locations.map((loc) => [
+      loc.id,
+      {
+        name: loc.name,
+        latitude: loc.latitude ? Number(loc.latitude) : null,
+        longitude: loc.longitude ? Number(loc.longitude) : null,
+      },
+    ])
+  );
+
+  return steps.map((step) => {
+    const loc = step.locationId ? locationMap.get(step.locationId) : undefined;
+    return {
+      ...step,
+      locationId: step.locationId ?? null,
+      locationName: loc?.name ?? null,
+      latitude: loc?.latitude ?? null,
+      longitude: loc?.longitude ?? null,
+    };
+  });
 }
 
 // Convert Prisma Tour to SafeTour with media (single tour - still makes individual query)
@@ -123,9 +164,35 @@ export async function createTour(
 export async function getTourById(id: string): Promise<SafeTour | null> {
   const tour = await prisma.tour.findUnique({
     where: { id },
+    include: {
+      locations: {
+        include: { location: true },
+        orderBy: { order: 'asc' },
+      },
+    },
   });
 
-  return tour ? await toSafeTourWithMedia(tour) : null;
+  if (!tour) return null;
+
+  const safeTour = await toSafeTourWithMedia(tour);
+
+  // Resolve itinerary step locations (lat/lng from Location table)
+  const resolvedItinerary = safeTour.itinerary
+    ? await resolveItineraryLocations(safeTour.itinerary)
+    : null;
+
+  // Map associated locations with coordinates
+  const locations: SafeTourLocation[] = tour.locations.map((tl) => ({
+    locationId: tl.location.id,
+    name: tl.location.name,
+    region: tl.location.region,
+    country: tl.location.country,
+    latitude: tl.location.latitude ? Number(tl.location.latitude) : null,
+    longitude: tl.location.longitude ? Number(tl.location.longitude) : null,
+    order: tl.order,
+  }));
+
+  return { ...safeTour, itinerary: resolvedItinerary, locations };
 }
 
 export async function listToursByOwner(
